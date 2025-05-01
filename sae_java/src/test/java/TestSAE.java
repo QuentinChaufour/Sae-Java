@@ -1,13 +1,12 @@
 
-import java.lang.reflect.Array;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestSAE {
     
@@ -87,18 +86,30 @@ public class TestSAE {
         Livre livre1 = new Livre("120","La Guerre des mondes",  Arrays.asList(new Auteur(1,"H.G. Wells")), "Gallimard", 1898,9.99, 159, "Science Fiction");
         Livre livre2 = new Livre("121","Le Petit Prince",  Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry")), "Gallimard", 1943, 7.99, 96, "Roman");
 
+        Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
         // Test ajout de livres
-        panier.ajouterLivre(livre1);
-        panier.ajouterLivre(livre2);
+        panier.ajouterLivre(livre1,librairie);
+        panier.ajouterLivre(livre2,librairie);
 
-        assertTrue(panier.getContenu().contains(livre1));
-        assertTrue(panier.getContenu().contains(livre2));
+        Map<Librairie,Map<Livre,Integer>> contenu = new HashMap<>();
+        contenu.put(librairie, new HashMap<>());
+        contenu.get(librairie).put(livre1, 1);
+        contenu.get(librairie).put(livre2, 1);
 
-        assertTrue(panier.getContenu().equals(Arrays.asList(livre1, livre2)));
+        assertTrue(panier.getContenu().equals(contenu));
+        assertTrue(panier.getLivres().contains(livre1));
+        assertTrue(panier.getLivres().contains(livre2));
+
+        assertEquals(17.98, panier.getPrixTotal(), 0.00);
 
         // Test suppression de livres
-        panier.removeLivre(livre1);
-        assertFalse(panier.getContenu().contains(livre1));
+        panier.removeLivre(livre2,librairie);
+        assertFalse(panier.getLivres().contains(livre2));
+
+        panier.viderPanier();
+        assertTrue(panier.getLivres().isEmpty());
+        assertTrue(panier.getContenu().isEmpty());
+        assertEquals(0.0, panier.getPrixTotal(), 0.00);
 
     }
 
