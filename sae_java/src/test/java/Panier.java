@@ -25,9 +25,7 @@ public class Panier {
         // si livre existe déjà dans le panier
         if(this.contenu.containsKey(librairie)){
             if(this.contenu.get(librairie).containsKey(livre)){
-                Integer quantite = this.contenu.get(librairie).get(livre);
-                quantite += qte; // Incrémente la quantité
-                this.contenu.get(librairie).put(livre, quantite); // Met à jour la quantité
+                this.contenu.get(librairie).put(livre,this.contenu.get(librairie).getOrDefault(livre, 0) + qte); // Met à jour la quantité
             }
             else {
                 this.contenu.get(librairie).put(livre, qte); // Ajoute le livre avec sa quantité
@@ -49,8 +47,7 @@ public class Panier {
             if(this.contenu.get(librairie).containsKey(livre)){
                 int quantite = this.contenu.get(librairie).get(livre);
                 if (quantite > qte) {
-                    quantite -= qte; // Décrémente la quantité
-                    this.contenu.get(librairie).put(livre, quantite); // Met à jour la quantité
+                    this.contenu.get(librairie).put(livre,this.contenu.get(librairie).get(livre) - qte); // Met à jour la quantité // Met à jour la quantité
                     this.prixTotal -= livre.getPrix() * qte; 
                 } 
                 else if (quantite == qte) {

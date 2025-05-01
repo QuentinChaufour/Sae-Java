@@ -135,4 +135,29 @@ public class TestSAE {
         }
     }
 
+    @Test
+    public void testLibrairieStock() {
+        Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+
+        // Test ajout de livres au stock
+        try {
+            librairie.ajouterLivre(livre, 5);
+            assertTrue(librairie.consulterStock().containsKey(livre));
+            assertEquals(5, (int) librairie.consulterStock().get(livre));
+
+            librairie.ajouterLivre(livre2, 0);
+
+
+        } catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide : " + e.getMessage());
+        }
+
+        // Test consultation du stock
+        assertTrue(librairie.consulterStock().containsKey(livre));
+        assertTrue(librairie.consulterStock().get(livre) == 5);
+
+    }
+
 }
