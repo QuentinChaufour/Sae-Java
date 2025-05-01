@@ -109,6 +109,33 @@ public class Librairie {
     }
 
     /**
+     * permet de retirer un livre de la librairie en une certaine quantité
+     * @param livre : Livre
+     * @param quantite : int
+     */
+    public void retirerLivre(Livre livre,int quantite) throws QuantiteInvalideException , BookNotInStockException {
+        
+        if (this.livreseEnStock.containsKey(livre)) {
+
+            int qte = this.livreseEnStock.get(livre);
+            if (qte > quantite) {
+                this.livreseEnStock.put(livre, qte - quantite);
+            } 
+            else if (qte == quantite) {
+                this.livreseEnStock.remove(livre);
+                this.livresDisponibles.remove(livre);
+            } 
+            else {
+                throw new QuantiteInvalideException();
+            }
+        } 
+        else {
+           throw new BookNotInStockException();
+        }
+    }
+
+
+    /**
      * permet l'affichage de la librairie
      */
     @Override
