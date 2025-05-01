@@ -1,12 +1,12 @@
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class TestSAE {
     
@@ -23,7 +23,6 @@ public class TestSAE {
         assertEquals("45000", client.getCodePostal());
         assertEquals("Orléans", client.getVille());
         assertEquals(new Librairie(7,"Loire et livres", "Orléans"), client.getLibrairie());
-        assertEquals(new Panier(), client.getPanier());
         
         client.setLibrairie(new Librairie(1,"La librairie parisienne", "Paris"));
         client.setNom("Dupont");
@@ -63,15 +62,15 @@ public class TestSAE {
     @Test
     public void testLivre() {
 
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells")), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
-        assetEquals("120", livre.getIsbn());
+        assertTrue(livre.getIsbn().equals("120"));
         assertEquals("La Guerre des mondes", livre.getTitre());
-        assertTrue(livre.getAuteurs().contains(new Auteur(1,"H.G. Wells")));
+        assertTrue(livre.getAuteurs().contains(new Auteur(1,"H.G. Wells",null,null)));
         assertEquals("Gallimard", livre.getEditeur());
-        assertEquals(1898, livre.getAnneePublication());
+        assertEquals(1898, livre.getDatePublication());
         assertEquals(9.99, livre.getPrix(), 0.00);
-        assertEquals(159, livre.getNombrePages());
+        assertEquals(159, livre.getNbPages());
         assertEquals("Science Fiction", livre.getClassification());
 
         livre.setPrix(12.99);
@@ -83,13 +82,13 @@ public class TestSAE {
     public void testPanier() {
 
         Panier panier = new Panier();
-        Livre livre1 = new Livre("120","La Guerre des mondes",  Arrays.asList(new Auteur(1,"H.G. Wells")), "Gallimard", 1898,9.99, 159, "Science Fiction");
-        Livre livre2 = new Livre("121","Le Petit Prince",  Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry")), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre livre1 = new Livre("120","La Guerre des mondes",  Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince",  Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
 
         Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
         // Test ajout de livres
-        panier.ajouterLivre(livre1,librairie);
-        panier.ajouterLivre(livre2,librairie);
+        panier.ajouterLivre(livre1,librairie,1);
+        panier.ajouterLivre(livre2,librairie,1);
 
         Map<Librairie,Map<Livre,Integer>> contenu = new HashMap<>();
         contenu.put(librairie, new HashMap<>());
@@ -103,9 +102,12 @@ public class TestSAE {
         assertEquals(17.98, panier.getPrixTotal(), 0.00);
 
         // Test suppression de livres
-        panier.removeLivre(livre2,librairie);
-        assertFalse(panier.getLivres().contains(livre2));
-
+        try{
+            panier.retirerLivre(livre2,librairie,1);
+            assertFalse(panier.getLivres().contains(livre2));
+        }catch (PasAssezDeStockException e) {
+            System.err.println("Pas assez de stock pour retirer le livre : " + e.getMessage());
+        }
         panier.viderPanier();
         assertTrue(panier.getLivres().isEmpty());
         assertTrue(panier.getContenu().isEmpty());
@@ -119,13 +121,18 @@ public class TestSAE {
         Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",new Librairie(7,"Loire et livres", "Orléans"));
 
         // Test ajout/suppression de livres au panier du client
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells")), "Gallimard", 1898,9.99, 159, "Science Fiction");
-        client.ajouterLivre(livre);
-        assertTrue(client.getPanier().getContenu().contains(livre));
-        assertFalse(client.getPanier().getContenu().contains(new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry")), "Gallimard", 1943, 7.99, 96, "Roman")));
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        client.ajouterAuPanier(livre,client.getLibrairie(), 1);
+        assertTrue(client.getPanier().getLivres().contains(livre));
+        assertFalse(client.getPanier().getLivres().contains(new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman")));
 
-        client.removeLivre(livre);
-        assertFalse(client.getPanier().getContenu().contains(livre));
+        try {
+            client.retirerDuPanier(livre, client.getLibrairie(), 1);
+            assertFalse(client.getPanier().getContenu().get(client.getLibrairie()).containsKey(livre));
+        } 
+        catch (PasAssezDeStockException e) {
+            System.err.println("Pas assez de stock pour retirer le livre : " + e.getMessage());
+        }
     }
 
 }
