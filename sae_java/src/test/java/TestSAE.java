@@ -177,9 +177,25 @@ public class TestSAE {
         assertTrue(librairie.consulterStock().containsKey(livre));
         assertFalse(librairie.consulterStock().containsKey(livre2));
 
-        System.out.println(librairie.consulterStock().get(livre));
         assertTrue(librairie.consulterStock().get(livre) == 5);
 
     }
 
+    @Test
+    public void testConsultationClient(){
+
+        Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
+        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+
+        try{
+            librairie.ajouterLivre(livre,3);
+        }
+        catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide");
+        }
+
+        assertTrue(client.consulterLivres().containsKey(livre));
+
+    }
 }

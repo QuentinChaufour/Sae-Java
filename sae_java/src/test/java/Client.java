@@ -1,3 +1,5 @@
+import java.util.HashMap;
+import java.util.Map;
 
 public class Client extends Personne{
     
@@ -118,6 +120,10 @@ public class Client extends Personne{
      */
     public Panier getPanier() {
         return this.panier;
+    }
+
+    public Map<Livre, Integer> consulterLivres() {
+        return new HashMap<>(this.librairie.consulterStock());
     }
 
     /**
