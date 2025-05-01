@@ -35,4 +35,22 @@ public class TestSAE {
         // pas de setteur pour idClient car c'est un attribut non modifiable (final)
     }
 
+    @Test
+    public void testLibrairieBasics() {
+        Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
+
+        // Test getters
+        assertEquals(1, librairie.getIdLibrairie());
+        assertEquals("La librairie parisienne", librairie.getNom());
+        assertEquals("Paris", librairie.getVille());
+
+        // Test setters
+        librairie.setNom("La librairie de Lyon");
+        //pas de setteur pour idLibrairie car c'est un attribut non modifiable (final)
+        librairie.setVille("Lyon"); // possible de changer la ville mais inutile car si une librairie est déplacée dans une autre ville, il faut créer une nouvelle librairie
+
+        assertEquals("La librairie de Lyon", librairie.getNom());
+        assertEquals("Lyon", librairie.getVille());
+    }
+
 }
