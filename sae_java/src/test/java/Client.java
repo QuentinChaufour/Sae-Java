@@ -6,6 +6,7 @@ public class Client extends Personne{
     private String codePostal;
     private String ville;
     private Librairie librairie;
+    private Panier panier;
 
 
     /**
@@ -26,6 +27,7 @@ public class Client extends Personne{
         this.ville = ville;
 
         this.librairie = librairie;
+        this.panier = new Panier();
     }
 
     /**
@@ -107,6 +109,53 @@ public class Client extends Personne{
      */
     public void setLibrairie(Librairie librairie) {
         this.librairie = librairie;
+    }
+
+    /**
+     * getteur du panier du client
+     * 
+     * @return le panier du client : Panier
+     */
+    public Panier getPanier() {
+        return this.panier;
+    }
+
+    /**
+     * ajoute un livre au panier du client
+     * 
+     * @param livre : Livre
+     * @param librairie : Librairie
+     * @param qte : int
+     */
+    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) {
+        panier.ajouterLivre(livre,librairie,qte);
+    }
+
+    /**
+     * retire un livre du panier du client
+     * 
+     * @param livre : Livre
+     * @param librairie : Librairie
+     * @param qte : int
+     */
+    public void retirerDuPanier(Livre livre,Librairie librairie,int qte) throws PasAssezDeStockException {
+        this.panier.retirerLivre(livre,librairie,qte);
+    }
+
+    /**
+     * vide le panier du client
+     * 
+     */
+    public void viderPanier() {
+        this.panier.viderPanier();
+    }
+
+    /**
+     * affiche le contenu du panier du client
+     * @return le panier : String
+     */
+    public String afficherPanier() {
+        return this.panier.toString();
     }
 
     /**
