@@ -25,8 +25,8 @@ public class TestSAE {
         client.setCodePostal("75000");
         client.setVille("Paris");
 
-        assertEquals("Jean", client.getNom());
-        assertEquals("Dupont", client.getPrenom());
+        assertEquals("Dupont", client.getNom());
+        assertEquals("Jean", client.getPrenom());
         assertEquals("456 avenue de la République", client.getAddress());
         assertEquals("75000", client.getCodePostal());
         assertEquals("Paris", client.getVille());
