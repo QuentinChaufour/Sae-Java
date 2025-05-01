@@ -106,7 +106,7 @@ public class TestSAE {
             panier.retirerLivre(livre2,librairie,1);
             assertFalse(panier.getLivres().contains(livre2));
         }catch (PasAssezDeStockException e) {
-            System.err.println("Pas assez de stock pour retirer le livre : " + e.getMessage());
+            System.err.println("Pas assez de stock pour retirer le livre");
         }
         panier.viderPanier();
         assertTrue(panier.getLivres().isEmpty());
@@ -131,7 +131,7 @@ public class TestSAE {
             assertFalse(client.getPanier().getContenu().get(client.getLibrairie()).containsKey(livre));
         } 
         catch (PasAssezDeStockException e) {
-            System.err.println("Pas assez de stock pour retirer le livre : " + e.getMessage());
+            System.err.println("Pas assez de stock pour retirer le livre");
         }
     }
 
@@ -145,17 +145,39 @@ public class TestSAE {
         try {
             librairie.ajouterLivre(livre, 5);
             assertTrue(librairie.consulterStock().containsKey(livre));
-            assertEquals(5, (int) librairie.consulterStock().get(livre));
+            assertTrue(librairie.consulterStock().get(livre) == 5);
+
+            librairie.ajouterLivre(livre, 2);
+            assertTrue(librairie.consulterStock().get(livre) == 7);
+
+            librairie.retirerLivre(livre,6);
+            assertTrue(librairie.consulterStock().get(livre) == 1);
+
+            librairie.retirerLivre(livre,1);
+            assertFalse(librairie.consulterStock().containsKey(livre));
 
             librairie.ajouterLivre(livre2, 0);
+        }
+        catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide");
+        }
+        catch (BookNotInStockException e) {
+            System.err.println("Livre non disponible");
+        }
 
 
-        } catch (QuantiteInvalideException e) {
-            System.err.println("Quantité invalide : " + e.getMessage());
+        try {
+            librairie.ajouterLivre(livre, 5);
+        }
+        catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide");
         }
 
         // Test consultation du stock
         assertTrue(librairie.consulterStock().containsKey(livre));
+        assertFalse(librairie.consulterStock().containsKey(livre2));
+
+        System.out.println(librairie.consulterStock().get(livre));
         assertTrue(librairie.consulterStock().get(livre) == 5);
 
     }
