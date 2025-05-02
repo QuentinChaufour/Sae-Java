@@ -136,6 +136,24 @@ public class Librairie {
 
 
     /**
+     * verifie si un livre est présent en une certaine quantité dans les stocks du magasin
+     * 
+     * @param livre : Livre
+     * @param qte : int
+     * @return
+     */
+    public boolean checkStock(Livre livre,int qte){
+
+        if(this.livreseEnStock.containsKey(livre)){
+            return this.livreseEnStock.get(livre) >= qte;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    /**
      * permet l'affichage de la librairie
      */
     @Override
