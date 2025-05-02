@@ -165,6 +165,27 @@ public class Client extends Personne{
     }
 
     /**
+     *  récupérer un livre depuis l'index d'affichage en u
+     * 
+     * @param index
+     * @param qte
+     * @return
+     * @throws PasAssezDeStockException
+     */
+    public Livre getLivreFromLibrairie(int index,int qte) throws PasAssezDeStockException{ 
+        
+        Livre recupLivre = this.librairie.getLivresDisponibles().get(index - 1); //pour contrebalancer l'affichage a partir de 1
+
+        if(this.librairie.checkStock(recupLivre,qte)){
+            return recupLivre;
+        }
+
+        else{
+            throw new PasAssezDeStockException();
+        }
+    }
+
+    /**
      * permet l'affichage du client
      */
     @Override

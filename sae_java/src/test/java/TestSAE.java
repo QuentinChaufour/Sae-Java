@@ -215,7 +215,7 @@ public class TestSAE {
         }
 
         try{
-            client.ajouterAuPanier(client.getLivreFromLibrairie(livre,3), librairie, 3);
+            client.ajouterAuPanier(client.getLivreFromLibrairie(1,3), librairie, 3);
 
             assertTrue(client.getPanier().getContenu().get(librairie).containsKey(livre));
             assertTrue(client.getPanier().getContenu().get(librairie).get(livre) == 3);
