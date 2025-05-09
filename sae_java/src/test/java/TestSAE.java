@@ -198,7 +198,7 @@ public class TestSAE {
         assertTrue(client.consulterLivres().containsKey(livre));
 
     }
-
+  
     @Test
     public void testSelectionLivre(){
 
@@ -226,4 +226,22 @@ public class TestSAE {
 
 
     }
+  
+      @Test
+    public void testCommandes(){
+        Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
+        Commande commande = new Commande(0,"2020-01-01","N","M",365,5);
+        
+        assertTrue(commande.getLibrairie() == 5);
+        assertTrue(commande.getNumCommande() == 0);
+        assertTrue(commande.getDetail().equals(Arrays.asList(0,"2020-01-01","N","M",365,5)));
+        assertFalse(commande.getEnLigne().equals("O"));
+        assertFalse(commande.getId() == 360);
+        assertTrue(commande.getId() == 365);
+    
+        commande.setNumCommande(1);
+        
+        assertEquals(1, commande.getNumCommande());
+    }
 }
+
