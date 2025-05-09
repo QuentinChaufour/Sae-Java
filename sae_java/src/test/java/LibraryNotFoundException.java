@@ -1,3 +1,3 @@
-public class LibraryNotFoundException {
+public class LibraryNotFoundException extends Exception{
     
 }
