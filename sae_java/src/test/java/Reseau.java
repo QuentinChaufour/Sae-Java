@@ -19,6 +19,8 @@ public class Reseau {
     
     public static int numCom = 1; // en cas de table vide (pas de commande)
     public static int numlig = 1; // en cas de table vide 
+    public static int nbCommande = 0;
+    public static int nbDetailCommande;
 
     static {
 
@@ -28,14 +30,14 @@ public class Reseau {
 
             
             // Récupère le plus grand numCom existant
-            PreparedStatement statement = connection.prepareStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
+            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 Reseau.numCom = resultSet.getInt("numcom") + 1; 
             }
 
-            PreparedStatement statementNumLig = connection.prepareStatement("SELECT numlig FROM testDETAILCOMMANDE where numlig >= ALL (SELECT numlig FROM testDETAILCOMMANDE)");
+            PreparedStatement statementNumLig = Reseau.connection.prepareStatement("SELECT numlig FROM testDETAILCOMMANDE where numlig >= ALL (SELECT numlig FROM testDETAILCOMMANDE)");
 
             resultSet = statementNumLig.executeQuery();
 
@@ -63,7 +65,7 @@ public class Reseau {
         
         try {
             PreparedStatement statementCommande = Reseau.connection.prepareStatement("INSERT INTO testCOMMANDE (numcom, datecom, enligne, livraison, idcli, idmag) VALUES (?, ?, ?, ?, ?, ?)");
-            statementCommande.setInt(1, Reseau.numCom);
+            statementCommande.setInt(1, commande.getNumCommande());
 
             Date sqlDate = new java.sql.Date(commande.getDate().getTime());
 
@@ -88,8 +90,8 @@ public class Reseau {
 
                     double prix = detail.getLivre().getPrix() * detail.getQuantite();
 
-                    statementDetail.setInt(1, Reseau.numCom);
-                    statementDetail.setInt(2, Reseau.numlig); // numlig = 1 pour la première ligne de commande
+                    statementDetail.setInt(1, commande.getNumCommande());
+                    statementDetail.setInt(2, detail.getNumLig());
                     statementDetail.setInt(3, detail.getQuantite());
                     statementDetail.setBigDecimal(4, new BigDecimal(prix));
                     statementDetail.setString(5, detail.getLivre().getIsbn());
