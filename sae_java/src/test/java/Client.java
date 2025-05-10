@@ -1,5 +1,8 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
 
 public class Client extends Personne{
     
@@ -133,7 +136,7 @@ public class Client extends Personne{
      * @param librairie : Librairie
      * @param qte : int
      */
-    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) {
+    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) throws QuantiteInvalideException{
         panier.ajouterLivre(livre,librairie,qte);
     }
 
@@ -183,6 +186,66 @@ public class Client extends Personne{
         else{
             throw new PasAssezDeStockException();
         }
+    }
+
+    public boolean commander() {
+
+        String livraison = "O";
+
+        if (!this.panier.getContenu().isEmpty()) {
+            List<Commande> commandes = createCommandes(livraison);
+
+            for (Commande commande : commandes) {
+                Reseau.enregisterCommande(commande);
+            }
+
+            this.panier.viderPanier();
+        } else {
+            System.out.println("Le panier est vide.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private List<Commande> createCommandes(String livraison) {
+
+        int commandeError = 0;
+        List<Commande> commandes = new ArrayList<>();
+
+        for (Librairie librairie : this.panier.getContenu().keySet()) {
+
+            Map<Livre, Integer> livres = this.panier.getContenu().get(librairie);
+
+
+            Commande commande = new Commande(Integer.valueOf(Reseau.numCom), new Date(),"O",livraison,this, librairie);
+            Reseau.numCom++;
+
+           for(Livre livre : livres.keySet()) {
+
+                int quantite = this.panier.getContenu().get(librairie).get(livre);
+
+                // Vérification de la quantité
+                if(!Reseau.checkStock(livre, librairie, quantite)){
+                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant.");
+                    commandeError++;
+                    continue;
+                }
+
+                // si la quantité est valide, on l'ajoute à la commande
+                try{
+                    commande.addDetailCommande(new DetailCommande(Integer.valueOf(Reseau.numlig), livre, quantite));
+                    Reseau.numlig++;
+                }
+                catch (QuantiteInvalideException e) {
+                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a une quantité selectionnée invalide.");
+                    commandeError++;
+                }
+            }
+            commandes.add(commande);
+        }
+        System.out.println("Nombre de commandes non enregistrées : " + commandeError);
+        return commandes;
     }
 
     /**
