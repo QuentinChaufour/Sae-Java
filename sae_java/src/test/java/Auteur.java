@@ -98,4 +98,9 @@ public class Auteur{
         Auteur auteur = (Auteur) obj;
         return idAuteur == auteur.idAuteur;
     }
+
+    @Override
+    public int hashCode() {
+        return 31 * idAuteur + nomPrenom.hashCode() + 11*dteNaissance.hashCode() + 7*dteMort.hashCode();
+    }
 }
