@@ -183,4 +183,10 @@ public class Livre {
 
         return isbn.equals(livre.isbn);
     }
+
+    @Override
+    public int hashCode() {
+        int prixInt = (int) prix*100;
+        return 31 * isbn.hashCode() + titre.hashCode() + 11 * editeur.hashCode() + 7 * datePublication.hashCode() + 19 * prixInt + 13 * nbPages + 17 * classification.hashCode();
+    }
 }
