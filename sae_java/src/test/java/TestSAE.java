@@ -1,5 +1,6 @@
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -118,11 +119,18 @@ public class TestSAE {
     @Test
     public void testPanierClient(){
 
-        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",new Librairie(7,"Loire et livres", "Orléans"));
+        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",new Librairie(7,"Loire et livres", "Orléans"));
 
         // Test ajout/suppression de livres au panier du client
         Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
-        client.ajouterAuPanier(livre,client.getLibrairie(), 1);
+        
+        try{
+            client.ajouterAuPanier(livre,client.getLibrairie(), 1);
+        }
+        catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide");
+        }
+        
         assertTrue(client.getPanier().getLivres().contains(livre));
         assertFalse(client.getPanier().getLivres().contains(new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman")));
 
@@ -185,7 +193,7 @@ public class TestSAE {
     public void testConsultationClient(){
 
         Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
-        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
         Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
         try{
@@ -203,7 +211,7 @@ public class TestSAE {
     public void testSelectionLivre(){
 
         Librairie librairie = new Librairie(7, "Loire et livres", "Orléans");
-        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
         Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
 
 
@@ -223,6 +231,9 @@ public class TestSAE {
         catch(PasAssezDeStockException e){
             System.out.println("Pas assez de livre : " + livre + " dans la librairie " + client.getLibrairie().getNom());
         }
+        catch (QuantiteInvalideException e) {
+            System.out.println("Quantité invalide");
+        }
 
 
     }
@@ -230,8 +241,8 @@ public class TestSAE {
       @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
-        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
-        Commande commande = new Commande(0, "2023-10-01", "O", "O", client, librairie);
+        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Commande commande = new Commande(0, new Date(), "O", "O", client, librairie);
         
         assertTrue(commande.getIdLibrairie() == 5);
         assertTrue(commande.getNumCommande() == 0);
@@ -261,6 +272,29 @@ public class TestSAE {
         catch(QuantiteInvalideException e){
             System.out.println("Quantité invalide");
         }
+    }
+
+    @Test
+    public void testCommanderClient(){
+        Librairie librairie = new Librairie(0,"Le Ch'ti livre","Orléans");
+        Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Client client2 = new Client("Dupont", "Jean", 2, "456 avenue de la République", "75000", "Paris",librairie);
+        
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+
+        Reseau.addLibrairie(librairie);
+        try{
+            librairie.ajouterLivre(livre, 3);
+            client.ajouterAuPanier(livre, client.getLibrairie(), 2);
+        }
+        catch(QuantiteInvalideException e){
+            System.out.println("Quantité invalide");
+        }
+
+        assertTrue(client.commander());
+        assertFalse(client2.commander());
+
+        
     }
 }
 

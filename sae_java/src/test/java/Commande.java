@@ -1,19 +1,20 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class Commande {
 
     private final int numCommande;
-    private String dateCom;
+    private Date dateCom;
     private String enLigne;
     private String livraison;
     private Client client;
     private Librairie librairie;
     private List<DetailCommande> details;
 
-    public Commande(int numCommande, String dateCom, String enLigne, String livraison, Client client, Librairie librairie){
+    public Commande(int numCommande, Date date, String enLigne, String livraison, Client client, Librairie librairie){
         this.numCommande = numCommande;
-        this.dateCom = dateCom;
+        this.dateCom = date;
         this.enLigne = enLigne;
         this.livraison = livraison;
         this.client = client;
@@ -26,7 +27,7 @@ public class Commande {
         return this.numCommande;
     }
 
-    public String getDate(){
+    public Date getDate(){
         return this.dateCom;
     }
 
@@ -50,7 +51,7 @@ public class Commande {
         return new ArrayList<>(this.details);
     }
 
-    public void setDateCom(String date){
+    public void setDateCom(Date date){
         this.dateCom = date;
     }
 
