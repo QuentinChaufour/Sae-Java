@@ -230,18 +230,14 @@ public class TestSAE {
       @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
-        Commande commande = new Commande(0,"2020-01-01","N","M",365,5);
+        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Commande commande = new Commande(0, "2023-10-01", "O", "O", client, librairie);
         
-        assertTrue(commande.getLibrairie() == 5);
+        assertTrue(commande.getIdLibrairie() == 5);
         assertTrue(commande.getNumCommande() == 0);
-        assertTrue(commande.getDetail().equals(Arrays.asList(0,"2020-01-01","N","M",365,5)));
-        assertFalse(commande.getEnLigne().equals("O"));
+        assertTrue(commande.getEnLigne().equals("O"));
         assertFalse(commande.getId() == 360);
-        assertTrue(commande.getId() == 365);
-    
-        commande.setNumCommande(1);
-        
-        assertEquals(1, commande.getNumCommande());
+        assertTrue(commande.getId() == 3);
     }
 }
 
