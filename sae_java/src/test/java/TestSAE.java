@@ -276,16 +276,25 @@ public class TestSAE {
 
     @Test
     public void testCommanderClient(){
-        Librairie librairie = new Librairie(0,"Le Ch'ti livre","Orléans");
+        Librairie librairie = new Librairie(0,"Librairie de la Fac","Orleans");
+        Librairie librairie2 = new Librairie(1, "La librairie du centre", "Tours");
         Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",librairie);
         Client client2 = new Client("Dupont", "Jean", 2, "456 avenue de la République", "75000", "Paris",librairie);
         
         Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
 
         Reseau.addLibrairie(librairie);
+        Reseau.addLibrairie(librairie2);
         try{
-            librairie.ajouterLivre(livre, 3);
+            librairie.ajouterLivre(livre, 4);
+            librairie.ajouterLivre(livre2, 5);
+            librairie2.ajouterLivre(livre, 5);
+            librairie2.ajouterLivre(livre2, 7);
+
             client.ajouterAuPanier(livre, client.getLibrairie(), 2);
+            client.ajouterAuPanier(livre2, client.getLibrairie(), 1);
+            client.ajouterAuPanier(livre, librairie2, 4);
         }
         catch(QuantiteInvalideException e){
             System.out.println("Quantité invalide");

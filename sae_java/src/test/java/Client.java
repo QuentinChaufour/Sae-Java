@@ -1,8 +1,8 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Client extends Personne{
     
@@ -213,20 +213,19 @@ public class Client extends Personne{
         int commandeError = 0;
         List<Commande> commandes = new ArrayList<>();
 
-        for (Librairie librairie : this.panier.getContenu().keySet()) {
+        for (Librairie librairiePanier : this.panier.getContenu().keySet()) {
 
-            Map<Livre, Integer> livres = this.panier.getContenu().get(librairie);
+            Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
-
-            Commande commande = new Commande(Integer.valueOf(Reseau.numCom), new Date(),"O",livraison,this, librairie);
-            Reseau.numCom++;
+            Commande commande = new Commande(Reseau.numCom + Reseau.nbCommande, new Date(),"O",livraison,this, librairiePanier);
+            Reseau.nbCommande++;
 
            for(Livre livre : livres.keySet()) {
 
-                int quantite = this.panier.getContenu().get(librairie).get(livre);
+                int quantite = livres.get(livre);
 
                 // Vérification de la quantité
-                if(!Reseau.checkStock(livre, librairie, quantite)){
+                if(!Reseau.checkStock(livre, librairiePanier, quantite)){
                     System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant.");
                     commandeError++;
                     continue;
@@ -234,8 +233,9 @@ public class Client extends Personne{
 
                 // si la quantité est valide, on l'ajoute à la commande
                 try{
-                    commande.addDetailCommande(new DetailCommande(Integer.valueOf(Reseau.numlig), livre, quantite));
-                    Reseau.numlig++;
+                    DetailCommande detail = new DetailCommande(Reseau.numlig + Reseau.nbDetailCommande, livre, quantite);
+                    commande.addDetailCommande(detail);
+                    Reseau.nbDetailCommande++;
                 }
                 catch (QuantiteInvalideException e) {
                     System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a une quantité selectionnée invalide.");
