@@ -238,6 +238,29 @@ public class TestSAE {
         assertTrue(commande.getEnLigne().equals("O"));
         assertFalse(commande.getId() == 360);
         assertTrue(commande.getId() == 3);
+
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        try{
+            DetailCommande detailCommande = new DetailCommande(1,livre,2);
+            
+            commande.addDetailCommande(detailCommande);
+
+            assertTrue(commande.getDetails().contains(detailCommande));
+            assertTrue(commande.getDetails().get(0).getLivre().equals(livre));
+            assertTrue(commande.getDetails().get(0).getQuantite() == 2);
+            assertFalse(commande.getDetails().get(0).getNumLig() == 10);
+            assertTrue(commande.getDetails().get(0).getNumLig() == 1);
+        } 
+        catch(QuantiteInvalideException e){
+            System.out.println("Quantité invalide");
+        }
+
+        try{
+            commande.addDetailCommande(new DetailCommande(2, livre, 0));
+        }
+        catch(QuantiteInvalideException e){
+            System.out.println("Quantité invalide");
+        }
     }
 }
 
