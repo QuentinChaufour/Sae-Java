@@ -1,6 +1,6 @@
 public class Auteur{
     
-    private int idAuteur;
+    private final int idAuteur;
     private String nomPrenom;
     private Integer dteNaissance;
     private Integer dteMort;

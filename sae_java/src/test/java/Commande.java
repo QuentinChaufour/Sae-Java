@@ -1,23 +1,25 @@
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class Commande {
 
-    private int numCommande;
+    private final int numCommande;
     private String dateCom;
     private String enLigne;
     private String livraison;
-    private int idClient;
-    private int idMag;
+    private Client client;
+    private Librairie librairie;
+    private List<DetailCommande> details;
 
-    public Commande(int numCommande, String dateCom, String enLigne, String livraison, int idClient, int idMag){
+    public Commande(int numCommande, String dateCom, String enLigne, String livraison, Client client, Librairie librairie){
         this.numCommande = numCommande;
         this.dateCom = dateCom;
         this.enLigne = enLigne;
         this.livraison = livraison;
-        this.idClient = idClient;
-        this.idMag = idMag;
+        this.client = client;
+        this.librairie = librairie;
+
+        this.details = new ArrayList<>();
     }
 
     public int getNumCommande(){
@@ -37,20 +39,15 @@ public class Commande {
     }
 
     public int getId(){
-        return this.idClient;
+        return this.client.getId();
     }
 
-    public int getLibrairie(){
-        return this.idMag;
+    public int getIdLibrairie(){
+        return this.librairie.getId();
     }
 
-    public List<Object> getDetail(){
-        return Arrays.asList(this.getNumCommande(),this.getDate(),this.getLivraison(),this.getId(),this.getLibrairie());
-
-    }
-
-    public void setNumCommande(int numCom){
-        this.numCommande = numCom;
+    public List<DetailCommande> getDetails(){
+        return new ArrayList<>(this.details);
     }
 
     public void setDateCom(String date){
@@ -65,15 +62,24 @@ public class Commande {
         this.livraison = livraison;
     }
 
-    public void setIdClient(int id){
-        this.idClient = id;
+    public void setClient(Client client){
+        this.client = client;
     }
 
-    public void setIdMag(int id){
-        this.idMag = id;
+    public void setLibrairie(Librairie librairie){
+        this.librairie = librairie;
     } 
 
-    
-    
+    public void addDetailCommande(DetailCommande detail){
+        this.details.add(detail);
+    }
 
+    public void removeDetailCommande(DetailCommande detail){
+        this.details.remove(detail);
+    }
+
+    @Override
+    public String toString() {
+        return "Commande {" + "numCommande = " + this.numCommande + ", dateCom = " + this.dateCom + ", enLigne = " + this.enLigne + ", livraison = " + this.livraison + ", idClient = " + this.client.getId() + ", idMag = " + this.librairie.getId() + '}';
+    }
 }
