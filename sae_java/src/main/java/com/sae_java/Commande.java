@@ -1,3 +1,5 @@
+package com.sae_java;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,11 +72,11 @@ public class Commande {
         this.librairie = librairie;
     } 
 
-    public void addDetailCommande(DetailCommande detail){
+    public void addDetail(DetailCommande detail){
         this.details.add(detail);
     }
 
-    public void removeDetailCommande(DetailCommande detail){
+    public void removeDetail(DetailCommande detail){
         this.details.remove(detail);
     }
 

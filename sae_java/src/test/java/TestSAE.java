@@ -230,18 +230,37 @@ public class TestSAE {
       @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
-        Commande commande = new Commande(0,"2020-01-01","N","M",365,5);
+        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Commande commande = new Commande(0, "2023-10-01", "O", "O", client, librairie);
         
-        assertTrue(commande.getLibrairie() == 5);
+        assertTrue(commande.getIdLibrairie() == 5);
         assertTrue(commande.getNumCommande() == 0);
-        assertTrue(commande.getDetail().equals(Arrays.asList(0,"2020-01-01","N","M",365,5)));
-        assertFalse(commande.getEnLigne().equals("O"));
+        assertTrue(commande.getEnLigne().equals("O"));
         assertFalse(commande.getId() == 360);
-        assertTrue(commande.getId() == 365);
-    
-        commande.setNumCommande(1);
-        
-        assertEquals(1, commande.getNumCommande());
+        assertTrue(commande.getId() == 3);
+
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        try{
+            DetailCommande detailCommande = new DetailCommande(1,livre,2);
+            
+            commande.addDetailCommande(detailCommande);
+
+            assertTrue(commande.getDetails().contains(detailCommande));
+            assertTrue(commande.getDetails().get(0).getLivre().equals(livre));
+            assertTrue(commande.getDetails().get(0).getQuantite() == 2);
+            assertFalse(commande.getDetails().get(0).getNumLig() == 10);
+            assertTrue(commande.getDetails().get(0).getNumLig() == 1);
+        } 
+        catch(QuantiteInvalideException e){
+            System.out.println("Quantité invalide");
+        }
+
+        try{
+            commande.addDetailCommande(new DetailCommande(2, livre, 0));
+        }
+        catch(QuantiteInvalideException e){
+            System.out.println("Quantité invalide");
+        }
     }
 }
 

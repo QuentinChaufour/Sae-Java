@@ -1,3 +1,5 @@
+package com.sae_java;
+
 public class Auteur{
     
     private final int idAuteur;
