@@ -26,7 +26,6 @@ public class Reseau {
             Reseau.connection = DriverManager.getConnection(DB_URL, "root", "root_password");
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
-            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
             Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
         }
         catch (SQLException e) {
@@ -36,6 +35,14 @@ public class Reseau {
 
     private Reseau() {} // Constructeur privé pour empêcher l'instanciation de la classe
 
+    public static Librairie getLibrairie(int idLibrairie) throws LibraryNotFoundException{
+        for(Librairie lib : Reseau.librairies){
+            if(lib.getId() == idLibrairie){
+                return lib;
+            }
+        }
+        throw new LibraryNotFoundException();
+    }
 
     /**
      * met a jour les informations par rapport a la BD
@@ -46,7 +53,95 @@ public class Reseau {
     public static void updateInfos(EnumUpdatesDB update){
 
         switch (update) {
-            case EnumUpdatesDB.LIBRAIRIE -> {
+            case EnumUpdatesDB.LIBRAIRIE,EnumUpdatesDB.STOCKS -> {
+
+                try{
+                    // Requête pour update les librairies
+                    PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testMAGASIN");
+
+                    List<Librairie> librairies = new ArrayList<>();
+
+                    ResultSet resultSet = statement.executeQuery();
+
+                    while(resultSet.next()){
+                        int idLibrairie = resultSet.getInt("idmag");
+                        String nomLibrairie = resultSet.getString("nommag");
+                        String villeLibrairie = resultSet.getString("villemag");
+
+                        librairies.add(new Librairie(idLibrairie, nomLibrairie, villeLibrairie));
+                    }
+
+                    Reseau.librairies = librairies;
+                }
+                catch (SQLException e){
+                    System.err.println("problème est survenu lors de l'update des Librairies");
+                }
+
+                // mise a jour des stocks
+
+                try {
+                    
+                    for(Librairie lib : Reseau.librairies){
+                        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testMAGASIN NATURAL JOIN testPOSSEDER NATURAL JOIN testLIVRE NATURAL JOIN testAUTEUR WHERE idmag = ?");
+
+                        statement.setInt(1,lib.getId());
+
+                        ResultSet resultSet = statement.executeQuery();
+
+                        while(resultSet.next()){
+
+                            String isbn = resultSet.getString("isbn");
+                            int qte = resultSet.getInt("qte");
+
+                            String titreLivre = resultSet.getString("titre");
+                            int nbPages = resultSet.getInt("nbpages");
+                            int datePubli = resultSet.getInt("datepubli");
+                            double prix = resultSet.getBigDecimal("prix").doubleValue();
+                            String nomClass = resultSet.getString("nomclass");
+                            String nomEdit = resultSet.getString("nomedit");
+
+                            Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass);
+
+                            List<Auteur> auteurs = new ArrayList<>();
+
+                            String idAuteur = resultSet.getString("idauteur");
+                            String nomPrenom = resultSet.getString("nomauteur");
+                            Integer naissance = resultSet.getInt("anneenais");
+                            Integer deces = resultSet.getInt("anneedeces");   
+                            auteurs.add(new Auteur(idAuteur, nomPrenom, naissance, deces));
+
+                            while(resultSet.next() && resultSet.getString("isbn").equals(isbn)){
+
+                                idAuteur = resultSet.getString("idauteur");
+                                nomPrenom = resultSet.getString("nomauteur");
+                                naissance = resultSet.getInt("anneenais");
+                                deces = resultSet.getInt("anneedeces");   
+
+                                auteurs.add(new Auteur(idAuteur, nomPrenom, naissance, deces));
+                                
+                            }
+
+                            if(resultSet.next() && !resultSet.getString("isbn").equals(isbn)){
+                                resultSet.previous();
+                                resultSet.previous();
+                            }
+
+                            for(Auteur auteur : auteurs){
+                                livre.ajouterAuteur(auteur);
+                            }
+                            
+                            try {
+                                lib.ajouterLivre(livre, qte);
+                            } catch (QuantiteInvalideException e) {
+                                System.err.println("Qte invalide");
+                            }
+                        }
+                    }
+
+                } catch (SQLException e) {
+                    System.err.println("problème est survenu lors de l'update des stocks");
+                }
+
             }
             case EnumUpdatesDB.NUMCOM,EnumUpdatesDB.NUMLIG -> { // liée donc update coordonnée
                 try{
@@ -71,9 +166,6 @@ public class Reseau {
                 catch(SQLException e){
 
                 }
-            }
-
-            case EnumUpdatesDB.STOCKS -> {
             }
             default -> throw new AssertionError();
         }
@@ -121,7 +213,7 @@ public class Reseau {
 
             statementCommande.setString(4, commande.getLivraison()); 
             statementCommande.setInt(5, commande.getId());
-            statementCommande.setString(6, commande.getIdLibrairie() + "");
+            statementCommande.setInt(6, commande.getIdLibrairie());
 
             statementCommande.executeUpdate();
             statementCommande.close();
@@ -160,6 +252,15 @@ public class Reseau {
             }
         } catch (SQLException e) {
             System.out.println("Erreur de connexion à la base de données : " + e.getMessage());
+        }
+    }
+
+    // methode uniquement pour les tests
+    public static PreparedStatement createStatement(String request){
+        try {
+            return  Reseau.connection.prepareStatement(request);
+        } catch (SQLException e) {
+            return null;
         }
     }
 

@@ -1,4 +1,6 @@
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,11 +65,11 @@ public class TestSAE {
     @Test
     public void testLivre() {
 
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
         assertTrue(livre.getIsbn().equals("120"));
         assertEquals("La Guerre des mondes", livre.getTitre());
-        assertTrue(livre.getAuteurs().contains(new Auteur(1,"H.G. Wells",null,null)));
+        assertTrue(livre.getAuteurs().contains(new Auteur("1","H.G. Wells",null,null)));
         assertEquals("Gallimard", livre.getEditeur());
         assertEquals(1898, livre.getDatePublication());
         assertEquals(9.99, livre.getPrix(), 0.00);
@@ -83,8 +85,8 @@ public class TestSAE {
     public void testPanier() {
 
         Panier panier = new Panier();
-        Livre livre1 = new Livre("120","La Guerre des mondes",  Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
-        Livre livre2 = new Livre("121","Le Petit Prince",  Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre livre1 = new Livre("120","La Guerre des mondes",  Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince",  Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
 
         Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
         // Test ajout de livres
@@ -122,7 +124,7 @@ public class TestSAE {
         Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",new Librairie(7,"Loire et livres", "Orléans"));
 
         // Test ajout/suppression de livres au panier du client
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
         
         try{
             client.ajouterAuPanier(livre,client.getLibrairie(), 1);
@@ -132,7 +134,7 @@ public class TestSAE {
         }
         
         assertTrue(client.getPanier().getLivres().contains(livre));
-        assertFalse(client.getPanier().getLivres().contains(new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman")));
+        assertFalse(client.getPanier().getLivres().contains(new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman")));
 
         try {
             client.retirerDuPanier(livre, client.getLibrairie(), 1);
@@ -146,8 +148,8 @@ public class TestSAE {
     @Test
     public void testLibrairieStock() {
         Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
-        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
 
         // Test ajout de livres au stock
         try {
@@ -194,7 +196,7 @@ public class TestSAE {
 
         Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
         Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
         try{
             librairie.ajouterLivre(livre,3);
@@ -208,37 +210,6 @@ public class TestSAE {
     }
   
     @Test
-    public void testSelectionLivre(){
-
-        Librairie librairie = new Librairie(7, "Loire et livres", "Orléans");
-        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
-        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
-
-
-        try{
-            librairie.ajouterLivre(livre, 3);
-        }
-        catch(QuantiteInvalideException e){
-            System.out.println("Quantité invalide");
-        }
-
-        try{
-            client.ajouterAuPanier(client.getLivreFromLibrairie(1,3), librairie, 3);
-
-            assertTrue(client.getPanier().getContenu().get(librairie).containsKey(livre));
-            assertTrue(client.getPanier().getContenu().get(librairie).get(livre) == 3);
-        }
-        catch(PasAssezDeStockException e){
-            System.out.println("Pas assez de livre : " + livre + " dans la librairie " + client.getLibrairie().getNom());
-        }
-        catch (QuantiteInvalideException e) {
-            System.out.println("Quantité invalide");
-        }
-
-
-    }
-  
-      @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
         Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
@@ -250,7 +221,7 @@ public class TestSAE {
         assertFalse(commande.getId() == 360);
         assertTrue(commande.getId() == 3);
 
-        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
         try{
             DetailCommande detailCommande = new DetailCommande(1,livre,2);
             
@@ -276,34 +247,134 @@ public class TestSAE {
 
     @Test
     public void testCommanderClient(){
-        Librairie librairie = new Librairie(0,"Librairie de la Fac","Orleans");
-        Librairie librairie2 = new Librairie(1, "La librairie du centre", "Tours");
-        Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",librairie);
-        Client client2 = new Client("Dupont", "Jean", 2, "456 avenue de la République", "75000", "Paris",librairie);
-        
-        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur(1, "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
-        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur(2,"Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
 
-        Reseau.addLibrairie(librairie);
-        Reseau.addLibrairie(librairie2);
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("1","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+
+        // préparer la bd test
+        try {
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
+
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+
+            Reseau.createStatement("insert into testAUTEUR values ('1','H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values ('2','Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('120','1')").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121','2')").executeUpdate();
+
+            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+    
+        } catch (SQLException e) {
+            System.err.println("pb insertion");
+        }
+
+        Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",Reseau.librairies.get(0));
+        Client client2 = new Client("Dupont", "Jean", 2, "456 avenue de la République", "75000", "Paris",Reseau.librairies.get(1));
+
         try{
-            librairie.ajouterLivre(livre, 4);
-            librairie.ajouterLivre(livre2, 5);
-            librairie2.ajouterLivre(livre, 5);
-            librairie2.ajouterLivre(livre2, 7);
-
-            client.ajouterAuPanier(livre, client.getLibrairie(), 2);
-            client.ajouterAuPanier(livre2, client.getLibrairie(), 1);
-            client.ajouterAuPanier(livre, librairie2, 4);
+            client.ajouterAuPanier(livre,client.getLibrairie(), 2);
+            client.ajouterAuPanier(livre2,client.getLibrairie(), 1);
+            client.ajouterAuPanier(livre, Reseau.getLibrairie(1), 4);
         }
         catch(QuantiteInvalideException e){
-            System.out.println("Quantité invalide");
+            System.out.println("Quantité invalide pour commande de livre");
+        }
+        catch (LibraryNotFoundException e){
+
         }
 
         assertTrue(client.commander());
         assertFalse(client2.commander());
 
+        try{
+
+            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            Reseau.librairies = new ArrayList<>();
+        }
+        catch (SQLException e){
+
+        }
         
     }
+
+    @Test
+    public void testUpdateLibrairie(){
+
+        Librairie librairie = new Librairie(0,"Librairie de la Fac","Orleans");
+        Librairie librairie2 = new Librairie(1, "La librairie du centre", "Tours");
+
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("1","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        
+        assertFalse(Reseau.librairies.contains(librairie));
+        assertFalse(Reseau.librairies.contains(librairie2));
+
+        try {
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+
+            assertTrue(Reseau.librairies.contains(librairie));
+            assertFalse(Reseau.librairies.contains(librairie2));
+
+            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+            
+            Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
+
+            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+
+        } catch (SQLException e) {
+        }
+
+        Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+
+        try{
+            assertTrue(Reseau.librairies.contains(librairie));
+            assertTrue(Reseau.librairies.contains(librairie2));
+
+            assertTrue(Reseau.getLibrairie(0).checkStock(livre, 3));
+            assertFalse(Reseau.getLibrairie(1).checkStock(livre2, 10));
+        }
+        catch (LibraryNotFoundException e){
+
+        }
+
+
+        try {
+            
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+
+        } catch (SQLException e) {
+        }
+
+    }
+
 }
 

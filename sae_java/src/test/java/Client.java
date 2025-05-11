@@ -167,30 +167,17 @@ public class Client extends Personne{
         return this.panier.toString();
     }
 
+
     /**
-     *  récupérer un livre depuis l'index d'affichage en u
-     * 
-     * @param index
-     * @param qte
-     * @return
-     * @throws PasAssezDeStockException
+     *  permet a un client de passer commande de son panier
+     * @return si les commandes ont été éffectué mais pas si elles étaient correctent
      */
-    public Livre getLivreFromLibrairie(int index,int qte) throws PasAssezDeStockException{ 
-        
-        Livre recupLivre = this.librairie.getLivresDisponibles().get(index - 1); //pour contrebalancer l'affichage a partir de 1
-
-        if(this.librairie.checkStock(recupLivre,qte)){
-            return recupLivre;
-        }
-
-        else{
-            throw new PasAssezDeStockException();
-        }
-    }
-
     public boolean commander() {
 
         String livraison = "O";
+
+        // assurer que les stocks sont a jour
+        Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
         if (!this.panier.getContenu().isEmpty()) {
             List<Commande> commandes = createCommandes(livraison);
@@ -208,6 +195,12 @@ public class Client extends Personne{
         return true;
     }
 
+    /**
+     * crée la liste des commandes du panier du client
+     * 
+     * @param livraison : String
+     * @return la liste des commandes du panier du client
+     */
     private List<Commande> createCommandes(String livraison) {
 
         int nbDetailCommande = 0;
@@ -222,13 +215,13 @@ public class Client extends Personne{
             Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this, librairiePanier);
             nbCommande++;
 
-           for(Livre livre : livres.keySet()) {
+            for(Livre livre : livres.keySet()) {
 
                 int quantite = livres.get(livre);
 
                 // Vérification de la quantité
-                if(!Reseau.checkStock(livre, librairiePanier, quantite)){
-                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant.");
+                if(!Reseau.checkStock(livre, Reseau.librairies.get(Reseau.librairies.indexOf(librairiePanier)), quantite)){
+                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
                     commandeError++;
                     continue;
                 }
