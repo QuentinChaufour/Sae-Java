@@ -210,6 +210,8 @@ public class Client extends Personne{
 
     private List<Commande> createCommandes(String livraison) {
 
+        int nbDetailCommande = 0;
+        int nbCommande = 0;
         int commandeError = 0;
         List<Commande> commandes = new ArrayList<>();
 
@@ -217,8 +219,8 @@ public class Client extends Personne{
 
             Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
-            Commande commande = new Commande(Reseau.numCom + Reseau.nbCommande, new Date(),"O",livraison,this, librairiePanier);
-            Reseau.nbCommande++;
+            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this, librairiePanier);
+            nbCommande++;
 
            for(Livre livre : livres.keySet()) {
 
@@ -233,9 +235,9 @@ public class Client extends Personne{
 
                 // si la quantité est valide, on l'ajoute à la commande
                 try{
-                    DetailCommande detail = new DetailCommande(Reseau.numlig + Reseau.nbDetailCommande, livre, quantite);
+                    DetailCommande detail = new DetailCommande(Reseau.numlig + nbDetailCommande, livre, quantite);
                     commande.addDetailCommande(detail);
-                    Reseau.nbDetailCommande++;
+                    nbDetailCommande++;
                 }
                 catch (QuantiteInvalideException e) {
                     System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a une quantité selectionnée invalide.");
@@ -245,6 +247,7 @@ public class Client extends Personne{
             commandes.add(commande);
         }
         System.out.println("Nombre de commandes non enregistrées : " + commandeError);
+        Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
         return commandes;
     }
 

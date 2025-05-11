@@ -19,32 +19,15 @@ public class Reseau {
     
     public static int numCom = 1; // en cas de table vide (pas de commande)
     public static int numlig = 1; // en cas de table vide 
-    public static int nbCommande = 0;
-    public static int nbDetailCommande;
 
+    // initialisation des valeurs de BD
     static {
-
-        // récupérer le plus grand numCom existant
         try {
             Reseau.connection = DriverManager.getConnection(DB_URL, "root", "root_password");
 
-            
-            // Récupère le plus grand numCom existant
-            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
-
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                Reseau.numCom = resultSet.getInt("numcom") + 1; 
-            }
-
-            PreparedStatement statementNumLig = Reseau.connection.prepareStatement("SELECT numlig FROM testDETAILCOMMANDE where numlig >= ALL (SELECT numlig FROM testDETAILCOMMANDE)");
-
-            resultSet = statementNumLig.executeQuery();
-
-
-            if (resultSet.next()) {
-                Reseau.numlig = resultSet.getInt("numlig") + 1; 
-            }
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
+            Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
         }
         catch (SQLException e) {
         }
@@ -53,14 +36,77 @@ public class Reseau {
 
     private Reseau() {} // Constructeur privé pour empêcher l'instanciation de la classe
 
-    public static void addLibrairie(Librairie librairie) {
-        librairies.add(librairie);
+
+    /**
+     * met a jour les informations par rapport a la BD
+     * 
+     * @param update : EnumUpdatesDB
+     * 
+     */
+    public static void updateInfos(EnumUpdatesDB update){
+
+        switch (update) {
+            case EnumUpdatesDB.LIBRAIRIE -> {
+            }
+            case EnumUpdatesDB.NUMCOM,EnumUpdatesDB.NUMLIG -> { // liée donc update coordonnée
+                try{
+
+                    // Récupère le plus grand numCom existant
+                    PreparedStatement statement = Reseau.connection.prepareStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
+
+                    ResultSet resultSet = statement.executeQuery();
+                    if (resultSet.next()) {
+                        Reseau.numCom = resultSet.getInt("numcom") + 1; 
+                    }
+                
+                    PreparedStatement statementNumLig = Reseau.connection.prepareStatement("SELECT numlig FROM testDETAILCOMMANDE where numlig >= ALL (SELECT numlig FROM testDETAILCOMMANDE)");
+                
+                    resultSet = statementNumLig.executeQuery();
+                
+                
+                    if (resultSet.next()) {
+                        Reseau.numlig = resultSet.getInt("numlig") + 1; 
+                    }
+                }
+                catch(SQLException e){
+
+                }
+            }
+
+            case EnumUpdatesDB.STOCKS -> {
+            }
+            default -> throw new AssertionError();
+        }
     }
 
+    /**
+     * ajoute une librairie au reseaux
+     * 
+     * @param librairie
+     */
+    public static void addLibrairie(Librairie librairie) {
+        librairies.add(librairie);
+
+        // ajouter partie BD
+    }
+
+    /**
+     * vérifie les stocks de livres pour une certaine librairie
+     * 
+     * @param livre : Livre
+     * @param librairie : Librairie
+     * @param qte : int
+     * @return si la quantité est inférieur ou égal au stocks, false sinon
+     */
     public static boolean checkStock(Livre livre, Librairie librairie, int qte) {
         return librairie.checkStock(livre, qte);
     }
 
+    /**
+     * enregiste une commande en BD
+     * 
+     * @param commande : Commande
+     */
     public static void enregisterCommande(Commande commande) {
         
         try {
@@ -71,7 +117,7 @@ public class Reseau {
 
             statementCommande.setDate(2, sqlDate);
 
-            statementCommande.setString(3,"O");             // le client a fait sa commande en ligne
+            statementCommande.setString(3,"O");             // le client a fait sa commande nécessairement en ligne
 
             statementCommande.setString(4, commande.getLivraison()); 
             statementCommande.setInt(5, commande.getId());
