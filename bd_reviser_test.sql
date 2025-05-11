@@ -1,3 +1,14 @@
+drop table testECRIRE;
+drop table testAUTEUR;
+drop table testDETAILCOMMANDE;
+drop table testCOMMANDE;
+drop table testPOSSEDER;
+drop table testLIVRE;
+drop table testVENDEUR;
+drop table testMAGASIN;
+drop table testCLIENT;
+
+
 CREATE TABLE testAUTEUR (
   PRIMARY KEY (idauteur),
   idauteur   varchar(11) NOT NULL,
@@ -23,7 +34,7 @@ CREATE TABLE testCOMMANDE (
   enligne char(1),
   livraison char(1),
   idcli   int NOT NULL,
-  idmag   VARCHAR(42) NOT NULL
+  idmag   int NOT NULL
 );
 
 CREATE TABLE testDETAILCOMMANDE (
@@ -56,17 +67,16 @@ CREATE TABLE testLIVRE (
 
 CREATE TABLE testMAGASIN (
   PRIMARY KEY (idmag),
-  idmag    VARCHAR(42) NOT NULL,
-  -- idmag int not null,
+  idmag    int NOT NULL,
   nommag   VARCHAR(42),
   villemag VARCHAR(42)
 );
 
 CREATE TABLE testPOSSEDER (
   PRIMARY KEY (idmag, isbn),
-  idmag VARCHAR(42) NOT NULL,
+  idmag int NOT NULL,
   isbn  varchar(13) NOT NULL,
-  qte   int
+  qte   int NOT NULL
 );
 
 CREATE TABLE testVENDEUR (
@@ -77,7 +87,7 @@ CREATE TABLE testVENDEUR (
   adresseV   VarChar(100),
   codepostalV varchar(5),
   villeV     VarChar(100),
-  idmag      varchar(42) NOT NULL
+  idmag      int NOT NULL
 );
 
 ALTER TABLE testCOMMANDE ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
@@ -95,7 +105,6 @@ ALTER TABLE testPOSSEDER ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
 ALTER TABLE testVENDEUR ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
 
 insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans');
---insert into testMAGASIN values (1,'Librairie de la Fac','Orleans');
 insert into testMAGASIN values ('0','Librairie de la Fac','Orleans');
 insert into testMAGASIN values ('1','La librairie du centre','Tours');
 insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris');

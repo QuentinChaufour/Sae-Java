@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Librairie {
@@ -10,7 +8,6 @@ public class Librairie {
     private String Ville;
 
     private Map<Livre,Integer> livreseEnStock = new HashMap<>();
-    private List<Livre> livresDisponibles = new ArrayList<>(); 
 
     /**
      * Constructeur de la classe Librairie
@@ -24,7 +21,6 @@ public class Librairie {
         this.Ville = ville;
 
         this.livreseEnStock = new HashMap<>();
-        this.livresDisponibles = new ArrayList<>();
     }
 
     /**
@@ -81,16 +77,6 @@ public class Librairie {
         return new HashMap<>(this.livreseEnStock);
     }
 
-
-    /**
-     * getteur de la liste des livres disponibles dans la librairie
-     * 
-     * @return
-     */
-    public List<Livre> getLivresDisponibles() {
-        return new ArrayList<>(this.livresDisponibles);
-    }
-
     /**
      * permet d'ajouter un livre à la librairie en une certaine quantité
      * @param livre : Livre
@@ -100,11 +86,6 @@ public class Librairie {
         if (quantite <= 0) {
            throw new QuantiteInvalideException();
         }
-
-        if (!this.livresDisponibles.contains(livre)) {
-            this.livresDisponibles.add(livre);
-        }
-
         this.livreseEnStock.put(livre, this.livreseEnStock.getOrDefault(livre, 0) + quantite);
     }
 
@@ -123,7 +104,6 @@ public class Librairie {
             } 
             else if (qte == quantite) {
                 this.livreseEnStock.remove(livre);
-                this.livresDisponibles.remove(livre);
             } 
             else {
                 throw new QuantiteInvalideException();
