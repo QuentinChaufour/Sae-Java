@@ -1,6 +1,5 @@
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -249,7 +248,7 @@ public class TestSAE {
     public void testCommanderClient(){
 
         Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
-        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("1","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
 
         // préparer la bd test
         try {
@@ -271,9 +270,9 @@ public class TestSAE {
             Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
             Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
             Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
-    
+             
         } catch (SQLException e) {
-            System.err.println("pb insertion");
+            System.err.println("pb insertion" + e.getMessage());
         }
 
         Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",Reseau.librairies.get(0));
@@ -283,6 +282,9 @@ public class TestSAE {
             client.ajouterAuPanier(livre,client.getLibrairie(), 2);
             client.ajouterAuPanier(livre2,client.getLibrairie(), 1);
             client.ajouterAuPanier(livre, Reseau.getLibrairie(1), 4);
+
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            assertTrue(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie().getId()), 4));
         }
         catch(QuantiteInvalideException e){
             System.out.println("Quantité invalide pour commande de livre");
@@ -291,11 +293,13 @@ public class TestSAE {
 
         }
 
+        
         assertTrue(client.commander());
         assertFalse(client2.commander());
 
+        
         try{
-
+            assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie().getId()), 4));
             Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
             Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
             Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
@@ -304,14 +308,17 @@ public class TestSAE {
             Reseau.createStatement("delete from testLIVRE").executeUpdate();
             Reseau.createStatement("delete from testMAGASIN").executeUpdate();
             Reseau.createStatement("delete from testCLIENT").executeUpdate();
-            Reseau.librairies = new ArrayList<>();
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
         }
         catch (SQLException e){
 
         }
+        catch (LibraryNotFoundException e){
+
+        }
         
     }
-
+    
     @Test
     public void testUpdateLibrairie(){
 
@@ -370,11 +377,11 @@ public class TestSAE {
             Reseau.createStatement("delete from testAUTEUR").executeUpdate();
             Reseau.createStatement("delete from testLIVRE").executeUpdate();
             Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
 
         } catch (SQLException e) {
         }
 
     }
-
 }
 

@@ -220,38 +220,56 @@ public class Reseau {
             
 
             for(DetailCommande detail : commande.getDetails()) {
+                try{
+                    Librairie librairie = Reseau.getLibrairie(commande.getIdLibrairie());
+                
+                    if(librairie.checkStock(detail.getLivre(), detail.getQuantite())){
+                        PreparedStatement statementDetail = Reseau.connection.prepareStatement("INSERT INTO testDETAILCOMMANDE (numcom, numlig, qte, prixvente, isbn) VALUES (?, ?, ?, ?, ?)");
 
-                Librairie librairie = Reseau.librairies.get(commande.getIdLibrairie());
+                        double prix = detail.getLivre().getPrix() * detail.getQuantite();
 
-                if(librairie.checkStock(detail.getLivre(), detail.getQuantite())){
-                    PreparedStatement statementDetail = connection.prepareStatement("INSERT INTO testDETAILCOMMANDE (numcom, numlig, qte, prixvente, isbn) VALUES (?, ?, ?, ?, ?)");
+                        statementDetail.setInt(1, commande.getNumCommande());
+                        statementDetail.setInt(2, detail.getNumLig());
+                        statementDetail.setInt(3, detail.getQuantite());
+                        statementDetail.setBigDecimal(4, new BigDecimal(prix));
+                        statementDetail.setString(5, detail.getLivre().getIsbn());
 
-                    double prix = detail.getLivre().getPrix() * detail.getQuantite();
+                        statementDetail.executeUpdate();
+                        statementDetail.close();
 
-                    statementDetail.setInt(1, commande.getNumCommande());
-                    statementDetail.setInt(2, detail.getNumLig());
-                    statementDetail.setInt(3, detail.getQuantite());
-                    statementDetail.setBigDecimal(4, new BigDecimal(prix));
-                    statementDetail.setString(5, detail.getLivre().getIsbn());
+                        // update DB'Stocks
+                        PreparedStatement statement  = Reseau.connection.prepareStatement("UPDATE testPOSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?");
 
-                    statementDetail.executeUpdate();
-                    statementDetail.close();
+                        statement.setInt(1,librairie.consulterStock().get(detail.getLivre()) - detail.getQuantite());
+                        statement.setInt(2,librairie.getId());
+                        statement.setString(3, detail.getLivre().getIsbn());
 
-                    try {
+                        statement.executeUpdate();
+
+                        
                         librairie.retirerLivre(detail.getLivre(), detail.getQuantite()); // Met à jour le stock de la librairie
-                    } catch (QuantiteInvalideException e) {
-                        System.out.println("Erreur : Pas assez de stock pour le livre " + detail.getLivre().getTitre());
-                    } catch (BookNotInStockException e) {
-                        System.out.println("Erreur : Livre " + detail.getLivre().getTitre() + " non trouvé dans le stock de la librairie.");
+                        int index = Reseau.librairies.indexOf(Reseau.getLibrairie(commande.getIdLibrairie())); // mettre a jour le pointeur
+                        Reseau.librairies.set(index,librairie);
                     }
-                }
-                else {
+                    else {
+                        System.out.println("Erreur : Pas assez de stock pour le livre " + detail.getLivre().getTitre());
+                    }
+                } catch (QuantiteInvalideException e) {
                     System.out.println("Erreur : Pas assez de stock pour le livre " + detail.getLivre().getTitre());
+                } catch (BookNotInStockException e) {
+                    System.out.println("Erreur : Livre " + detail.getLivre().getTitre() + " non trouvé dans le stock de la librairie.");
                 }
-
+                catch(SQLException e){
+                    System.out.println("Pb DB");
+                }
+                catch(LibraryNotFoundException e){
+                    System.out.println("La librairie : " + commande.getIdLibrairie() +" n'est pas présente");
+                }
             }
-        } catch (SQLException e) {
-            System.out.println("Erreur de connexion à la base de données : " + e.getMessage());
+
+        }
+        catch (SQLException e){
+
         }
     }
 
