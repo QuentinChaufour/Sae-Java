@@ -292,11 +292,9 @@ public class TestSAE {
         catch (LibraryNotFoundException e){
 
         }
-
         
         assertTrue(client.commander());
         assertFalse(client2.commander());
-
         
         try{
             assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie().getId()), 4));

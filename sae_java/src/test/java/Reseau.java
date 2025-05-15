@@ -29,6 +29,7 @@ public class Reseau {
             Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
         }
         catch (SQLException e) {
+            System.exit(2);
         }
 
     }
@@ -59,7 +60,7 @@ public class Reseau {
                     // Requête pour update les librairies
                     PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testMAGASIN");
 
-                    List<Librairie> librairies = new ArrayList<>();
+                    List<Librairie> newLibrairies = new ArrayList<>();
 
                     ResultSet resultSet = statement.executeQuery();
 
@@ -68,10 +69,10 @@ public class Reseau {
                         String nomLibrairie = resultSet.getString("nommag");
                         String villeLibrairie = resultSet.getString("villemag");
 
-                        librairies.add(new Librairie(idLibrairie, nomLibrairie, villeLibrairie));
+                        newLibrairies.add(new Librairie(idLibrairie, nomLibrairie, villeLibrairie));
                     }
 
-                    Reseau.librairies = librairies;
+                    Reseau.librairies = newLibrairies;
                 }
                 catch (SQLException e){
                     System.err.println("problème est survenu lors de l'update des Librairies");
@@ -202,7 +203,7 @@ public class Reseau {
     public static void enregisterCommande(Commande commande) {
         
         try {
-            PreparedStatement statementCommande = Reseau.connection.prepareStatement("INSERT INTO testCOMMANDE (numcom, datecom, enligne, livraison, idcli, idmag) VALUES (?, ?, ?, ?, ?, ?)");
+            PreparedStatement statementCommande = Reseau.connection.prepareStatement("INSERT INTO testCOMMANDE VALUES (?, ?, ?, ?, ?, ?)");
             statementCommande.setInt(1, commande.getNumCommande());
 
             Date sqlDate = new java.sql.Date(commande.getDate().getTime());
@@ -246,19 +247,11 @@ public class Reseau {
 
                         statement.executeUpdate();
 
-                        
-                        librairie.retirerLivre(detail.getLivre(), detail.getQuantite()); // Met à jour le stock de la librairie
-                        int index = Reseau.librairies.indexOf(Reseau.getLibrairie(commande.getIdLibrairie())); // mettre a jour le pointeur
-                        Reseau.librairies.set(index,librairie);
                     }
                     else {
                         System.out.println("Erreur : Pas assez de stock pour le livre " + detail.getLivre().getTitre());
                     }
-                } catch (QuantiteInvalideException e) {
-                    System.out.println("Erreur : Pas assez de stock pour le livre " + detail.getLivre().getTitre());
-                } catch (BookNotInStockException e) {
-                    System.out.println("Erreur : Livre " + detail.getLivre().getTitre() + " non trouvé dans le stock de la librairie.");
-                }
+                } 
                 catch(SQLException e){
                     System.out.println("Pb DB");
                 }
@@ -266,7 +259,6 @@ public class Reseau {
                     System.out.println("La librairie : " + commande.getIdLibrairie() +" n'est pas présente");
                 }
             }
-
         }
         catch (SQLException e){
 
