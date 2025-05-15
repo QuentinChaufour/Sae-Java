@@ -187,6 +187,7 @@ public class Client extends Personne{
             }
 
             this.panier.viderPanier();
+            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
         } else {
             System.out.println("Le panier est vide.");
             return false;
