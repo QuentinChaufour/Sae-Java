@@ -1,8 +1,10 @@
 
+import java.util.ArrayList;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -207,6 +209,24 @@ public class TestSAE {
         assertTrue(client.consulterLivres().containsKey(livre));
 
     }
+
+    @Test
+    public void testVendeur(){
+        Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
+        Vendeur vendeur = new Vendeur("null", null, 0);
+        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Panier panier = new Panier();
+        panier.ajouterLivre(livre, librairie, 1);
+        DetailCommande detailcommande = new DetailCommande(1, livre);
+        List<DetailCommande> listedetail = new ArrayList<>();
+        listedetail.add(detailcommande);
+        Commande commande = new Commande(1,"10-05-2025", "O", "O", 3, 7, listedetail);
+        List<Commande> listeCommandes = new ArrayList<>();
+        listeCommandes.add(commande);
+        assertTrue(vendeur.checkQte(commande));
+        assertEquals(listeCommandes, vendeur.preparerCommandes());
+        assertEquals(livre, vendeur.transfererLivre(livre, librairie));
   
     @Test
     public void testCommandes(){
