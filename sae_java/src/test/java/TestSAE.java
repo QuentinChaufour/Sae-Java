@@ -227,7 +227,7 @@ public class TestSAE {
         assertTrue(vendeur.checkQte(commande));
         assertEquals(listeCommandes, vendeur.preparerCommandes());
         assertEquals(livre, vendeur.transfererLivre(livre, librairie));
-  
+    }
     @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
