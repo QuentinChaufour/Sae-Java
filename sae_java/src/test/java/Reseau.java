@@ -184,6 +184,34 @@ public class Reseau {
     }
 
     /**
+     * retire une librairie du reseaux
+     * 
+     * @param librairie
+     **/
+    public void removeLibrairie(Librairie librairie) throws LibraryNotFoundException {
+        if (librairies.contains(librairie)) {
+            librairies.remove(librairie);
+        }
+        else {
+            throw new LibraryNotFoundException();
+        }
+    }
+
+    /**
+     * Cherche un livre dans une certaine quantité dans l'ensemble des librairies du réseau
+     * 
+     * @param librairie
+     **/
+    public Librairie findLivre(Livre livre, int qte) {
+        for (Librairie lib : librairies) {
+            if (lib.checkStock(livre, qte)) {
+                return lib;
+            }
+        }
+        return null;
+    }
+
+    /**
      * vérifie les stocks de livres pour une certaine librairie
      * 
      * @param livre : Livre
