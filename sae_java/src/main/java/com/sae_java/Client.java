@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.Date;
+package com.sae_java;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Client extends Personne{
@@ -136,7 +135,7 @@ public class Client extends Personne{
      * @param librairie : Librairie
      * @param qte : int
      */
-    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) throws QuantiteInvalideException{
+    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) {
         panier.ajouterLivre(livre,librairie,qte);
     }
 
@@ -167,82 +166,25 @@ public class Client extends Personne{
         return this.panier.toString();
     }
 
-
     /**
-     *  permet a un client de passer commande de son panier
-     * @return si les commandes ont été éffectué mais pas si elles étaient correctent
-     */
-    public boolean commander() {
-
-        String livraison = "O";
-
-        // assurer que les stocks sont a jour
-        Reseau.updateInfos(EnumUpdatesDB.STOCKS);
-
-        if (!this.panier.getContenu().isEmpty()) {
-            List<Commande> commandes = createCommandes(livraison);
-
-            for (Commande commande : commandes) {
-                Reseau.enregisterCommande(commande);
-            }
-
-            this.panier.viderPanier();
-            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
-        } else {
-            System.out.println("Le panier est vide.");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * crée la liste des commandes du panier du client
+     *  récupérer un livre depuis l'index d'affichage en u
      * 
-     * @param livraison : String
-     * @return la liste des commandes du panier du client
+     * @param index
+     * @param qte
+     * @return
+     * @throws PasAssezDeStockException
      */
-    private List<Commande> createCommandes(String livraison) {
+    public Livre getLivreFromLibrairie(int index,int qte) throws PasAssezDeStockException{ 
+        
+        Livre recupLivre = this.librairie.getLivresDisponibles().get(index - 1); //pour contrebalancer l'affichage a partir de 1
 
-        int nbDetailCommande = 0;
-        int nbCommande = 0;
-        int commandeError = 0;
-        List<Commande> commandes = new ArrayList<>();
-
-        for (Librairie librairiePanier : this.panier.getContenu().keySet()) {
-
-            Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
-
-            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this, librairiePanier);
-            nbCommande++;
-
-            for(Livre livre : livres.keySet()) {
-
-                int quantite = livres.get(livre);
-
-                // Vérification de la quantité
-                if(!Reseau.checkStock(livre, Reseau.librairies.get(Reseau.librairies.indexOf(librairiePanier)), quantite)){
-                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
-                    commandeError++;
-                    continue;
-                }
-
-                // si la quantité est valide, on l'ajoute à la commande
-                try{
-                    DetailCommande detail = new DetailCommande(Reseau.numlig + nbDetailCommande, livre, quantite);
-                    commande.addDetailCommande(detail);
-                    nbDetailCommande++;
-                }
-                catch (QuantiteInvalideException e) {
-                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a une quantité selectionnée invalide.");
-                    commandeError++;
-                }
-            }
-            commandes.add(commande);
+        if(this.librairie.checkStock(recupLivre,qte)){
+            return recupLivre;
         }
-        System.out.println("Nombre de commandes non enregistrées : " + commandeError);
-        Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
-        return commandes;
+
+        else{
+            throw new PasAssezDeStockException();
+        }
     }
 
     /**

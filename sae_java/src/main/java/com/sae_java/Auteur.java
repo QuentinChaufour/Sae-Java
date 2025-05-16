@@ -1,6 +1,8 @@
+package com.sae_java;
+
 public class Auteur{
     
-    private final String idAuteur;
+    private final int idAuteur;
     private String nomPrenom;
     private Integer dteNaissance;
     private Integer dteMort;
@@ -10,7 +12,7 @@ public class Auteur{
      * @param id : int
      * @param nomPrenom : String
      */
-    public Auteur(String id, String nomPrenom,Integer dteNaissance, Integer dteMort) {
+    public Auteur(int id, String nomPrenom,Integer dteNaissance, Integer dteMort) {
         this.idAuteur = id;
         this.nomPrenom = nomPrenom;  
         this.dteNaissance = dteNaissance;
@@ -22,7 +24,7 @@ public class Auteur{
      * 
      * @return l'id de l'auteur : int
      */
-    public String getId() {
+    public int getId() {
         return idAuteur;
     }
 
@@ -96,11 +98,6 @@ public class Auteur{
 
         if (!(obj instanceof Auteur)) {return false;}
         Auteur auteur = (Auteur) obj;
-        return idAuteur.equals(auteur.idAuteur);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * idAuteur.hashCode() + nomPrenom.hashCode() + 11*dteNaissance.hashCode() + 7*dteMort.hashCode();
+        return idAuteur == auteur.idAuteur;
     }
 }

@@ -1,20 +1,21 @@
+package com.sae_java;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
 public class Commande {
 
     private final int numCommande;
-    private Date dateCom;
+    private String dateCom;
     private String enLigne;
     private String livraison;
     private Client client;
     private Librairie librairie;
     private List<DetailCommande> details;
 
-    public Commande(int numCommande, Date date, String enLigne, String livraison, Client client, Librairie librairie){
+    public Commande(int numCommande, String dateCom, String enLigne, String livraison, Client client, Librairie librairie){
         this.numCommande = numCommande;
-        this.dateCom = date;
+        this.dateCom = dateCom;
         this.enLigne = enLigne;
         this.livraison = livraison;
         this.client = client;
@@ -27,7 +28,7 @@ public class Commande {
         return this.numCommande;
     }
 
-    public Date getDate(){
+    public String getDate(){
         return this.dateCom;
     }
 
@@ -51,7 +52,7 @@ public class Commande {
         return new ArrayList<>(this.details);
     }
 
-    public void setDateCom(Date date){
+    public void setDateCom(String date){
         this.dateCom = date;
     }
 
@@ -71,11 +72,11 @@ public class Commande {
         this.librairie = librairie;
     } 
 
-    public void addDetailCommande(DetailCommande detail){
+    public void addDetail(DetailCommande detail){
         this.details.add(detail);
     }
 
-    public void removeDetailCommande(DetailCommande detail){
+    public void removeDetail(DetailCommande detail){
         this.details.remove(detail);
     }
 
