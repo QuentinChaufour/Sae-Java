@@ -1,4 +1,3 @@
-import java.sql.PreparedStatement;
 import java.util.List;
 
 public class Vendeur extends Personne{
@@ -14,10 +13,9 @@ public class Vendeur extends Personne{
         
     }
 
-    public boolean checkQte(Commande commande){
-        for(DetailCommande detail : commande.getDetailCommandes()){
-            reseau.getLibrairie(commande.getIdMag()).updateStocks();
-            if(!detail.getLivre().checkStocks(detail.getLivre(), detail.getQte())){
+    public boolean checkQte(Commande commande) throws LibraryNotFoundException{
+        for(DetailCommande detail : commande.getDetails()){
+            if(!Reseau.checkStock(detail.getLivre(), Reseau.getLibrairie(commande.getIdLibrairie()), detail.getQuantite())){
                 return false;
             }
         }
@@ -26,12 +24,13 @@ public class Vendeur extends Personne{
 
     public List<Commande> preparerCommandes(){
         //transfer panier
+        return null;
     }
 
     public void enregistrerCommandes(List<Commande> commandes){
         // va faire l'insert des commandes dans la bd et soustraire les stocks
     }
-
+/* 
     public void passerCommande(Client client, boolean faireFacture){
         List<Commande> commandesClient = reseau.createCommande(client.getPanier());
         for(Commande commande : commandesClient){
@@ -66,4 +65,5 @@ public class Vendeur extends Personne{
         client.setVille(ville);
         client.setCodePostal(codePostal);
     }
+        */
 }

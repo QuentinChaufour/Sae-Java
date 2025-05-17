@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Reseau {
@@ -142,6 +143,7 @@ public class Reseau {
                 } catch (SQLException e) {
                     System.err.println("problème est survenu lors de l'update des stocks");
                 }
+                Collections.sort(Reseau.librairies);
 
             }
             case EnumUpdatesDB.NUMCOM,EnumUpdatesDB.NUMLIG -> { // liée donc update coordonnée
@@ -188,7 +190,7 @@ public class Reseau {
      * 
      * @param librairie
      **/
-    public void removeLibrairie(Librairie librairie) throws LibraryNotFoundException {
+    public static void removeLibrairie(Librairie librairie) throws LibraryNotFoundException {
         if (librairies.contains(librairie)) {
             librairies.remove(librairie);
         }
