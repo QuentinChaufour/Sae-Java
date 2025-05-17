@@ -1,16 +1,15 @@
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Client extends Personne{
     
-    private int idClient;
+    private final int idClient;
     private String address;
     private String codePostal;
     private String ville;
-    private Librairie librairie;
+    private int idLibrairie;
     private Panier panier;
 
 
@@ -24,14 +23,14 @@ public class Client extends Personne{
      * @param ville : String
      * @param librairie : Librairie
      */
-    public Client(String nom, String prenom,int id, String address, String codePostal, String ville, Librairie librairie) {
+    public Client(String nom, String prenom,int id, String address, String codePostal, String ville, int idLibrairie) {
         super(nom, prenom);
         this.idClient = id;  
         this.address = address;
         this.codePostal = codePostal;
         this.ville = ville;
 
-        this.librairie = librairie;
+        this.idLibrairie = idLibrairie;
         this.panier = new Panier();
     }
 
@@ -74,10 +73,10 @@ public class Client extends Personne{
     /**
      * getteur de la librairie liée au client
      * 
-     * @return la librairie liée au client : Librairie
+     * @return id de la librairie liée au client : int
      */
-    public Librairie getLibrairie() {
-        return librairie;
+    public int getLibrairie() {
+        return idLibrairie;
     }
 
     /**
@@ -112,8 +111,8 @@ public class Client extends Personne{
      * 
      * @param librairie
      */
-    public void setLibrairie(Librairie librairie) {
-        this.librairie = librairie;
+    public void setLibrairie(int idLibrairie) {
+        this.idLibrairie = idLibrairie;
     }
 
     /**
@@ -126,7 +125,12 @@ public class Client extends Personne{
     }
 
     public Map<Livre, Integer> consulterLivres() {
-        return new HashMap<>(this.librairie.consulterStock());
+        try {
+            return Reseau.getLibrairie(this.idLibrairie).consulterStock();
+        } catch (LibraryNotFoundException e) {
+            System.err.println("Erreur : librairie non trouvée (" + e.getMessage() + ")");
+            return null;
+        }
     }
 
     /**
@@ -136,7 +140,7 @@ public class Client extends Personne{
      * @param librairie : Librairie
      * @param qte : int
      */
-    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) throws QuantiteInvalideException{
+    public void ajouterAuPanier(Livre livre, int librairie, int qte) throws QuantiteInvalideException{
         panier.ajouterLivre(livre,librairie,qte);
     }
 
@@ -147,7 +151,7 @@ public class Client extends Personne{
      * @param librairie : Librairie
      * @param qte : int
      */
-    public void retirerDuPanier(Livre livre,Librairie librairie,int qte) throws PasAssezDeStockException {
+    public void retirerDuPanier(Livre livre,int librairie,int qte) throws PasAssezDeStockException {
         this.panier.retirerLivre(livre,librairie,qte);
     }
 
@@ -209,11 +213,11 @@ public class Client extends Personne{
         int commandeError = 0;
         List<Commande> commandes = new ArrayList<>();
 
-        for (Librairie librairiePanier : this.panier.getContenu().keySet()) {
+        for (int librairiePanier : this.panier.getContenu().keySet()) {
 
             Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
-            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this, librairiePanier);
+            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this.idClient, librairiePanier);
             nbCommande++;
 
             for(Livre livre : livres.keySet()) {
@@ -221,7 +225,7 @@ public class Client extends Personne{
                 int quantite = livres.get(livre);
 
                 // Vérification de la quantité
-                if(!Reseau.checkStock(livre, Reseau.librairies.get(Reseau.librairies.indexOf(librairiePanier)), quantite)){
+                if(!Reseau.checkStock(livre, Reseau.librairies.get(librairiePanier), quantite)){
                     System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
                     commandeError++;
                     continue;
@@ -250,12 +254,10 @@ public class Client extends Personne{
      */
     @Override
     public String toString() {
-        return "Client{" +
+        return "Client " +
                 "idClient=" + idClient +
                 ", address='" + address + '\'' +
                 ", codePostal='" + codePostal + '\'' +
-                ", ville='" + ville + '\'' +
-                ", librairie=" + librairie.getNom() +
-                '}';
+                ", ville='" + ville + '\'';
     }
 }

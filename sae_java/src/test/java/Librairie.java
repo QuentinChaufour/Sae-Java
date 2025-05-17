@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public class Librairie {
+public class Librairie implements Comparable<Librairie>{
 
     private final int id;
     private String nom;
@@ -153,5 +153,23 @@ public class Librairie {
         Librairie librairie = (Librairie) obj;
 
         return this.id == librairie.id;
+    }
+
+    @Override
+    public int hashCode(){
+        int hash = 0;
+        hash += this.id * 31;
+        hash += this.nom.hashCode() * 19;
+        hash += this.Ville.hashCode() * 3;
+
+        return hash;
+    }
+
+    @Override
+    public int compareTo(Librairie lib){
+
+        if(this.id == lib.id){return  0;}
+        else if(this.id > lib.id){return 1;}
+        else{return  -1;}
     }
 }
