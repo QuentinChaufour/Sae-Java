@@ -1,7 +1,8 @@
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -240,7 +241,7 @@ public class TestSAE {
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
         Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
-        Commande commande = new Commande(0, new Date(), "O", "O", client.getId(), client.getLibrairie());
+        Commande commande = new Commande(0, new java.util.Date(), "O", "O", client.getId(), client.getLibrairie());
         Reseau.addLibrairie(librairie);
         
         assertTrue(commande.getIdLibrairie() == 5);
@@ -286,10 +287,11 @@ public class TestSAE {
 
         // préparer la bd test
         try {
-            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
             Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans')").executeUpdate();
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
 
@@ -319,6 +321,7 @@ public class TestSAE {
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
             assertTrue(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
+
         }
         catch(QuantiteInvalideException e){
             System.out.println("Quantité invalide pour commande de livre");
@@ -326,9 +329,9 @@ public class TestSAE {
         catch (LibraryNotFoundException e){
 
         }
-        
-        assertTrue(client.commander());
-        assertFalse(client2.commander());
+
+        assertTrue(client.commander("C",true));
+        assertFalse(client2.commander("M",false));
         
         try{
             assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
@@ -414,6 +417,72 @@ public class TestSAE {
         } catch (SQLException e) {
         }
 
+    }
+
+    @Test
+    public void testOnVousRecommande(){
+
+        Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
+
+        try {
+
+            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+            
+            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+
+            Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (3,'Eric',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121',3)").executeUpdate();
+
+            PreparedStatement statement = Reseau.createStatement("insert into testCOMMANDE values (1,?,'O','M',1,1)");
+            
+            Date sqlDate = new Date(new java.util.Date().getTime());
+
+            statement.setDate(1, sqlDate);
+            statement.executeUpdate();
+            PreparedStatement statement2 = Reseau.createStatement("insert into testCOMMANDE values (2,?,'O','M',2,1)");
+
+            statement2.setDate(1, sqlDate);
+            statement2.executeUpdate();
+            PreparedStatement statement3 = Reseau.createStatement("insert into testCOMMANDE values (3,?,'O','M',3,1)");
+
+            statement3.setDate(1, sqlDate);
+            statement3.executeUpdate();
+
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (1,1,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (1,2,2,20,'121')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (2,3,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (2,4,1,9.99,'121')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,5,1,9.99,'120')").executeUpdate();
+
+            //System.out.println(client.OnVousRecommande());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(Reseau.getUserBooks(client.getId()));
+        System.out.println(Reseau.mapperCommandesClients(client.getId()));
+
+
+        try {
+            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+
+        } catch (SQLException e) {
+        }
     }
 }
 

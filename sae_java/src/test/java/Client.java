@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Client extends Personne{
     
@@ -176,15 +177,13 @@ public class Client extends Personne{
      *  permet a un client de passer commande de son panier
      * @return si les commandes ont été éffectué mais pas si elles étaient correctent
      */
-    public boolean commander() {
-
-        String livraison = "O";
+    public boolean commander(String modeLivraison,boolean enligne) {
 
         // assurer que les stocks sont a jour
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
         if (!this.panier.getContenu().isEmpty()) {
-            List<Commande> commandes = createCommandes(livraison);
+            List<Commande> commandes = createCommandes(modeLivraison,enligne);
 
             for (Commande commande : commandes) {
                 Reseau.enregisterCommande(commande);
@@ -206,7 +205,7 @@ public class Client extends Personne{
      * @param livraison : String
      * @return la liste des commandes du panier du client
      */
-    private List<Commande> createCommandes(String livraison) {
+    private List<Commande> createCommandes(String livraison,boolean enligne) {
 
         int nbDetailCommande = 0;
         int nbCommande = 0;
@@ -217,7 +216,12 @@ public class Client extends Personne{
 
             Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
-            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this.idClient, librairiePanier);
+            String typeCommande;
+            if(enligne){ typeCommande = "O";}
+            else{ typeCommande = "N";}
+
+
+            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),typeCommande,livraison,this.idClient, librairiePanier);
             nbCommande++;
 
             for(Livre livre : livres.keySet()) {
@@ -225,10 +229,14 @@ public class Client extends Personne{
                 int quantite = livres.get(livre);
 
                 // Vérification de la quantité
-                if(!Reseau.checkStock(livre, Reseau.librairies.get(librairiePanier), quantite)){
-                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
-                    commandeError++;
-                    continue;
+                try {
+                    if(!Reseau.checkStock(livre, Reseau.getLibrairie(librairiePanier), quantite)){
+                        System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " pour une qte = " + quantite + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
+                        commandeError++;
+                        continue;
+                    }
+                } catch (LibraryNotFoundException e) {
+                    e.printStackTrace();
                 }
 
                 // si la quantité est valide, on l'ajoute à la commande
@@ -248,6 +256,14 @@ public class Client extends Personne{
         Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
         return commandes;
     }
+
+    public List<Livre> OnVousRecommande(){
+
+        Set<Livre> userBooks = Reseau.getUserBooks(this.idClient); 
+
+        return null;
+    }
+
 
     /**
      * permet l'affichage du client

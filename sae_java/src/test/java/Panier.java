@@ -94,7 +94,7 @@ public class Panier {
                 panier += "Quantité : " + contenu.get(idLib).get(livre) + "\n";
             }
         }
-        panier += "Prix total : " + this.prixTotal + " €";
+        panier += "Prix total : " + this.prixTotal + " euro(s)";
         return panier;
     }
 }
