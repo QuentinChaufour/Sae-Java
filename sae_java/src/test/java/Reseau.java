@@ -8,7 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Reseau {
 
@@ -74,6 +78,8 @@ public class Reseau {
                     }
 
                     Reseau.librairies = newLibrairies;
+
+                    statement.close();
                 }
                 catch (SQLException e){
                     System.err.println("problème est survenu lors de l'update des Librairies");
@@ -84,64 +90,40 @@ public class Reseau {
                 try {
                     
                     for(Librairie lib : Reseau.librairies){
-                        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testMAGASIN NATURAL JOIN testPOSSEDER NATURAL JOIN testLIVRE NATURAL JOIN testAUTEUR WHERE idmag = ?");
+
+                        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testPOSSEDER WHERE idmag = ?");
 
                         statement.setInt(1,lib.getId());
 
                         ResultSet resultSet = statement.executeQuery();
 
+                        Map<String,Integer> stocks = new HashMap<>();
+
                         while(resultSet.next()){
 
                             String isbn = resultSet.getString("isbn");
-                            int qte = resultSet.getInt("qte");
+                            Integer qte = resultSet.getInt("qte");
 
-                            String titreLivre = resultSet.getString("titre");
-                            int nbPages = resultSet.getInt("nbpages");
-                            int datePubli = resultSet.getInt("datepubli");
-                            double prix = resultSet.getBigDecimal("prix").doubleValue();
-                            String nomClass = resultSet.getString("nomclass");
-                            String nomEdit = resultSet.getString("nomedit");
+                            stocks.put(isbn,qte);
+                        }
 
-                            Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass);
+                        statement.close();
 
-                            List<Auteur> auteurs = new ArrayList<>();
+                        for(String isbn : stocks.keySet()){
 
-                            String idAuteur = resultSet.getString("idauteur");
-                            String nomPrenom = resultSet.getString("nomauteur");
-                            Integer naissance = resultSet.getInt("anneenais");
-                            Integer deces = resultSet.getInt("anneedeces");   
-                            auteurs.add(new Auteur(idAuteur, nomPrenom, naissance, deces));
+                            Livre livre = Reseau.createLivre(isbn);
 
-                            while(resultSet.next() && resultSet.getString("isbn").equals(isbn)){
-
-                                idAuteur = resultSet.getString("idauteur");
-                                nomPrenom = resultSet.getString("nomauteur");
-                                naissance = resultSet.getInt("anneenais");
-                                deces = resultSet.getInt("anneedeces");   
-
-                                auteurs.add(new Auteur(idAuteur, nomPrenom, naissance, deces));
-                                
-                            }
-
-                            if(resultSet.next() && !resultSet.getString("isbn").equals(isbn)){
-                                resultSet.previous();
-                                resultSet.previous();
-                            }
-
-                            for(Auteur auteur : auteurs){
-                                livre.ajouterAuteur(auteur);
-                            }
-                            
                             try {
-                                lib.ajouterLivre(livre, qte);
+                                lib.ajouterLivre(livre, stocks.get(isbn));
                             } catch (QuantiteInvalideException e) {
-                                System.err.println("Qte invalide");
+                                e.printStackTrace();
                             }
                         }
                     }
 
                 } catch (SQLException e) {
                     System.err.println("problème est survenu lors de l'update des stocks");
+                    e.printStackTrace();
                 }
                 Collections.sort(Reseau.librairies);
 
@@ -165,6 +147,7 @@ public class Reseau {
                     if (resultSet.next()) {
                         Reseau.numlig = resultSet.getInt("numlig") + 1; 
                     }
+                    statement.close();
                 }
                 catch(SQLException e){
 
@@ -276,6 +259,7 @@ public class Reseau {
                         statement.setString(3, detail.getLivre().getIsbn());
 
                         statement.executeUpdate();
+                        statement.close();
 
                     }
                     else {
@@ -288,12 +272,108 @@ public class Reseau {
                 catch(LibraryNotFoundException e){
                     System.out.println("La librairie : " + commande.getIdLibrairie() +" n'est pas présente");
                 }
+
+                statementCommande.close();
             }
         }
         catch (SQLException e){
 
         }
     }
+
+
+    public static Set<Livre> getUserBooks(int idClient){
+
+        Set<Livre> userBooks = new HashSet<>();
+
+        try {
+
+            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE WHERE idcli = ?");
+            statement.setInt(1,idClient);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+
+                String isbn = resultSet.getString("isbn");
+
+                Livre livre = Reseau.createLivre(isbn);
+                userBooks.add(livre);
+            }
+            statement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userBooks;
+    }
+
+    public static Map<Livre,Set<Integer>> mapperCommandesClients(int idClientToAvoid){
+
+        Map<Livre,Set<Integer>> clientsBooks = new HashMap<>(); // livre et set d'ID client pour connaitre la popularité d'un livre reflété par les commandes
+
+        try {
+            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE WHERE idcli <> ?");
+            statement.setInt(1,idClientToAvoid);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+
+                String isbn = resultSet.getString("isbn");
+                int idClient = resultSet.getInt("idcli");
+
+                Livre livre = Reseau.createLivre(isbn);
+
+                Set<Integer> clients = clientsBooks.getOrDefault(livre, new HashSet<>());
+                clients.add(idClient);
+                clientsBooks.put(livre,clients);
+
+            }
+
+            statement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return clientsBooks;
+    }
+
+    private static Livre createLivre(String isbn) throws SQLException{
+        
+        PreparedStatement statementLivre = Reseau.connection.prepareStatement("SELECT * FROM testLIVRE WHERE isbn = ?");
+        statementLivre.setString(1, isbn);
+        ResultSet resultSetLivre = statementLivre.executeQuery();
+
+        resultSetLivre.next();
+
+        String titreLivre = resultSetLivre.getString("titre");
+        Integer nbPages = resultSetLivre.getInt("nbpages");
+        Integer datePubli = resultSetLivre.getInt("datepubli");
+        double prix = resultSetLivre.getBigDecimal("prix").doubleValue();
+        String nomClass = resultSetLivre.getString("nomclass");
+        String nomEdit = resultSetLivre.getString("nomedit");
+
+        Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass);
+
+        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM testECRIRE NATURAL JOIN testAUTEUR WHERE isbn = ?");
+        statementAutor.setString(1, isbn);
+
+        ResultSet resultSetAutor = statementAutor.executeQuery();
+
+        while (resultSetAutor.next()) {
+            String idAuteur = resultSetAutor.getString("idauteur");
+            String nomPrenom = resultSetAutor.getString("nomauteur");
+            Integer naissance = resultSetAutor.getInt("anneenais");
+            Integer deces = resultSetAutor.getInt("anneedeces");
+            livre.ajouterAuteur(new Auteur(idAuteur, nomPrenom, naissance, deces));
+        }
+
+        statementAutor.close();
+        return livre;
+    }
+
 
     // methode uniquement pour les tests
     public static PreparedStatement createStatement(String request){
