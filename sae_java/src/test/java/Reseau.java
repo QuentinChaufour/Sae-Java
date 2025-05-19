@@ -309,9 +309,9 @@ public class Reseau {
         return userBooks;
     }
 
-    public static Map<Integer,Set<Livre>> mapperCommandesClients(int idClientToAvoid){
+    public static Map<Livre,Set<Integer>> mapperCommandesClients(int idClientToAvoid){
 
-        Map<Integer,Set<Livre>> clientsBooks = new HashMap<>();
+        Map<Livre,Set<Integer>> clientsBooks = new HashMap<>(); // livre et set d'ID client pour connaitre la popularité d'un livre reflété par les commandes
 
         try {
             PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE WHERE idcli <> ?");
@@ -326,18 +326,17 @@ public class Reseau {
 
                 Livre livre = Reseau.createLivre(isbn);
 
-                Set<Livre> livres = clientsBooks.getOrDefault(idClient, new HashSet<>());
-                livres.add(livre);
-                clientsBooks.put(idClient,livres);
+                Set<Integer> clients = clientsBooks.getOrDefault(livre, new HashSet<>());
+                clients.add(idClient);
+                clientsBooks.put(livre,clients);
 
             }
 
             statement.close();
 
         } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-
         return clientsBooks;
     }
 
@@ -358,8 +357,7 @@ public class Reseau {
 
         Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass);
 
-        PreparedStatement statementAutor = Reseau.connection
-                .prepareStatement("SELECT * FROM testECRIRE NATURAL JOIN testAUTEUR WHERE isbn = ?");
+        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM testECRIRE NATURAL JOIN testAUTEUR WHERE isbn = ?");
         statementAutor.setString(1, isbn);
 
         ResultSet resultSetAutor = statementAutor.executeQuery();

@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -257,11 +259,80 @@ public class Client extends Personne{
         return commandes;
     }
 
-    public List<Livre> OnVousRecommande(){
+    // methode de base selon la classification des livres
+    public List<Livre> OnVousRecommande() throws LibraryNotFoundException{
+
+        Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
         Set<Livre> userBooks = Reseau.getUserBooks(this.idClient); 
+        Set<String> criteria = this.getClassificationsCriteria(userBooks);
 
-        return null;
+        Map<Livre,Set<Integer>> mapCommandesClients = Reseau.mapperCommandesClients(this.idClient);
+
+        // traitement des livres respectant les critères
+
+        Map<Livre,Set<Integer>> copyMapCommandesClients= new HashMap<>(mapCommandesClients);
+
+        for(Livre book : copyMapCommandesClients.keySet()){
+            if(!criteria.contains(book.getClassification())){
+                mapCommandesClients.remove(book); // livre non conforme au critère
+            }
+        }
+
+        // créer la liste des livres selon popularité
+        List<Livre> popularBooks = this.getPopularBooks(mapCommandesClients);
+        mapCommandesClients = null;
+
+        // verif si livre pas commandé par les clients et livre en stock dans librairie courante
+
+        Librairie currentLibrary = Reseau.getLibrairie(this.idLibrairie);
+
+        List<Livre> recommanded = new ArrayList<>();
+
+        for(Livre book : popularBooks){
+            if(!userBooks.contains(book) && currentLibrary.checkStock(book, 1)){
+                recommanded.add(book);
+            }
+
+        }
+
+        return recommanded;
+    }
+
+    private Set<String> getClassificationsCriteria(Set<Livre> books){
+
+        Set<String> classifications = new HashSet<>();
+
+        for(Livre book : books){
+            classifications.add(book.getClassification());
+        }
+
+        return classifications;
+    }
+
+    private List<Livre> getPopularBooks(Map<Livre,Set<Integer>> booksMap){
+
+        List<Livre> popularBooks = new ArrayList<>();
+        Integer maxPop = null;
+        Livre popLivre = null; 
+
+        while(!booksMap.isEmpty()){
+
+            for(Livre book : booksMap.keySet()){
+
+                int pop =  booksMap.get(book).size();
+
+                if((maxPop == null || pop > maxPop) && !popularBooks.contains(book)){
+                    maxPop = pop;
+                    popLivre = book;
+                }
+            }
+
+            popularBooks.add(popLivre);
+            maxPop = null;
+            booksMap.remove(popLivre);
+        }
+        return popularBooks;
     }
 
 
