@@ -2,9 +2,12 @@
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -425,7 +428,7 @@ public class TestSAE {
         Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
 
         try {
-
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
             
             Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','60 avenue de la Republique','75000','Paris')").executeUpdate();
@@ -434,12 +437,29 @@ public class TestSAE {
 
             Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
             Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
-            Reseau.createStatement("insert into testAUTEUR values (3,'Eric',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
+            
             Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
             Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
+            
             Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
             Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
-            Reseau.createStatement("insert into testECRIRE values ('121',3)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('124',3)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('125',4)").executeUpdate();
+
+            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'122',2)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'124',1)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'125',9)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+            
 
             PreparedStatement statement = Reseau.createStatement("insert into testCOMMANDE values (1,?,'O','M',1,1)");
             
@@ -460,15 +480,33 @@ public class TestSAE {
             Reseau.createStatement("insert into testDETAILCOMMANDE values (1,2,2,20,'121')").executeUpdate();
             Reseau.createStatement("insert into testDETAILCOMMANDE values (2,3,1,9.99,'120')").executeUpdate();
             Reseau.createStatement("insert into testDETAILCOMMANDE values (2,4,1,9.99,'121')").executeUpdate();
-            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,5,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (2,5,1,9.99,'124')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,6,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,7,1,9.99,'122')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,8,1,9.99,'123')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,9,1,9.99,'125')").executeUpdate();
 
             //System.out.println(client.OnVousRecommande());
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        System.out.println(Reseau.getUserBooks(client.getId()));
-        System.out.println(Reseau.mapperCommandesClients(client.getId()));
+        Set<Livre> userBooks = new HashSet<>();
+        userBooks.add(new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction"));
+        userBooks.add(new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("1","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman"));
+
+        assertTrue(userBooks.equals(Reseau.getUserBooks(client.getId())));
+
+        userBooks = null;
+            
+        Livre potter = new Livre("122", "Harry Potter", new ArrayList<Auteur>(),"Gallimard", 1943, 7.99, 96, "Romand");
+        Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
+
+        try {
+            assertEquals(Arrays.asList(potter,clanWar),client.OnVousRecommande());
+        } catch (LibraryNotFoundException ex) {
+            System.err.println("Library not found");
+        }
 
 
         try {
