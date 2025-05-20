@@ -335,6 +335,16 @@ public class Client extends Personne{
         return popularBooks;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof Client)) return false;
+
+        Client client = (Client) obj;
+
+        return this.idClient == client.idClient;
+    }
 
     /**
      * permet l'affichage du client
