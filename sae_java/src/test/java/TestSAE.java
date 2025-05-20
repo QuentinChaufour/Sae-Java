@@ -522,5 +522,44 @@ public class TestSAE {
         } catch (SQLException e) {
         }
     }
+
+    @Test
+    public void testIdentification(){
+
+        Client client = new Client("Martin", "Julie",1, "133 boulevard de l'Université", "45000", "Orléans",0);
+        Client client2 = new Client("Dupont", "Jean",2, "456 avenue de la République", "75000", "Paris",1);
+        Client client3 = new Client("Eboue", "Fabrice",3, "60 avenue de la République", "75000", "Paris",1);
+
+        try {
+            
+            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l''Université','45000','Orléans')").executeUpdate();
+
+            Client identifie = Reseau.identificationClient("Martin", "Julie","133 boulevard de l'Université" , 0);
+            assertEquals(client, identifie);
+
+            Client identifie2 = Reseau.identificationClient("Dupont", "Jean","456 avenue de la République" , 0);
+            assertEquals(client2, identifie2);
+
+            Client identifie3 = Reseau.identificationClient("Eboue", "Fabrice","60 avenue de la République" , 0);
+            assertEquals(client3, identifie3);
+
+
+            Client identifie4 = Reseau.identificationClient("Niel", "Xavier","60 avenue de la République" , 0);
+            // émet une erreur car le client n'existe pas
+
+        } catch (SQLException e) {
+            System.err.println("pb insertion identificationClient" + e.getMessage());
+        }
+        catch (NoCorrespondingClient e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
 }
 
