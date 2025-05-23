@@ -376,12 +376,12 @@ public class Reseau {
 
         // identifications 
 
-    public static Client identificationClient(String nom,String prenom,String adresse,int idLibrary) throws SQLException, NoCorrespondingClient{
+    public static Client identificationClient(String nom,String prenom, String motDePasse, String adresse,int idLibrary) throws SQLException, NoCorrespondingClient{
 
-        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCLIENT WHERE nomcli = ? AND prenomcli = ? AND adressecli = ?");
+        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCLIENT WHERE nomcli = ? AND prenomcli = ? AND motdepassecli = ?");
         statement.setString(1, nom);
         statement.setString(2, prenom);
-        statement.setString(3, adresse);
+        statement.setString(3, motDePasse);
         
         ResultSet resultset = statement.executeQuery();
         if(resultset.next()){
@@ -389,16 +389,17 @@ public class Reseau {
             int idClient = resultset.getInt("idcli");
             String nomClient = resultset.getString("nomcli");
             String prenomClient = resultset.getString("prenomcli");
+            String motDePasseClient = resultset.getString("motdepassecli");
             String adresseClient = resultset.getString("adressecli");
             String codePostal = resultset.getString("codepostal");
             String ville = resultset.getString("villecli");
             
 
-            Client client = new Client(nomClient, prenomClient,idClient, adresseClient, codePostal, ville,idLibrary);
+            Client client = new Client(nomClient, prenomClient, motDePasseClient, idClient, adresseClient, codePostal, ville,idLibrary);
             return client;
         }
         else {
-            throw new NoCorrespondingClient("Aucun client ne correspond selon les critères de recherche : " + prenom + " " + nom + " habitant au " + adresse);
+            throw new NoCorrespondingClient("Aucun client ne correspond selon les critères de recherche : " + prenom + " " + nom + " avec comme mot de passe " + motDePasse);
         }
         
     }
