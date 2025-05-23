@@ -22,7 +22,7 @@ CREATE TABLE testCLIENT (
   idcli      int NOT NULL,
   nomcli     varchar(50),
   prenomcli  varchar(30),
-  motdepassecli varchar(30),
+  motdepassecli varchar(30) UNIQUE,
   adressecli varchar(100),
   codepostal varchar(5),
   villecli   varchar(100)
