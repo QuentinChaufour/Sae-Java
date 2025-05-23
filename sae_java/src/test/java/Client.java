@@ -20,14 +20,15 @@ public class Client extends Personne{
      * Constructeur de la classe Client
      * @param nom : String
      * @param prenom : String
+     * @param prenom : motDePasse
      * @param id : int
      * @param address : String
      * @param codePostal : String
      * @param ville : String
      * @param librairie : Librairie
      */
-    public Client(String nom, String prenom,int id, String address, String codePostal, String ville, int idLibrairie) {
-        super(nom, prenom);
+    public Client(String nom, String prenom, String motDePasse, int id, String address, String codePostal, String ville, int idLibrairie) {
+        super(nom, prenom, motDePasse);
         this.idClient = id;  
         this.address = address;
         this.codePostal = codePostal;
