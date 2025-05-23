@@ -19,7 +19,7 @@ public class TestSAE {
 
     @Test
     public void testClientBasics() {
-        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",7);
+        Client client = new Client("Julie", "Martin", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",7);
 
         // Test getters
         assertEquals("Julie", client.getNom());
@@ -128,7 +128,7 @@ public class TestSAE {
     @Test
     public void testPanierClient(){
 
-        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",7);
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",7);
 
         // Test ajout/suppression de livres au panier du client
         Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
@@ -201,7 +201,7 @@ public class TestSAE {
     public void testConsultationClient(){
 
         Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
-        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
         Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
         Reseau.addLibrairie(librairie);
@@ -243,7 +243,7 @@ public class TestSAE {
     @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
-        Client client = new Client("Martin", "Julie", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
         Commande commande = new Commande(0, new java.util.Date(), "O", "O", client.getId(), client.getLibrairie());
         Reseau.addLibrairie(librairie);
         
@@ -314,8 +314,8 @@ public class TestSAE {
             System.err.println("pb insertion" + e.getMessage());
         }
 
-        Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
-        Client client2 = new Client("Dupont", "Jean", 2, "456 avenue de la République", "75000", "Paris",1);
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
+        Client client2 = new Client("Dupont", "Jean", "mot_de_passe_1439", 2, "456 avenue de la République", "75000", "Paris",1);
 
         try{
             client.ajouterAuPanier(livre,client.getLibrairie(), 2);
@@ -425,7 +425,7 @@ public class TestSAE {
     @Test
     public void testOnVousRecommande(){
 
-        Client client = new Client("Martin", "Julie", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
 
         try {
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
@@ -526,9 +526,9 @@ public class TestSAE {
     @Test
     public void testIdentification(){
 
-        Client client = new Client("Martin", "Julie",1, "133 boulevard de l'Université", "45000", "Orléans",0);
-        Client client2 = new Client("Dupont", "Jean",2, "456 avenue de la République", "75000", "Paris",1);
-        Client client3 = new Client("Eboue", "Fabrice",3, "60 avenue de la République", "75000", "Paris",1);
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 1, "133 boulevard de l'Université", "45000", "Orléans",0);
+        Client client2 = new Client("Dupont", "Jean", "mot_de_passe_1439", 2, "456 avenue de la République", "75000", "Paris",1);
+        Client client3 = new Client("Eboue", "Fabrice", "mot_de_passe_1439", 3, "60 avenue de la République", "75000", "Paris",1);
 
         try {
             
