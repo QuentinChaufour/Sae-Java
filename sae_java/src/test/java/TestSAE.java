@@ -293,8 +293,8 @@ public class TestSAE {
 
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','a','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','b','133 boulevard de l universite','45000','Orleans')").executeUpdate();
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
 
@@ -431,9 +431,9 @@ public class TestSAE {
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
             
-            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','60 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','a','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
 
             Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
             Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
@@ -499,7 +499,7 @@ public class TestSAE {
 
         userBooks = null;
             
-        Livre potter = new Livre("122", "Harry Potter", new ArrayList<Auteur>(),"Gallimard", 1943, 7.99, 96, "Romand");
+        Livre potter = new Livre("122", "Harry Potter", new ArrayList<>(),"Gallimard", 1943, 7.99, 96, "Romand");
         Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
 
         try {
@@ -532,21 +532,21 @@ public class TestSAE {
 
         try {
             
-            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','60 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l''Université','45000','Orléans')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','Tient!!!','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','riviere','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','pecheur','133 boulevard de l''Université','45000','Orléans')").executeUpdate();
 
-            Client identifie = Reseau.identificationClient("Martin", "Julie","133 boulevard de l'Université" , 0);
+            Client identifie = Reseau.identificationClient("Martin", "Julie","pecheur" , 0);
             assertEquals(client, identifie);
 
-            Client identifie2 = Reseau.identificationClient("Dupont", "Jean","456 avenue de la République" , 0);
+            Client identifie2 = Reseau.identificationClient("Dupont", "Jean","riviere" , 0);
             assertEquals(client2, identifie2);
 
-            Client identifie3 = Reseau.identificationClient("Eboue", "Fabrice","60 avenue de la République" , 0);
+            Client identifie3 = Reseau.identificationClient("Eboue", "Fabrice","Tient!!!" , 0);
             assertEquals(client3, identifie3);
 
 
-            Client identifie4 = Reseau.identificationClient("Niel", "Xavier","60 avenue de la République" , 0);
+            Client identifie4 = Reseau.identificationClient("Niel", "Xavier","maitreDeLaCom" , 0);
             // émet une erreur car le client n'existe pas
 
         } catch (SQLException e) {

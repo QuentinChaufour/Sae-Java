@@ -376,7 +376,7 @@ public class Reseau {
 
         // identifications 
 
-    public static Client identificationClient(String nom,String prenom, String motDePasse, String adresse,int idLibrary) throws SQLException, NoCorrespondingClient{
+    public static Client identificationClient(String nom,String prenom, String motDePasse,int idLibrary) throws SQLException, NoCorrespondingClient{
 
         PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCLIENT WHERE nomcli = ? AND prenomcli = ? AND motdepassecli = ?");
         statement.setString(1, nom);
