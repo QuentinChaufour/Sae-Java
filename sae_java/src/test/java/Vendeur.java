@@ -4,8 +4,8 @@ public class Vendeur extends Personne{
     private int idVendeur;
     private int id;
 
-    public Vendeur(String nom, String prenom, int id){
-        super(nom, prenom);
+    public Vendeur(String nom, String prenom, String motDePasse, int id){
+        super(nom, prenom, motDePasse);
         this.idVendeur = id;
     }
 

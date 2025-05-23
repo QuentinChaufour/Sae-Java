@@ -2,17 +2,19 @@ public abstract class Personne {
  
     private String nom;
     private String prenom;
+    private String motDePasse;
 
-    public Personne(String nom, String prenom) {
+    public Personne(String nom, String prenom, String motDePasse) {
         this.nom = nom;
         this.prenom = prenom;
+        this.motDePasse = motDePasse;
     }
     /**
      *getteurs du nom de la personne
      * @return le nom de la personne
      */
     public String getNom() {
-        return nom;
+        return this.nom;
     }
 
     /**
@@ -20,7 +22,15 @@ public abstract class Personne {
      * @return le prenom de la personne
      */
     public String getPrenom() {
-        return prenom;
+        return this.prenom;
+    }
+
+    /**
+     *getteurs du mot de passe de la personne
+     * @return le mot de passe de la personne
+     */
+    public String getMotDePasse() {
+        return this.motDePasse;
     }
 
     /**
@@ -29,6 +39,14 @@ public abstract class Personne {
      */
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    /**
+     * setteur du mot de passe de la personne
+     * @param motDePasse : String
+     */
+    public void setMotDePasse(String motDePasse) {
+        this.motDePasse = motDePasse;
     }
 
     /**
@@ -44,7 +62,7 @@ public abstract class Personne {
      */
     @Override
     public String toString() {
-        return "Nom: " + nom + ", Prénom: " + prenom;
+        return "Nom: " + this.nom + ", Prénom: " + this.prenom;
     }
 
 }
