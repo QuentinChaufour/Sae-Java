@@ -664,5 +664,14 @@ public class TestSAE {
         } catch (SQLException e) {
         }
     }
+
+    @Test
+    public void testLogAdmin(){
+
+        assertFalse(Reseau.identificationAdmin("sae", "1234"));
+        assertFalse(Reseau.identificationAdmin("revan", "1234"));
+        assertTrue(Reseau.identificationAdmin("revan", "Two_Face"));
+
+    }
 }
 

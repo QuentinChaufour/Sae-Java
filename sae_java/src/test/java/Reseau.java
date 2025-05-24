@@ -16,7 +16,12 @@ import java.util.Set;
 
 public class Reseau {
 
-    public static final String DB_URL = "jdbc:mariadb://localhost:3306/testLibrairie";
+    private static final String DB_URL = "jdbc:mariadb://localhost:3306/testLibrairie";
+
+    // compte admin
+
+    private static final String ADMIN_USER = "revan";
+    private static final String ADMIN_PASSWORD = "Two_Face";
 
     public static List<Librairie> librairies = new ArrayList<>();
 
@@ -28,7 +33,7 @@ public class Reseau {
     // initialisation des valeurs de BD
     static {
         try {
-            Reseau.connection = DriverManager.getConnection(DB_URL, "root", "root_password");
+            Reseau.connection = DriverManager.getConnection(Reseau.DB_URL, "root", "root_password");
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
             Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
@@ -429,6 +434,26 @@ public class Reseau {
         }
         
     }
+
+    public static boolean identificationAdmin(String userName, String motDePasse) {
+
+        return userName.equals(Reseau.ADMIN_USER) && motDePasse.equals(Reseau.ADMIN_PASSWORD);
+    }
+
+    // fonction facture PDF
+
+    /**
+     * Crée un PDF de facture pour les commandes passées par un client
+     * @param commandes : Commande
+     * @param client : Client
+     * @param fileName : String
+     */
+    public void createBillPDF(List<Commande> commandes, Client client,String fileName) {
+        // Implémentation de la création du PDF
+        // Cette méthode pourrait utiliser une bibliothèque comme iText ou Apache PDFBox pour générer le PDF
+        // Le contenu du PDF serait basé sur les détails des commandes passées
+    }
+
 
     public static PreparedStatement createStatement(String request){
         try {
