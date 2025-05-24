@@ -79,6 +79,14 @@ public class Commande {
         this.details.remove(detail);
     }
 
+    public double getTotalCommande() {
+        double total = 0.0;
+        for (DetailCommande detail : this.details) {
+            total += detail.getQuantite()*detail.getLivre().getPrix();
+        }
+        return total;
+    }
+
     @Override
     public String toString() {
         return "Commande {" + "numCommande = " + this.numCommande + ", dateCom = " + this.dateCom + ", enLigne = " + this.enLigne + ", livraison = " + this.livraison + ", idClient = " + this.idClient + ", idMag = " + this.idLibrairie + '}';

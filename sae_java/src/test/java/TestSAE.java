@@ -371,8 +371,8 @@ public class TestSAE {
 
         }
 
-        assertTrue(client.commander("C",true));
-        assertFalse(client2.commander("M",false));
+        assertTrue(client.commander("C",true,false));
+        assertFalse(client2.commander("M",false,false));
         
         try{
             assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
@@ -672,6 +672,96 @@ public class TestSAE {
         assertFalse(Reseau.identificationAdmin("revan", "1234"));
         assertTrue(Reseau.identificationAdmin("revan", "Two_Face"));
 
+    }
+
+    @Test
+    public void testfacture(){
+        
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
+
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre potter = new Livre("122", "Harry Potter", new ArrayList<>(),"Gallimard", 1943, 7.99, 96, "Romand");
+        Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
+
+        // préparer la bd test
+        try {
+
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+            
+            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','a','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+
+            Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
+            
+            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
+            
+            Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('124',3)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('125',4)").executeUpdate();
+
+            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'122',2)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'124',1)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'125',9)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
+             
+        } catch (SQLException e) {
+            System.err.println("pb insertion test facture" + e.getMessage());
+        }
+
+        try{
+            client.ajouterAuPanier(livre,client.getLibrairie(), 2);
+            client.ajouterAuPanier(livre2,client.getLibrairie(), 1);
+            client.ajouterAuPanier(potter, 1, 1);
+            client.ajouterAuPanier(clanWar, 1, 3);
+
+
+            assertTrue(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
+
+        }
+        catch(QuantiteInvalideException e){
+            System.out.println("Quantité invalide pour commande de livre");
+        }
+        catch (LibraryNotFoundException e){
+
+        }
+
+        client.commander("C",true,true);
+        
+        try{
+            assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
+            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+        }
+        catch (SQLException e){
+            System.err.println("pb suppression commander client" + e.getMessage());
+        }
+        catch (LibraryNotFoundException e){
+        }
     }
 }
 

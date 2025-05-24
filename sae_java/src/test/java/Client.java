@@ -180,7 +180,7 @@ public class Client extends Personne{
      *  permet a un client de passer commande de son panier
      * @return si les commandes ont été éffectué mais pas si elles étaient correctent
      */
-    public boolean commander(String modeLivraison,boolean enligne) {
+    public boolean commander(String modeLivraison,boolean enligne,boolean faireFacture) {
 
         // assurer que les stocks sont a jour
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
@@ -194,6 +194,11 @@ public class Client extends Personne{
 
             this.panier.viderPanier();
             Reseau.updateInfos(EnumUpdatesDB.STOCKS);
+
+            if(faireFacture){
+                Reseau.createBillPDF(commandes, this, "."); // current directory
+            }
+
         } else {
             System.out.println("Le panier est vide.");
             return false;
@@ -253,7 +258,9 @@ public class Client extends Personne{
                     commandeError++;
                 }
             }
-            commandes.add(commande);
+            if(!commande.getDetails().isEmpty()) {
+                commandes.add(commande);
+            }
         }
         System.out.println("Nombre de commandes non enregistrées : " + commandeError);
         Reseau.updateInfos(EnumUpdatesDB.NUMCOM);

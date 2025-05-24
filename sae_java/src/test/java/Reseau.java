@@ -1,4 +1,6 @@
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,6 +15,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 
 public class Reseau {
 
@@ -448,10 +462,171 @@ public class Reseau {
      * @param client : Client
      * @param fileName : String
      */
-    public void createBillPDF(List<Commande> commandes, Client client,String fileName) {
-        // Implémentation de la création du PDF
-        // Cette méthode pourrait utiliser une bibliothèque comme iText ou Apache PDFBox pour générer le PDF
-        // Le contenu du PDF serait basé sur les détails des commandes passées
+    public static void createBillPDF(List<Commande> commandes, Client client,String folderName) {
+
+        try {
+
+            Document facturePDF = new Document();
+            double total = 0.0;
+
+            String fileName = folderName + "/" + client.getNom() + "_" + client.getPrenom() + "_facture" + ".pdf";
+
+            PdfWriter writer = PdfWriter.getInstance(facturePDF, new FileOutputStream(fileName));
+
+            Font infoFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
+
+            facturePDF.open();
+
+            // client information
+            Paragraph clientInfo = new Paragraph(
+                    """
+                    Informations du client : 
+                    ID Client : """ + client.getId() + "    " +
+                    "Nom : " + client.getNom() + "   " +
+                    "Prénom : " + client.getPrenom() + "\n" +
+                    "Adresse : " + client.getAddress() + "  " +
+                    client.getCodePostal() + "   " +       
+                    client.getVille() + "\n" +
+                    "______________________________________________________________________________" + 
+                    "\n",infoFont
+                );
+
+            facturePDF.add(clientInfo);
+
+            // commandes information
+            for(Commande commande : commandes) {
+
+                String typeCommande = commande.getEnLigne();
+
+                switch (typeCommande) {
+                    case "O" -> typeCommande = "En ligne";
+                    case "M" -> typeCommande = "En point de vente";
+                    default -> typeCommande = "Inconnu";
+                }
+
+                String typeLivraison = commande.getLivraison();
+
+                switch (typeLivraison) {
+                    case "C" -> typeLivraison = "Livraison à domicile";
+                    case "M" -> typeLivraison = "Retrait en librairie";
+                    default -> typeLivraison = "Inconnu";
+                }
+
+                Paragraph commandeInfo = new Paragraph(
+                        """
+                        Informations de la commande :
+                        Numéro de commande : """ + commande.getNumCommande() + "\n" +
+                        "Date de la commande : " + commande.getDate() + "\n" +
+                        "Livraison : " + typeLivraison + "  |  " +
+                        "Type de commande : " + typeCommande + "\n\n" +
+                        "Librairie : " + Reseau.getLibrairie(commande.getIdLibrairie()).getNom() + "\n\n",infoFont
+                    );
+
+                facturePDF.add(commandeInfo);
+
+                // creation du tableau des détails de la commande
+
+                PdfPTable table = new PdfPTable(3);
+                table.setWidthPercentage(100);
+                table.setSpacingBefore(11f);
+                table.setSpacingAfter(11f);
+                
+
+                float[] columnWidths = {4f, 1f, 2f};
+                table.setWidths(columnWidths);
+
+                table.setHeaderRows(1);
+
+                // entête du tableau
+                Paragraph livreHeader = new Paragraph("Livre");
+
+                PdfPCell livreHeaderCell = new PdfPCell(livreHeader);
+                livreHeaderCell.setPadding(5f);
+                livreHeaderCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                livreHeaderCell.setBackgroundColor(BaseColor.GRAY);
+
+                Paragraph quantityHeader = new Paragraph("Quantité");
+                quantityHeader.setAlignment(Paragraph.ALIGN_CENTER);
+                PdfPCell quantityHeaderCell = new PdfPCell(quantityHeader);
+                quantityHeaderCell.setPadding(5f);
+                quantityHeaderCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                quantityHeaderCell.setBackgroundColor(BaseColor.GRAY);
+
+                Paragraph priceHeader = new Paragraph("Total (€)");
+                priceHeader.setAlignment(Paragraph.ALIGN_CENTER);
+                PdfPCell priceHeaderCell = new PdfPCell(priceHeader);
+                priceHeaderCell.setPadding(5f);
+                priceHeaderCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                priceHeaderCell.setBackgroundColor(BaseColor.GRAY);
+
+                table.addCell(livreHeaderCell);
+                table.addCell(quantityHeaderCell);
+                table.addCell(priceHeaderCell);
+
+                // cellules pour les détails de la commande
+
+                PdfPCell cellBook = new PdfPCell();
+                cellBook.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                cellBook.setPadding(5f);
+
+                PdfPCell cellQuantity = new PdfPCell();
+                cellQuantity.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                cellQuantity.setPadding(5f);
+
+                PdfPCell cellPrice = new PdfPCell();
+                cellPrice.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                cellPrice.setPadding(5f);
+
+                cellBook.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                cellQuantity.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                cellPrice.setBackgroundColor(BaseColor.LIGHT_GRAY);
+
+                // détails de la commande
+                for(DetailCommande detail : commande.getDetails()) {
+                    Chunk detailInfo = new Chunk(
+                        "ISBN : " + detail.getLivre().getIsbn() + "     " +
+                        detail.getLivre().getTitre()
+                    );
+
+                    cellBook.addElement(detailInfo);
+
+                    Paragraph quantityInfo = new Paragraph(detail.getQuantite());
+                    quantityInfo.setAlignment(Paragraph.ALIGN_CENTER);
+                    Paragraph priceInfo = new Paragraph((detail.getLivre().getPrix() * detail.getQuantite()) + " €");
+                    priceInfo.setAlignment(Paragraph.ALIGN_RIGHT);
+
+                    double prix = detail.getLivre().getPrix() * detail.getQuantite();
+
+                    cellQuantity.addElement(quantityInfo);
+                    cellPrice.addElement(priceInfo);
+                }
+
+                table.addCell(cellBook);
+                table.addCell(cellQuantity);
+                table.addCell(cellPrice);
+                facturePDF.add(table);
+                double totalCommande = commande.getTotalCommande();
+                total += totalCommande;
+                facturePDF.add(new Paragraph("Montant total de la commande : " + totalCommande + " €\n\n"));
+                facturePDF.add(new Paragraph("______________________________________________________________________________\n\n"));
+            }
+
+            // total de toutes les commandes
+            facturePDF.add(new Paragraph("Montant total de toutes les commandes : " + total + " €\n\n"));
+
+            facturePDF.close();
+            writer.close();
+            
+        } catch (DocumentException | FileNotFoundException e) {
+            System.err.println("Erreur lors de la création du PDF : " + e.getMessage());
+        }
+        catch (LibraryNotFoundException e) {
+            System.err.println("Erreur lors de la récupération de la librairie pour la création de la facture²: " + e.getMessage());
+        }
+
+
+
+        
     }
 
 

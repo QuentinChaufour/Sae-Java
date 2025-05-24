@@ -186,7 +186,7 @@ public class Livre {
 
     @Override
     public int hashCode() {
-        int prixInt = (int) prix*100;
+
         return 31 * isbn.hashCode();
     }
 }
