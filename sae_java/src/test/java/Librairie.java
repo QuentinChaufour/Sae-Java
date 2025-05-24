@@ -82,7 +82,7 @@ public class Librairie implements Comparable<Librairie>{
     }
 
     /**
-     * permet d'ajouter un livre au stock de la librairie dans le cadre de la mise a jour
+     * permet d'ajouter un livre au stock de la librairie dans le cadre de la mise a jour des stocks
      * 
      * @param livre : Livre
      * @param quantite : int
@@ -107,7 +107,7 @@ public class Librairie implements Comparable<Librairie>{
         if(this.livreseEnStock.containsKey(livre)){
             //mettre a jour la qte
 
-            PreparedStatement statement = Reseau.createStatement("UPDATE testPOSSEDER SET qte = qte + ? WHERE isbn = ? AND nummag = ?");
+            PreparedStatement statement = Reseau.createStatement("UPDATE testPOSSEDER SET qte = qte + ? WHERE isbn = ? AND idmag = ?");
             statement.setInt(1, quantite);
             statement.setString(2, livre.getIsbn());
             statement.setInt(3, this.id);
@@ -147,20 +147,34 @@ public class Librairie implements Comparable<Librairie>{
     }
 
     /**
-     * permet de retirer un livre de la librairie en une certaine quantité
+     * permet de retirer un livre de la librairie en une certaine quantité et de mettre à jour la base de données
      * @param livre : Livre
      * @param quantite : int
      */
-    public void retirerLivre(Livre livre,int quantite) throws QuantiteInvalideException , BookNotInStockException {
+    public void retirerLivre(Livre livre,int quantite) throws QuantiteInvalideException , BookNotInStockException, SQLException {
         
         if (this.livreseEnStock.containsKey(livre)) {
 
             int qte = this.livreseEnStock.get(livre);
             if (qte > quantite) {
                 this.livreseEnStock.put(livre, qte - quantite);
+
+                // mettre à jour la quantité dans la base de données
+                PreparedStatement statement = Reseau.createStatement("UPDATE testPOSSEDER SET qte = qte - ? WHERE isbn = ? AND idmag = ?");
+                statement.setInt(1, quantite);
+                statement.setString(2, livre.getIsbn());
+                statement.setInt(3, this.id);
+                statement.executeUpdate();
+                statement.close();
             } 
             else if (qte == quantite) {
                 this.livreseEnStock.remove(livre);
+                // supprimer le livre de la base de données
+                PreparedStatement statement = Reseau.createStatement("DELETE FROM testPOSSEDER WHERE isbn = ? AND idmag = ?");
+                statement.setString(1, livre.getIsbn());
+                statement.setInt(2, this.id);
+                statement.executeUpdate();
+                statement.close();
             } 
             else {
                 throw new QuantiteInvalideException();
@@ -170,7 +184,6 @@ public class Librairie implements Comparable<Librairie>{
            throw new BookNotInStockException();
         }
     }
-
 
     /**
      * verifie si un livre est présent en une certaine quantité dans les stocks du magasin

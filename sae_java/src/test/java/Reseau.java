@@ -162,10 +162,26 @@ public class Reseau {
      * 
      * @param librairie
      */
-    public static void addLibrairie(Librairie librairie) {
-        librairies.add(librairie);
+    public static void addLibrairie(Librairie librairie) throws SQLException{
 
-        // ajouter partie BD
+        if (!librairies.contains(librairie)) {
+            librairies.add(librairie);
+        }
+    }
+
+    public static void addNewLibrairie(Librairie librairie) throws SQLException, LibraryAlreadyExistsException {
+        if (librairies.contains(librairie)) {
+            throw new LibraryAlreadyExistsException("La librairie " + librairie.getNom() + " existe déjà dans le réseau.");
+        } else {
+            PreparedStatement statement = Reseau.connection.prepareStatement("INSERT INTO testMAGASIN VALUES (?, ?, ?)");
+            statement.setInt(1, librairie.getId());
+            statement.setString(2, librairie.getNom());
+            statement.setString(3, librairie.getVille());
+            statement.executeUpdate();
+            statement.close();
+
+            librairies.add(librairie);
+        }
     }
 
     /**

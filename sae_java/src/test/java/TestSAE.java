@@ -92,7 +92,11 @@ public class TestSAE {
 
         Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
 
-        Reseau.addLibrairie(librairie);
+        try {
+            Reseau.addLibrairie(librairie);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         // Test ajout de livres
         panier.ajouterLivre(livre1,1,1);
         panier.ajouterLivre(livre2,1,1);
@@ -181,6 +185,9 @@ public class TestSAE {
         catch (BookNotInStockException e) {
             System.err.println("Livre non disponible");
         }
+        catch (SQLException e) {
+            System.err.println("Erreur SQL lors de l'ajout/suppression au stock");
+        }
 
 
         try {
@@ -205,7 +212,11 @@ public class TestSAE {
         Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
         Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
-        Reseau.addLibrairie(librairie);
+        try {
+            Reseau.addLibrairie(librairie);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         try{
             librairie.ajouterAuStock(livre,3);
@@ -243,12 +254,17 @@ public class TestSAE {
         assertEquals(livre, vendeur.transfererLivre(livre, librairie));
     }
  */
+
     @Test
     public void testCommandes(){
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
         Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
         Commande commande = new Commande(0, new java.util.Date(), "O", "O", client.getId(), client.getLibrairie());
-        Reseau.addLibrairie(librairie);
+        try {
+            Reseau.addLibrairie(librairie);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         
         assertTrue(commande.getIdLibrairie() == 5);
         assertTrue(commande.getNumCommande() == 0);
@@ -284,6 +300,23 @@ public class TestSAE {
         } catch (LibraryNotFoundException e) {
         }
         catch (SQLException e) {
+        }
+    }
+
+    @Test
+    public void clearBD(){
+        try {
+            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+        } catch (SQLException e) {
+            System.err.println("pb suppression clear DB" + e.getMessage());
         }
     }
 
