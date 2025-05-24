@@ -76,7 +76,7 @@ public class Reseau {
 
                         newLibrairies.add(new Librairie(idLibrairie, nomLibrairie, villeLibrairie));
                     }
-
+                    Collections.sort(newLibrairies); // Tri des librairies par ID pour l'affichage
                     Reseau.librairies = newLibrairies;
 
                     statement.close();
@@ -114,7 +114,7 @@ public class Reseau {
                             Livre livre = Reseau.createLivre(isbn);
 
                             try {
-                                lib.ajouterLivre(livre, stocks.get(isbn));
+                                lib.ajouterAuStock(livre, stocks.get(isbn));
                             } catch (QuantiteInvalideException e) {
                                 e.printStackTrace();
                             }
@@ -173,9 +173,19 @@ public class Reseau {
      * 
      * @param librairie
      **/
-    public static void removeLibrairie(Librairie librairie) throws LibraryNotFoundException {
+    public static void removeLibrairie(Librairie librairie) throws LibraryNotFoundException,SQLException {
         if (librairies.contains(librairie)) {
-            librairies.remove(librairie);
+                
+                PreparedStatement statementMagasin = Reseau.connection.prepareStatement("DELETE FROM testMAGASIN WHERE idmag = ?");
+                PreparedStatement statementLivre = Reseau.connection.prepareStatement("DELETE FROM testPOSSEDER WHERE idmag = ?");
+                statementMagasin.setInt(1, librairie.getId());
+                statementLivre.setInt(1, librairie.getId());
+                statementMagasin.executeUpdate();
+                statementLivre.executeUpdate();
+                statementMagasin.close();
+                statementLivre.close();
+
+                librairies.remove(librairie);
         }
         else {
             throw new LibraryNotFoundException();
@@ -404,8 +414,6 @@ public class Reseau {
         
     }
 
-
-    // methode uniquement pour les tests
     public static PreparedStatement createStatement(String request){
         try {
             return  Reseau.connection.prepareStatement(request);

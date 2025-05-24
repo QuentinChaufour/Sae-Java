@@ -120,7 +120,8 @@ public class TestSAE {
         try {
             Reseau.removeLibrairie(librairie);
         } catch (LibraryNotFoundException e) {
-
+        }
+        catch (SQLException e) {
         }
 
     }
@@ -159,11 +160,11 @@ public class TestSAE {
 
         // Test ajout de livres au stock
         try {
-            librairie.ajouterLivre(livre, 5);
+            librairie.ajouterAuStock(livre, 5);
             assertTrue(librairie.consulterStock().containsKey(livre));
             assertTrue(librairie.consulterStock().get(livre) == 5);
 
-            librairie.ajouterLivre(livre, 2);
+            librairie.ajouterAuStock(livre, 2);
             assertTrue(librairie.consulterStock().get(livre) == 7);
 
             librairie.retirerLivre(livre,6);
@@ -172,7 +173,7 @@ public class TestSAE {
             librairie.retirerLivre(livre,1);
             assertFalse(librairie.consulterStock().containsKey(livre));
 
-            librairie.ajouterLivre(livre2, 0);
+            librairie.ajouterAuStock(livre2, 0);
         }
         catch (QuantiteInvalideException e) {
             System.err.println("Quantité invalide");
@@ -183,7 +184,7 @@ public class TestSAE {
 
 
         try {
-            librairie.ajouterLivre(livre, 5);
+            librairie.ajouterAuStock(livre, 5);
         }
         catch (QuantiteInvalideException e) {
             System.err.println("Quantité invalide");
@@ -207,7 +208,7 @@ public class TestSAE {
         Reseau.addLibrairie(librairie);
 
         try{
-            librairie.ajouterLivre(livre,3);
+            librairie.ajouterAuStock(livre,3);
         }
         catch (QuantiteInvalideException e) {
             System.err.println("Quantité invalide");
@@ -217,8 +218,10 @@ public class TestSAE {
         try {
             Reseau.removeLibrairie(librairie);
         } catch (LibraryNotFoundException e) {
-
         }
+        catch (SQLException e) {
+        }
+
     }
 /*
     @Test
@@ -279,6 +282,8 @@ public class TestSAE {
         try {
             Reseau.removeLibrairie(librairie);
         } catch (LibraryNotFoundException e) {
+        }
+        catch (SQLException e) {
         }
     }
 
@@ -349,7 +354,7 @@ public class TestSAE {
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
         }
         catch (SQLException e){
-
+            System.err.println("pb suppression commander client" + e.getMessage());
         }
         catch (LibraryNotFoundException e){
 
@@ -365,7 +370,9 @@ public class TestSAE {
 
         Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
         Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("1","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
-        
+
+        Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+
         assertFalse(Reseau.librairies.contains(librairie));
         assertFalse(Reseau.librairies.contains(librairie2));
 
@@ -557,6 +564,69 @@ public class TestSAE {
         }
 
         try {
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
+
+    @Test
+    public void testAjoutLivreVendeurAdmin(){
+
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre potter = new Livre("122", "Harry Potter", new ArrayList<>(),"Gallimard", 1943, 7.99, 96, "Romand");
+        Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
+
+        try
+        {
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+
+            Librairie librairie = Reseau.getLibrairie(0);
+
+            librairie.ajouterNouveauLivre(livre, 2);
+            librairie.ajouterNouveauLivre(potter, 3);
+
+            assertTrue(librairie.consulterStock().containsKey(livre));
+            assertTrue(librairie.consulterStock().get(livre) == 2);
+            assertTrue(librairie.consulterStock().containsKey(potter));
+            assertTrue(librairie.consulterStock().get(potter) == 3);
+            assertFalse(librairie.consulterStock().containsKey(livre2));
+
+            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
+            // si les livres sont bien ajoutés, ils seront toujours dans le stock de la librairie
+
+            librairie = Reseau.getLibrairie(0);
+
+            assertTrue(librairie.consulterStock().containsKey(livre));
+            assertTrue(librairie.consulterStock().get(livre) == 2);
+            assertTrue(librairie.consulterStock().containsKey(potter));
+            assertTrue(librairie.consulterStock().get(potter) == 3);
+            assertFalse(librairie.consulterStock().containsKey(clanWar));
+
+
+        } catch (SQLException e) {
+            System.err.println("pb insertion test ajout livre Vendeur/Admin" + e.getMessage());
+        }
+        catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide pour l'ajout du livre");
+        }
+        catch (LibraryNotFoundException e) {
+            System.err.println("Library not found");
+        }
+
+
+
+        try {
+            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
             Reseau.createStatement("delete from testCLIENT").executeUpdate();
         } catch (SQLException e) {
         }
