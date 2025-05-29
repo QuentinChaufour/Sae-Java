@@ -40,7 +40,7 @@ public class Reseau {
     public static List<Librairie> librairies = new ArrayList<>();
 
     private static Connection connection = null;
-    
+
     public static int numCom = 1; // en cas de table vide (pas de commande)
     public static int numlig = 1; // en cas de table vide 
 
@@ -69,6 +69,9 @@ public class Reseau {
         throw new LibraryNotFoundException();
     }
 
+    public static Connection getConnection(){
+        return Reseau.connection;
+    }
     /**
      * met a jour les informations par rapport a la BD
      * 
