@@ -1,4 +1,4 @@
-import java.beans.Statement;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -12,8 +12,8 @@ public class Vendeur extends Personne{
     private int idVendeur;
     private int idlibrairie;
 
-    public Vendeur(String nom, String prenom, int id){
-        super(nom, prenom);
+    public Vendeur(String nom, String prenom, String motDePasse, int id){
+        super(nom, prenom, motDePasse);
         this.idVendeur = id;
     }
 
@@ -38,9 +38,10 @@ public class Vendeur extends Personne{
         } 
     }
 
+
     public boolean checkQte(Commande commande){
+      Reseau.updateInfos(EnumUpdatesDB.STOCKS);
         for(DetailCommande detail : commande.getDetails()){
-            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
             try {
                 if(!Reseau.checkStock(detail.getLivre(), Reseau.getLibrairie(commande.getIdLibrairie()), 1)){
                     return false;
@@ -71,7 +72,6 @@ public class Vendeur extends Personne{
         for(Livre livre : listeLivres.keySet()){
             
         }
-        
     }
 
     public void enregistrerCommandes(List<Commande> commandes){
@@ -84,7 +84,7 @@ public class Vendeur extends Personne{
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
         }
     }
-
+/* 
     public void passerCommande(Client client, boolean faireFacture){
         List<Commande> commandesClient = Reseau.createCommande(client.getPanier());
         for(Commande commande : commandesClient){
@@ -145,4 +145,5 @@ public class Vendeur extends Personne{
         client.setVille(ville);
         client.setCodePostal(codePostal);
     }
+        */
 }

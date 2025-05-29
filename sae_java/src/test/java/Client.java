@@ -1,16 +1,18 @@
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Client extends Personne{
     
-    private int idClient;
+    private final int idClient;
     private String address;
     private String codePostal;
     private String ville;
-    private Librairie librairie;
+    private int idLibrairie;
     private Panier panier;
 
 
@@ -18,20 +20,21 @@ public class Client extends Personne{
      * Constructeur de la classe Client
      * @param nom : String
      * @param prenom : String
+     * @param prenom : motDePasse
      * @param id : int
      * @param address : String
      * @param codePostal : String
      * @param ville : String
      * @param librairie : Librairie
      */
-    public Client(String nom, String prenom,int id, String address, String codePostal, String ville, Librairie librairie) {
-        super(nom, prenom);
+    public Client(String nom, String prenom, String motDePasse, int id, String address, String codePostal, String ville, int idLibrairie) {
+        super(nom, prenom, motDePasse);
         this.idClient = id;  
         this.address = address;
         this.codePostal = codePostal;
         this.ville = ville;
 
-        this.librairie = librairie;
+        this.idLibrairie = idLibrairie;
         this.panier = new Panier();
     }
 
@@ -74,10 +77,10 @@ public class Client extends Personne{
     /**
      * getteur de la librairie liée au client
      * 
-     * @return la librairie liée au client : Librairie
+     * @return id de la librairie liée au client : int
      */
-    public Librairie getLibrairie() {
-        return librairie;
+    public int getLibrairie() {
+        return idLibrairie;
     }
 
     /**
@@ -112,8 +115,8 @@ public class Client extends Personne{
      * 
      * @param librairie
      */
-    public void setLibrairie(Librairie librairie) {
-        this.librairie = librairie;
+    public void setLibrairie(int idLibrairie) {
+        this.idLibrairie = idLibrairie;
     }
 
     /**
@@ -126,7 +129,12 @@ public class Client extends Personne{
     }
 
     public Map<Livre, Integer> consulterLivres() {
-        return new HashMap<>(this.librairie.consulterStock());
+        try {
+            return Reseau.getLibrairie(this.idLibrairie).consulterStock();
+        } catch (LibraryNotFoundException e) {
+            System.err.println("Erreur : librairie non trouvée (" + e.getMessage() + ")");
+            return null;
+        }
     }
 
     /**
@@ -136,7 +144,7 @@ public class Client extends Personne{
      * @param librairie : Librairie
      * @param qte : int
      */
-    public void ajouterAuPanier(Livre livre, Librairie librairie, int qte) throws QuantiteInvalideException{
+    public void ajouterAuPanier(Livre livre, int librairie, int qte) throws QuantiteInvalideException{
         panier.ajouterLivre(livre,librairie,qte);
     }
 
@@ -147,7 +155,7 @@ public class Client extends Personne{
      * @param librairie : Librairie
      * @param qte : int
      */
-    public void retirerDuPanier(Livre livre,Librairie librairie,int qte) throws PasAssezDeStockException {
+    public void retirerDuPanier(Livre livre,int librairie,int qte) throws PasAssezDeStockException {
         this.panier.retirerLivre(livre,librairie,qte);
     }
 
@@ -172,15 +180,13 @@ public class Client extends Personne{
      *  permet a un client de passer commande de son panier
      * @return si les commandes ont été éffectué mais pas si elles étaient correctent
      */
-    public boolean commander() {
-
-        String livraison = "O";
+    public boolean commander(String modeLivraison,boolean enligne,boolean faireFacture) {
 
         // assurer que les stocks sont a jour
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
         if (!this.panier.getContenu().isEmpty()) {
-            List<Commande> commandes = createCommandes(livraison);
+            List<Commande> commandes = createCommandes(modeLivraison,enligne);
 
             for (Commande commande : commandes) {
                 Reseau.enregisterCommande(commande);
@@ -188,6 +194,11 @@ public class Client extends Personne{
 
             this.panier.viderPanier();
             Reseau.updateInfos(EnumUpdatesDB.STOCKS);
+
+            if(faireFacture){
+                Reseau.createBillPDF(commandes, this, "."); // current directory
+            }
+
         } else {
             System.out.println("Le panier est vide.");
             return false;
@@ -202,18 +213,23 @@ public class Client extends Personne{
      * @param livraison : String
      * @return la liste des commandes du panier du client
      */
-    private List<Commande> createCommandes(String livraison) {
+    private List<Commande> createCommandes(String livraison,boolean enligne) {
 
         int nbDetailCommande = 0;
         int nbCommande = 0;
         int commandeError = 0;
         List<Commande> commandes = new ArrayList<>();
 
-        for (Librairie librairiePanier : this.panier.getContenu().keySet()) {
+        for (int librairiePanier : this.panier.getContenu().keySet()) {
 
             Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
-            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),"O",livraison,this, librairiePanier);
+            String typeCommande;
+            if(enligne){ typeCommande = "O";}
+            else{ typeCommande = "N";}
+
+
+            Commande commande = new Commande(Reseau.numCom + nbCommande, new Date(),typeCommande,livraison,this.idClient, librairiePanier);
             nbCommande++;
 
             for(Livre livre : livres.keySet()) {
@@ -221,10 +237,14 @@ public class Client extends Personne{
                 int quantite = livres.get(livre);
 
                 // Vérification de la quantité
-                if(!Reseau.checkStock(livre, Reseau.librairies.get(Reseau.librairies.indexOf(librairiePanier)), quantite)){
-                    System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
-                    commandeError++;
-                    continue;
+                try {
+                    if(!Reseau.checkStock(livre, Reseau.getLibrairie(librairiePanier), quantite)){
+                        System.out.println("Erreur lors de l'ajout du livre " + livre.getTitre() + " pour une qte = " + quantite + " à la commande, dû a un stock insuffisant de la librairie : "+ librairiePanier +".");
+                        commandeError++;
+                        continue;
+                    }
+                } catch (LibraryNotFoundException e) {
+                    e.printStackTrace();
                 }
 
                 // si la quantité est valide, on l'ajoute à la commande
@@ -238,11 +258,100 @@ public class Client extends Personne{
                     commandeError++;
                 }
             }
-            commandes.add(commande);
+            if(!commande.getDetails().isEmpty()) {
+                commandes.add(commande);
+            }
         }
         System.out.println("Nombre de commandes non enregistrées : " + commandeError);
         Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
         return commandes;
+    }
+
+    // methode de base selon la classification des livres
+    public List<Livre> OnVousRecommande() throws LibraryNotFoundException{
+
+        Reseau.updateInfos(EnumUpdatesDB.STOCKS);
+
+        Set<Livre> userBooks = Reseau.getUserBooks(this.idClient); 
+        Set<String> criteria = this.getClassificationsCriteria(userBooks);
+
+        Map<Livre,Set<Integer>> mapCommandesClients = Reseau.mapperCommandesClients(this.idClient);
+
+        // traitement des livres respectant les critères
+
+        Map<Livre,Set<Integer>> copyMapCommandesClients= new HashMap<>(mapCommandesClients);
+
+        for(Livre book : copyMapCommandesClients.keySet()){
+            if(!criteria.contains(book.getClassification())){
+                mapCommandesClients.remove(book); // livre non conforme au critère
+            }
+        }
+
+        // créer la liste des livres selon popularité
+        List<Livre> popularBooks = this.getPopularBooks(mapCommandesClients);
+        mapCommandesClients = null;
+
+        // verif si livre pas commandé par les clients et livre en stock dans librairie courante
+
+        Librairie currentLibrary = Reseau.getLibrairie(this.idLibrairie);
+
+        List<Livre> recommanded = new ArrayList<>();
+
+        for(Livre book : popularBooks){
+            if(!userBooks.contains(book) && currentLibrary.checkStock(book, 1)){
+                recommanded.add(book);
+            }
+
+        }
+
+        return recommanded;
+    }
+
+    private Set<String> getClassificationsCriteria(Set<Livre> books){
+
+        Set<String> classifications = new HashSet<>();
+
+        for(Livre book : books){
+            classifications.add(book.getClassification());
+        }
+
+        return classifications;
+    }
+
+    private List<Livre> getPopularBooks(Map<Livre,Set<Integer>> booksMap){
+
+        List<Livre> popularBooks = new ArrayList<>();
+        Integer maxPop = null;
+        Livre popLivre = null; 
+
+        while(!booksMap.isEmpty()){
+
+            for(Livre book : booksMap.keySet()){
+
+                int pop =  booksMap.get(book).size();
+
+                if((maxPop == null || pop > maxPop) && !popularBooks.contains(book)){
+                    maxPop = pop;
+                    popLivre = book;
+                }
+            }
+
+            popularBooks.add(popLivre);
+            maxPop = null;
+            booksMap.remove(popLivre);
+        }
+        return popularBooks;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof Client)) return false;
+
+        Client client = (Client) obj;
+
+        return this.idClient == client.idClient;
     }
 
     /**
@@ -250,12 +359,10 @@ public class Client extends Personne{
      */
     @Override
     public String toString() {
-        return "Client{" +
+        return "Client " +
                 "idClient=" + idClient +
                 ", address='" + address + '\'' +
                 ", codePostal='" + codePostal + '\'' +
-                ", ville='" + ville + '\'' +
-                ", librairie=" + librairie.getNom() +
-                '}';
+                ", ville='" + ville + '\'';
     }
 }

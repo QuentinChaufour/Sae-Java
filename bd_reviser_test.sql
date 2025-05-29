@@ -22,6 +22,7 @@ CREATE TABLE testCLIENT (
   idcli      int NOT NULL,
   nomcli     varchar(50),
   prenomcli  varchar(30),
+  motdepassecli varchar(30) UNIQUE,
   adressecli varchar(100),
   codepostal varchar(5),
   villecli   varchar(100)
@@ -103,14 +104,3 @@ ALTER TABLE testPOSSEDER ADD FOREIGN KEY (isbn) REFERENCES testLIVRE (isbn);
 ALTER TABLE testPOSSEDER ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
 
 ALTER TABLE testVENDEUR ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
-
-insert into testCLIENT values (1,'Martin','Julie','133 boulevard de l universite','45000','Orleans');
-insert into testMAGASIN values ('0','Librairie de la Fac','Orleans');
-insert into testMAGASIN values ('1','La librairie du centre','Tours');
-insert into testCLIENT values (2,'Dupont','Jean','456 avenue de la Republique','75000','Paris');
-insert into testAUTEUR values (1,'H.G Wells',null,null);
-insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null);
-insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null);
-insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null);
-insert into testECRIRE values ('120',1);
-insert into testECRIRE values ('121',2);
