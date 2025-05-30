@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -457,7 +458,7 @@ public class Reseau {
         return userName.equals(Reseau.ADMIN_USER) && motDePasse.equals(Reseau.ADMIN_PASSWORD);
     }
 
-    // fonction facture PDF
+
 
     /**
      * Crée un PDF de facture pour les commandes passées par un client
@@ -626,11 +627,149 @@ public class Reseau {
         catch (LibraryNotFoundException e) {
             System.err.println("Erreur lors de la récupération de la librairie pour la création de la facture²: " + e.getMessage());
         }
-
-
-
-        
     }
+
+    // stats
+
+    /**
+     * permet de récupérer le palmarès des livres/auteurs/librairies, par ordre décroissant de popularité et de les limiter à n éléments
+     * 
+     * @param <T>
+     * @param n : int
+     * @return List<T> : liste des éléments de type T (Livre, Auteur, Librairie) les plus populaires par ordre décroissant
+     */
+    public static <T> Map<T,Integer> getPalmares(int n,EnumPalmares type)  throws SQLException{
+
+        switch (type) {
+            case EnumPalmares.LIVRE -> {
+                return getPalmaresLivre(n);
+            }
+
+            case EnumPalmares.AUTEUR -> {
+                return getPalmaresAuteur(n);
+            }
+      
+            case EnumPalmares.LIBRAIRIE -> {
+                return getPalmaresLibrairie(n);
+            }
+
+            default -> {
+                throw new IllegalArgumentException("Type de palmarès inconnu : " + type);
+            }
+        }
+    }
+
+    /**
+     * Récupère le palmarès des livres les plus populaires
+     * 
+     * @param n : int, le nombre de livres à récupérer
+     * @return List<T> : liste des livres les plus populaires, par ordre décroissant
+     * @throws SQLException
+     */
+    private static <T> Map<T,Integer> getPalmaresLivre(int n) throws SQLException {
+
+        PreparedStatement statement = Reseau.createStatement("SELECT isbn, titre, nomedit, datepubli, prix, nbpages, nomclass,COUNT(numlig) nbCommande FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE NATURAL JOIN testLIVRE GROUP BY isbn ORDER BY COUNT(numlig) DESC LIMIT ?");
+        statement.setInt(1, n);
+        ResultSet resultSet = statement.executeQuery();
+        Map<T,Integer> livresPalmares = new LinkedHashMap<>();
+
+        while (resultSet.next()) {
+            String isbn = resultSet.getString("isbn");
+            String titre = resultSet.getString("titre");
+            String nomEdit = resultSet.getString("nomedit");
+            Integer datePubli = resultSet.getInt("datepubli");
+            double prix = resultSet.getBigDecimal("prix").doubleValue();
+            Integer nbPages = resultSet.getInt("nbpages");
+            String nomClass = resultSet.getString("nomclass");
+
+            Integer nombreCommandes = resultSet.getInt("nbCommande");
+
+            Livre livre = new Livre(isbn, titre, nomEdit, datePubli, prix, nbPages, nomClass);
+            
+            // Ajout des auteurs
+            PreparedStatement statementAuteur = Reseau.connection.prepareStatement("SELECT * FROM testECRIRE NATURAL JOIN testAUTEUR WHERE isbn = ?");
+            statementAuteur.setString(1, isbn);
+            ResultSet resultSetAuteur = statementAuteur.executeQuery();
+
+            while (resultSetAuteur.next()) {
+                String idAuteur = resultSetAuteur.getString("idauteur");
+                String nomPrenom = resultSetAuteur.getString("nomauteur");
+                Integer naissance = resultSetAuteur.getInt("anneenais");
+                Integer deces = resultSetAuteur.getInt("anneedeces");
+                livre.ajouterAuteur(new Auteur(idAuteur, nomPrenom, naissance, deces));
+            }
+
+            livresPalmares.put((T) livre, nombreCommandes);
+        }
+
+        return livresPalmares;
+    }
+
+    /**
+     * Récupère le palmarès des auteurs les plus populaires
+     * 
+     * @param n : int, le nombre d'auteurs à récupérer
+     * @return List<T> : liste des auteurs les plus populaires, par ordre décroissant
+     * @throws SQLException
+     */
+    private static <T> Map<T,Integer> getPalmaresAuteur(int n) throws SQLException {
+
+        PreparedStatement statement = Reseau.createStatement("SELECT idauteur, nomauteur,anneenais,anneedeces,SUM(qte) nbLivreCommande FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE NATURAL JOIN testLIVRE NATURAL JOIN testECRIRE NATURAL JOIN testAUTEUR GROUP BY idauteur ORDER BY SUM(qte) DESC LIMIT ?");
+        statement.setInt(1, n);
+        ResultSet resultSet = statement.executeQuery();
+
+        Map<T,Integer> auteursPalmares = new LinkedHashMap<>();
+        while (resultSet.next()) {
+            String idAuteur = resultSet.getString("idauteur");
+            String nomAuteur = resultSet.getString("nomauteur");
+            Integer anneeNais = resultSet.getInt("anneenais");
+            Integer anneeDeces = resultSet.getInt("anneedeces");
+            Integer nombreCommandes = resultSet.getInt("nbLivreCommande"); // Nombre de commandes pour cet auteur
+
+            Auteur auteur = new Auteur(idAuteur, nomAuteur, anneeNais, anneeDeces);
+            auteursPalmares.put((T) auteur, nombreCommandes);
+        }
+
+        return auteursPalmares;
+    }
+
+    /**
+     * Récupère le palmarès des librairies les plus populaires
+     * 
+     * @param n : int, le nombre de librairies à récupérer
+     * @return List<T> : liste des librairies les plus populaires, par ordre décroissant
+     * @throws SQLException
+     */
+    private static <T> Map<T,Integer> getPalmaresLibrairie(int n) throws SQLException {
+
+        PreparedStatement statement = Reseau.createStatement("SELECT idmag,nommag,villemag,SUM(qte) nbVentes FROM testMAGASIN NATURAL JOIN testCOMMANDE NATURAL JOIN testDETAILCOMMANDE GROUP BY idmag ORDER BY SUM(qte) DESC LIMIT ?");
+        statement.setInt(1, n);
+        ResultSet resultSet = statement.executeQuery();
+        Map<T,Integer> librairiesPalmares = new LinkedHashMap<>();
+
+        while (resultSet.next()) {
+            int idLibrairie = resultSet.getInt("idmag");
+            String nomLibrairie = resultSet.getString("nommag");
+            String villeLibrairie = resultSet.getString("villemag");
+            Integer nombreCommandes = resultSet.getInt("nbVentes"); // Nombre de commandes pour cette librairie
+
+            Librairie librairie = new Librairie(idLibrairie, nomLibrairie, villeLibrairie);
+            librairiesPalmares.put((T) librairie, nombreCommandes);
+        }
+
+        return librairiesPalmares;
+    }
+
+    /**
+     * Récupère le chiffre d'affaire par librairie
+     * 
+     * @return Map<Librairie, Double> : Map avec les librairies et leur chiffre d'affaire respectif
+     */
+    public static Map<Librairie,Double> CAByLibrairie() {
+
+        return null;
+    }
+
 
 
     public static PreparedStatement createStatement(String request){
