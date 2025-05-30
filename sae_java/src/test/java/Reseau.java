@@ -763,11 +763,32 @@ public class Reseau {
     /**
      * Récupère le chiffre d'affaire par librairie
      * 
-     * @return Map<Librairie, Double> : Map avec les librairies et leur chiffre d'affaire respectif
+     * @return Map<Librairie, Double> : Map avec les librairies et leur chiffre d'affaire respectif par ordre décroissant
      */
     public static Map<Librairie,Double> CAByLibrairie() {
 
-        return null;
+        Map<Librairie,Double> caLibrairies = new LinkedHashMap<>();
+
+        try {
+            PreparedStatement statement = Reseau.createStatement("SELECT idmag, nommag, villemag, SUM(prixvente*qte) CA FROM testMAGASIN NATURAL JOIN testCOMMANDE NATURAL JOIN testDETAILCOMMANDE GROUP BY idmag ORDER BY CA DESC");
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int idLibrairie = resultSet.getInt("idmag");
+                String nomLibrairie = resultSet.getString("nommag");
+                String villeLibrairie = resultSet.getString("villemag");
+                double ca = resultSet.getBigDecimal("CA").doubleValue();
+
+                Librairie librairie = new Librairie(idLibrairie, nomLibrairie, villeLibrairie);
+                caLibrairies.put(librairie, ca);
+            }
+
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return caLibrairies;
     }
 
 
