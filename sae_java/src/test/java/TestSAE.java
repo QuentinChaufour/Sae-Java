@@ -763,5 +763,136 @@ public class TestSAE {
         catch (LibraryNotFoundException e){
         }
     }
+
+    @Test
+    public void testStats(){
+
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
+
+        Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
+        Livre livre2 = new Livre("121","Le Petit Prince", Arrays.asList(new Auteur("2","Antoine de Saint-Exupéry",null,null)), "Gallimard", 1943, 7.99, 96, "Roman");
+        Livre potter = new Livre("122", "Harry Potter", new ArrayList<>(),"Gallimard", 1943, 7.99, 96, "Romand");
+        Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
+
+        // préparer la bd test
+        try {
+
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+            
+            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','a','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+
+            Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
+            
+            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
+            
+            Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('124',3)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('125',4)").executeUpdate();
+
+            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'122',2)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'124',1)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'125',9)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+
+
+            PreparedStatement statement = Reseau.createStatement("insert into testCOMMANDE values (1,?,'O','M',1,1)");
+            
+            Date sqlDate = new Date(new java.util.Date().getTime());
+
+            statement.setDate(1, sqlDate);
+            statement.executeUpdate();
+            PreparedStatement statement2 = Reseau.createStatement("insert into testCOMMANDE values (2,?,'O','M',2,1)");
+
+            statement2.setDate(1, sqlDate);
+            statement2.executeUpdate();
+            PreparedStatement statement3 = Reseau.createStatement("insert into testCOMMANDE values (3,?,'O','M',3,1)");
+
+            statement3.setDate(1, sqlDate);
+            statement3.executeUpdate();
+
+            PreparedStatement statement4 = Reseau.createStatement("insert into testCOMMANDE values (4,?,'O','M',3,0)");
+
+            statement4.setDate(1, sqlDate);
+            statement4.executeUpdate();
+
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (1,1,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (1,2,2,20,'121')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (2,3,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (2,4,1,9.99,'124')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,5,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,6,1,9.99,'122')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,7,1,9.99,'123')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (3,8,1,9.99,'125')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (4,9,1,9.99,'120')").executeUpdate();
+            Reseau.createStatement("insert into testDETAILCOMMANDE values (4,10,1,9.99,'125')").executeUpdate();
+
+
+
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
+             
+        } catch (SQLException e) {
+            System.err.println("pb insertion test stats" + e.getMessage());
+        }
+
+        try{
+
+                assertTrue(Reseau.getPalmares(10, EnumPalmares.LIBRAIRIE).get(Reseau.getLibrairie(1)) == 9);
+
+                int nbVenteLivre = Reseau.getPalmares(10, EnumPalmares.AUTEUR).get(new Auteur("2","Antoine de Saint-Exupéry",null,null));
+                assertTrue(nbVenteLivre == 2);
+                nbVenteLivre = Reseau.getPalmares(10, EnumPalmares.AUTEUR).get(new Auteur("1","H.G Wells",null,null));
+                assertTrue(nbVenteLivre == 4);
+
+                int venteLivre = Reseau.getPalmares(10, EnumPalmares.LIVRE).get(clanWar);
+                assertTrue(venteLivre == 2);
+                venteLivre = Reseau.getPalmares(10, EnumPalmares.LIVRE).get(livre);
+                assertTrue(venteLivre == 4);    
+
+                
+                double chiffreAffaire = Reseau.CAByLibrairie().get(Reseau.getLibrairie(1));
+                assertEquals(109.93, chiffreAffaire,0.01);
+
+        }
+        catch (SQLException e){
+            System.err.println("pb stats " + e.getMessage());
+        }
+        catch (LibraryNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try{
+            
+            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
+            Reseau.createStatement("delete from testECRIRE").executeUpdate();
+            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
+            Reseau.createStatement("delete from testLIVRE").executeUpdate();
+            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
+            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+        }
+        catch (SQLException e){
+            System.err.println("pb suppression stats " + e.getMessage());
+        }
+
+
+    }
 }
 

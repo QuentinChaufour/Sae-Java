@@ -101,6 +101,15 @@ public class Auteur{
 
     @Override
     public int hashCode() {
-        return 31 * idAuteur.hashCode() + nomPrenom.hashCode() + 11*dteNaissance.hashCode() + 7*dteMort.hashCode();
+
+        int hash = 0; 
+        if (!(dteNaissance == null)) {
+            hash += dteNaissance.hashCode() * 11;
+        }
+        if (!(dteMort == null)) {
+            hash += dteMort.hashCode() * 7;
+        }
+
+        return 31 * idAuteur.hashCode() + nomPrenom.hashCode() + hash;
     }
 }
