@@ -864,6 +864,9 @@ public class TestSAE {
                 venteLivre = Reseau.getPalmares(10, EnumPalmares.LIVRE).get(livre);
                 assertTrue(venteLivre == 4);    
 
+                
+                double chiffreAffaire = Reseau.CAByLibrairie().get(Reseau.getLibrairie(1));
+                assertEquals(109.93, chiffreAffaire,0.01);
 
         }
         catch (SQLException e){
