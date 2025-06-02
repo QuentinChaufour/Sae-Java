@@ -1,25 +1,26 @@
 package com.sae_java;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Commande {
 
     private final int numCommande;
-    private String dateCom;
+    private Date dateCom;
     private String enLigne;
     private String livraison;
-    private Client client;
-    private Librairie librairie;
+    private int idClient;
+    private int idLibrairie;
     private List<DetailCommande> details;
 
-    public Commande(int numCommande, String dateCom, String enLigne, String livraison, Client client, Librairie librairie){
+    public Commande(int numCommande, Date date, String enLigne, String livraison, int client, int librairie){
         this.numCommande = numCommande;
-        this.dateCom = dateCom;
+        this.dateCom = date;
         this.enLigne = enLigne;
         this.livraison = livraison;
-        this.client = client;
-        this.librairie = librairie;
+        this.idClient = client;
+        this.idLibrairie = librairie;
 
         this.details = new ArrayList<>();
     }
@@ -28,7 +29,7 @@ public class Commande {
         return this.numCommande;
     }
 
-    public String getDate(){
+    public Date getDate(){
         return this.dateCom;
     }
 
@@ -41,18 +42,18 @@ public class Commande {
     }
 
     public int getId(){
-        return this.client.getId();
+        return this.idClient;
     }
 
     public int getIdLibrairie(){
-        return this.librairie.getId();
+        return this.idLibrairie;
     }
 
     public List<DetailCommande> getDetails(){
         return new ArrayList<>(this.details);
     }
 
-    public void setDateCom(String date){
+    public void setDateCom(Date date){
         this.dateCom = date;
     }
 
@@ -64,24 +65,32 @@ public class Commande {
         this.livraison = livraison;
     }
 
-    public void setClient(Client client){
-        this.client = client;
+    public void setClient(int idClient){
+        this.idClient = idClient;
     }
 
-    public void setLibrairie(Librairie librairie){
-        this.librairie = librairie;
+    public void setLibrairie(int idLibrairie){
+        this.idLibrairie = idLibrairie;
     } 
 
-    public void addDetail(DetailCommande detail){
+    public void addDetailCommande(DetailCommande detail){
         this.details.add(detail);
     }
 
-    public void removeDetail(DetailCommande detail){
+    public void removeDetailCommande(DetailCommande detail){
         this.details.remove(detail);
+    }
+
+    public double getTotalCommande() {
+        double total = 0.0;
+        for (DetailCommande detail : this.details) {
+            total += detail.getQuantite()*detail.getLivre().getPrix();
+        }
+        return total;
     }
 
     @Override
     public String toString() {
-        return "Commande {" + "numCommande = " + this.numCommande + ", dateCom = " + this.dateCom + ", enLigne = " + this.enLigne + ", livraison = " + this.livraison + ", idClient = " + this.client.getId() + ", idMag = " + this.librairie.getId() + '}';
+        return "Commande {" + "numCommande = " + this.numCommande + ", dateCom = " + this.dateCom + ", enLigne = " + this.enLigne + ", livraison = " + this.livraison + ", idClient = " + this.idClient + ", idMag = " + this.idLibrairie + '}';
     }
 }

@@ -6,10 +6,14 @@ public class DetailCommande {
     private Livre livre;
     private int quantite;
 
-    public DetailCommande(int numLig, Livre livre, int quantite){
+    public DetailCommande(int numLig, Livre livre, int quantite) throws QuantiteInvalideException{
         this.numLig = numLig;
         this.livre = livre;
         this.quantite = quantite;
+
+        if(quantite <= 0){
+            throw new QuantiteInvalideException();
+        }
     }
 
     public int getNumLig(){

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Livre {
+public class Livre implements Comparable<Livre> {
 
     private final String isbn;
     private String titre;
@@ -188,5 +188,10 @@ public class Livre {
     public int hashCode() {
 
         return 31 * isbn.hashCode();
+    }
+
+    @Override
+    public int compareTo(Livre o) {
+        return String.CASE_INSENSITIVE_ORDER.compare(this.isbn, o.isbn);
     }
 }
