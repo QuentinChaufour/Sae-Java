@@ -267,8 +267,12 @@ public class Client extends Personne{
         return commandes;
     }
 
-    // methode de base selon la classification des livres
     public List<Livre> OnVousRecommande() throws LibraryNotFoundException{
+        return this.OnVousRecommande(10);
+    }
+
+    // methode de base selon la classification des livres
+    public List<Livre> OnVousRecommande(int nbRecommandation) throws LibraryNotFoundException{
 
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
@@ -352,6 +356,11 @@ public class Client extends Personne{
         Client client = (Client) obj;
 
         return this.idClient == client.idClient;
+    }
+
+    @Override
+    public int hashCode(){
+        return this.idClient * 7 + this.getNom().hashCode() * 11 + this.getPrenom().hashCode()*19;
     }
 
     /**

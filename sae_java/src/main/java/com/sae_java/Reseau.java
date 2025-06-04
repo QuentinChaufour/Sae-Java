@@ -596,12 +596,10 @@ public class Reseau {
 
                     cellBook.addElement(detailInfo);
 
-                    Paragraph quantityInfo = new Paragraph(detail.getQuantite());
+                    Paragraph quantityInfo = new Paragraph(detail.getQuantite() + "");
                     quantityInfo.setAlignment(Paragraph.ALIGN_CENTER);
-                    Paragraph priceInfo = new Paragraph((detail.getLivre().getPrix() * detail.getQuantite()) + " €");
+                    Paragraph priceInfo = new Paragraph(detail.getLivre().getPrix() * detail.getQuantite() + " €");
                     priceInfo.setAlignment(Paragraph.ALIGN_RIGHT);
-
-                    double prix = detail.getLivre().getPrix() * detail.getQuantite();
 
                     cellQuantity.addElement(quantityInfo);
                     cellPrice.addElement(priceInfo);

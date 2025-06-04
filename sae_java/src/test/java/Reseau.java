@@ -600,7 +600,6 @@ public class Reseau {
                     Paragraph priceInfo = new Paragraph(detail.getLivre().getPrix() * detail.getQuantite() + " €");
                     priceInfo.setAlignment(Paragraph.ALIGN_RIGHT);
 
-
                     cellQuantity.addElement(quantityInfo);
                     cellPrice.addElement(priceInfo);
                 }

@@ -162,13 +162,16 @@ public class Livre implements Comparable<Livre> {
         this.auteurs.add(auteur);
     }
 
+    public String completeDisplay(){
+        return this.titre + " de " + this.auteurs + ", " + this.editeur + ", " + this.datePublication + ", " + this.prix + " euros, " + this.nbPages + " pages, " + this.classification;
+    }
 
     /**
      * permet l'affichage du livre
      */
     @Override
     public String toString() {
-        return this.titre + " de " + this.auteurs + ", " + this.editeur + ", " + this.datePublication + ", " + this.prix + " euros, " + this.nbPages + " pages, " + this.classification;
+        return this.titre +  ", " + this.prix + " euros";
     }
 
     /**
