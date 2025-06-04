@@ -301,11 +301,13 @@ public class Client extends Personne{
 
         List<Livre> recommanded = new ArrayList<>();
 
-        for(Livre book : popularBooks){
-            if(!userBooks.contains(book) && currentLibrary.checkStock(book, 1)){
-                recommanded.add(book);
+        for(int i=0;i<nbRecommandation;i++){
+            if(i < popularBooks.size()){
+                Livre book = popularBooks.get(i);
+                if(!userBooks.contains(book) && currentLibrary.checkStock(book, 1)){
+                    recommanded.add(book);
+                }
             }
-
         }
 
         return recommanded;

@@ -304,23 +304,6 @@ public class TestSAE {
     }
 
     @Test
-    public void clearBD(){
-        try {
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
-            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
-        } catch (SQLException e) {
-            System.err.println("pb suppression clear DB" + e.getMessage());
-        }
-    }
-
-    @Test
     public void testCommanderClient(){
 
         Livre livre = new Livre("120", "La Guerre des mondes", Arrays.asList(new Auteur("1", "H.G. Wells", null, null)),"Gallimard", 1898, 9.99, 159, "Science Fiction");
@@ -328,6 +311,7 @@ public class TestSAE {
 
         // préparer la bd test
         try {
+            this.reset();
 
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
@@ -376,15 +360,7 @@ public class TestSAE {
         
         try{
             assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
-            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            this.reset();
         }
         catch (SQLException e){
             System.err.println("pb suppression commander client" + e.getMessage());
@@ -410,6 +386,8 @@ public class TestSAE {
         assertFalse(Reseau.librairies.contains(librairie2));
 
         try {
+            this.reset();
+
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
@@ -449,14 +427,7 @@ public class TestSAE {
 
 
         try {
-            
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
-
+            this.reset();
         } catch (SQLException e) {
         }
 
@@ -468,6 +439,8 @@ public class TestSAE {
         Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 1, "133 boulevard de l''Université", "45000", "Orléans",0);
 
         try {
+            this.reset();
+
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
             
@@ -550,15 +523,7 @@ public class TestSAE {
 
 
         try {
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
-
+            this.reset();
         } catch (SQLException e) {
         }
     }
@@ -571,6 +536,7 @@ public class TestSAE {
         Client client3 = new Client("Eboue", "Fabrice", "mot_de_passe_1439", 3, "60 avenue de la République", "75000", "Paris",1);
 
         try {
+            this.reset();
             
             Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','Tient!!!','60 avenue de la Republique','75000','Paris')").executeUpdate();
             Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','riviere','456 avenue de la Republique','75000','Paris')").executeUpdate();
@@ -597,7 +563,7 @@ public class TestSAE {
         }
 
         try {
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            this.reset();
         } catch (SQLException e) {
         }
     }
@@ -613,6 +579,9 @@ public class TestSAE {
 
         try
         {
+
+            this.reset();
+
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
@@ -653,14 +622,7 @@ public class TestSAE {
 
 
         try {
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            this.reset();   
         } catch (SQLException e) {
         }
     }
@@ -686,6 +648,7 @@ public class TestSAE {
 
         // préparer la bd test
         try {
+            this.reset();
 
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
@@ -747,15 +710,7 @@ public class TestSAE {
         
         try{
             assertFalse(Reseau.checkStock(livre, Reseau.getLibrairie(client.getLibrairie()), 4));
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
-            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            this.reset();
         }
         catch (SQLException e){
             System.err.println("pb suppression commander client" + e.getMessage());
@@ -776,6 +731,7 @@ public class TestSAE {
 
         // préparer la bd test
         try {
+            this.reset();
 
             Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
             Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
@@ -877,7 +833,16 @@ public class TestSAE {
         }
 
         try{
-            
+            this.reset();
+        }
+        catch (SQLException e){
+            System.err.println("pb suppression stats " + e.getMessage());
+        }
+
+
+    }
+
+    private void reset() throws SQLException{
             Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
             Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
             Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
@@ -886,13 +851,9 @@ public class TestSAE {
             Reseau.createStatement("delete from testLIVRE").executeUpdate();
             Reseau.createStatement("delete from testMAGASIN").executeUpdate();
             Reseau.createStatement("delete from testCLIENT").executeUpdate();
+
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
-        }
-        catch (SQLException e){
-            System.err.println("pb suppression stats " + e.getMessage());
-        }
-
-
+            Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
     }
 }
 
