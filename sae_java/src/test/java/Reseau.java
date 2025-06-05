@@ -71,9 +71,6 @@ public class Reseau {
         throw new LibraryNotFoundException();
     }
 
-    public static Connection getConnection(){
-        return Reseau.connection;
-    }
     /**
      * met a jour les informations par rapport a la BD
      * 

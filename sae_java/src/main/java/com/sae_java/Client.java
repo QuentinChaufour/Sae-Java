@@ -224,6 +224,14 @@ public class Client extends Personne{
 
         for (int librairiePanier : this.panier.getContenu().keySet()) {
 
+            try {
+                Reseau.getLibrairie(idLibrairie);   // assurer que la librairie existe encore    
+            } 
+            catch (LibraryNotFoundException e) {
+                commandeError += this.panier.getContenu().get(librairiePanier).size();
+                continue; // on passe
+            }
+
             Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
             String typeCommande;
