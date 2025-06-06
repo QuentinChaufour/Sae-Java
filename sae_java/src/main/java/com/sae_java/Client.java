@@ -277,10 +277,6 @@ public class Client extends Personne{
         return commandes;
     }
 
-    public List<Livre> OnVousRecommande() throws LibraryNotFoundException{
-        return this.OnVousRecommande(10);
-    }
-
     // methode de base selon la classification des livres
     public List<Livre> OnVousRecommande(int nbRecommandation) throws LibraryNotFoundException{
 

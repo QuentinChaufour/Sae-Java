@@ -516,7 +516,7 @@ public class TestSAE {
         Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
 
         try {
-            assertEquals(Arrays.asList(potter,clanWar),client.OnVousRecommande());
+            assertEquals(Arrays.asList(potter,clanWar),client.OnVousRecommande(10));
         } catch (LibraryNotFoundException ex) {
             System.err.println("Library not found");
         }
