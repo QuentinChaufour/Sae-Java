@@ -222,6 +222,14 @@ public class Client extends Personne{
 
         for (int librairiePanier : this.panier.getContenu().keySet()) {
 
+            try {
+                Reseau.getLibrairie(idLibrairie);   // assurer que la librairie existe encore    
+            } 
+            catch (LibraryNotFoundException e) {
+                commandeError += this.panier.getContenu().get(librairiePanier).size();
+                continue; // on passe
+            }
+
             Map<Livre, Integer> livres = this.panier.getContenu().get(librairiePanier);
 
             String typeCommande;
@@ -268,7 +276,7 @@ public class Client extends Personne{
     }
 
     // methode de base selon la classification des livres
-    public List<Livre> OnVousRecommande() throws LibraryNotFoundException{
+    public List<Livre> OnVousRecommande(int nbRecommandation) throws LibraryNotFoundException{
 
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
@@ -297,11 +305,13 @@ public class Client extends Personne{
 
         List<Livre> recommanded = new ArrayList<>();
 
-        for(Livre book : popularBooks){
-            if(!userBooks.contains(book) && currentLibrary.checkStock(book, 1)){
-                recommanded.add(book);
+        for(int i=0;i<nbRecommandation;i++){
+            if(i < popularBooks.size()){
+                Livre book = popularBooks.get(i);
+                if(!userBooks.contains(book) && currentLibrary.checkStock(book, 1)){
+                    recommanded.add(book);
+                }
             }
-
         }
 
         return recommanded;
@@ -352,6 +362,11 @@ public class Client extends Personne{
         Client client = (Client) obj;
 
         return this.idClient == client.idClient;
+    }
+
+    @Override
+    public int hashCode(){
+        return this.idClient * 7 + this.getNom().hashCode() * 11 + this.getPrenom().hashCode()*19;
     }
 
     /**

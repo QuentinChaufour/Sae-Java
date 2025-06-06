@@ -289,7 +289,7 @@ public class Librairie implements Comparable<Librairie>{
      */
     @Override
     public String toString() {
-        return "la librairie " + nom + " est située à " + Ville + " et a pour id " + id;
+        return nom + " - " + Ville;
     }
 
     /**

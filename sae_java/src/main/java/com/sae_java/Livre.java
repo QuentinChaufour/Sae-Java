@@ -3,7 +3,7 @@ package com.sae_java;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Livre {
+public class Livre implements Comparable<Livre> {
 
     private final String isbn;
     private String titre;
@@ -162,13 +162,16 @@ public class Livre {
         this.auteurs.add(auteur);
     }
 
+    public String completeDisplay(){
+        return this.titre + " de " + this.auteurs + ", " + this.editeur + ", " + this.datePublication + ", " + this.prix + " euros, " + this.nbPages + " pages, " + this.classification;
+    }
 
     /**
      * permet l'affichage du livre
      */
     @Override
     public String toString() {
-        return this.titre + " de " + this.auteurs + ", " + this.editeur + ", " + this.datePublication + ", " + this.prix + " euros, " + this.nbPages + " pages, " + this.classification;
+        return this.titre +  ", " + this.prix + " euros";
     }
 
     /**
@@ -184,5 +187,16 @@ public class Livre {
         Livre livre = (Livre) obj;
 
         return isbn.equals(livre.isbn);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 31 * isbn.hashCode();
+    }
+
+    @Override
+    public int compareTo(Livre o) {
+        return String.CASE_INSENSITIVE_ORDER.compare(this.isbn, o.isbn);
     }
 }
