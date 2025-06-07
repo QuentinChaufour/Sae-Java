@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,26 +235,33 @@ public class TestSAE {
         }
 
     }
-/*
+
     @Test
     public void testVendeur(){
         Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
-        Vendeur vendeur = new Vendeur("null", null, 0);
-        Client client = new Client("Julie", "Martin", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie);
-        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur(1,"H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
+        Vendeur vendeur = new Vendeur("Julie", "Martin", "1234", 3);
+        Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
+        Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
         Panier panier = new Panier();
-        panier.ajouterLivre(livre, librairie, 1);
-        DetailCommande detailcommande = new DetailCommande(1, livre);
-        List<DetailCommande> listedetail = new ArrayList<>();
-        listedetail.add(detailcommande);
-        Commande commande = new Commande(1,"10-05-2025", "O", "O", 3, 7, listedetail);
+        panier.ajouterLivre(livre, librairie.getId(), 1);
+        Commande commande = new Commande(1, new java.util.Date(), "O", "O", client.getId(), librairie.getId());
+        DetailCommande detailcommande;
+        try {
+            detailcommande = new DetailCommande(1, livre, 1);
+            commande.addDetailCommande(detailcommande);
+
+        } catch (QuantiteInvalideException e) {
+            System.err.println("Quantité invalide");
+        }
         List<Commande> listeCommandes = new ArrayList<>();
         listeCommandes.add(commande);
+        Map<Livre, Integer> livresCommande = new HashMap<>();
+        livresCommande.put(livre, 1);
         assertTrue(vendeur.checkQte(commande));
-        assertEquals(listeCommandes, vendeur.preparerCommandes());
+        assertEquals(listeCommandes, vendeur.preparerCommandes(client.getId(), livresCommande, new java.util.Date(), "O", "O"));
         assertEquals(livre, vendeur.transfererLivre(livre, librairie));
     }
- */
+ 
 
     @Test
     public void testCommandes(){
