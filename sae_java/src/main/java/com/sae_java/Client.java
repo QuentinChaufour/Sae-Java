@@ -1,5 +1,7 @@
 package com.sae_java;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,7 +16,7 @@ public class Client extends Personne{
     private String address;
     private String codePostal;
     private String ville;
-    private int idLibrairie;
+    private Integer idLibrairie;
     private Panier panier;
 
 
@@ -27,9 +29,9 @@ public class Client extends Personne{
      * @param address : String
      * @param codePostal : String
      * @param ville : String
-     * @param librairie : Librairie
+     * @param idLibrairie : l'id de la librairie courante
      */
-    public Client(String nom, String prenom, String motDePasse, int id, String address, String codePostal, String ville, int idLibrairie) {
+    public Client(String nom, String prenom, String motDePasse, Integer id, String address, String codePostal, String ville, Integer idLibrairie) {
         super(nom, prenom, motDePasse);
         this.idClient = id;  
         this.address = address;
@@ -81,7 +83,7 @@ public class Client extends Personne{
      * 
      * @return id de la librairie liée au client : int
      */
-    public int getLibrairie() {
+    public Integer getLibrairie() {
         return idLibrairie;
     }
 
@@ -117,7 +119,7 @@ public class Client extends Personne{
      * 
      * @param librairie
      */
-    public void setLibrairie(int idLibrairie) {
+    public void setLibrairie(Integer idLibrairie) {
         this.idLibrairie = idLibrairie;
     }
 
@@ -353,6 +355,71 @@ public class Client extends Personne{
             booksMap.remove(popLivre);
         }
         return popularBooks;
+    }
+
+    /**
+     * permet de modifier les informations du client en BD
+     * @param info : EnumInfoClient
+     * @param data : String
+     * @throws SQLException
+     */
+    public void modifInfo(EnumInfoClient info,String data) throws SQLException{
+
+        switch (info) {
+
+            case EnumInfoClient.NOM -> {
+
+                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET nomcli = ? WHERE idcli = ?");
+                statement.setString(1, data);
+                statement.setInt(2, this.idClient);
+                statement.executeUpdate();
+                this.setNom(data);
+            }
+
+            case EnumInfoClient.PRENOM -> {
+
+                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET prenomcli = ? WHERE idcli = ?");
+                statement.setString(1, data);
+                statement.setInt(2, this.idClient);
+                statement.executeUpdate();
+                this.setPrenom(data);
+            }
+
+            case EnumInfoClient.ADDRESS -> {
+                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET adressecli = ? WHERE idcli = ?");
+                statement.setString(1, data);
+                statement.setInt(2, this.idClient);
+                statement.executeUpdate();
+                this.address = data;
+            }
+
+            case EnumInfoClient.MDP -> {
+                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET motdepassecli = ? WHERE idcli = ?");
+                statement.setString(1, data);
+                statement.setInt(2, this.idClient);
+                statement.executeUpdate();
+                this.setMotDePasse(data);
+
+            }
+
+            case EnumInfoClient.VILLE -> {
+
+                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET villecli = ? WHERE idcli = ?");
+                statement.setString(1, data);
+                statement.setInt(2, this.idClient);
+                statement.executeUpdate();
+                this.ville = data;
+            }   
+             
+            case EnumInfoClient.CODEPOSTAL -> {
+
+                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET codepostal = ? WHERE idcli = ?");
+                statement.setString(1, data);
+                statement.setInt(2, this.idClient);
+                statement.executeUpdate();
+                this.codePostal = data;
+            }
+        }
     }
 
     @Override
