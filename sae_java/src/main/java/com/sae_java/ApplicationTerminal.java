@@ -78,7 +78,7 @@ public class ApplicationTerminal {
         String motDePasse = this.scanner.nextLine().trim();
 
         try {
-            this.client = Reseau.identificationClient(nom, prenom, motDePasse, 0);
+            this.client = Reseau.identificationClient(nom, prenom, motDePasse, null);
 
             // Si l'identification est réussie, on affiche le menu client
             System.out.println("Identification réussie. \nBienvenue " + this.client.getPrenom() + " " + this.client.getNom() + " !");
@@ -161,8 +161,9 @@ public class ApplicationTerminal {
             System.out.println("║  B. Se faire recommander des livres                            ║");
             System.out.println("║  C. Changer librairie                                          ║");
             System.out.println("║  D. Consulter Panier                                           ║");
-            System.out.println("║  E. Déconnexion                                                ║");
-            System.out.println("║  F. Quitter                                                    ║");
+            System.out.println("║  E. Modification information personnelles                      ║");
+            System.out.println("║  F. Déconnexion                                                ║");
+            System.out.println("║  Q. Quitter                                                    ║");
             System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
 
             System.out.print("Votre choix : ");
@@ -190,10 +191,13 @@ public class ApplicationTerminal {
                     this.menuConsultationPanier();
                 }
                 case "e" -> {
+                    this.menuUpdateInfoClient();
+                }
+                case "f" -> {
                     actif = false;
                     this.deconnexion();
                 }
-                case "f" -> {
+                case "q" -> {
                     actif = false;
                     this.quitter();
                 }
@@ -590,7 +594,172 @@ public class ApplicationTerminal {
     }
 
     public void menuUpdateInfoClient() {
-        System.out.println("== Mise à jour des infos client ==");
+        
+        boolean actif = true;
+
+        while(actif){
+
+            System.out.println("╔════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                   CHANGEMENT  D'INFORMATIONS                   ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║  Quelle information voulez-vous modifier                       ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║  A. Nom                                                        ║");
+            System.out.println("║  B. Prénom                                                     ║");
+            System.out.println("║  C. Mot de passe                                               ║");
+            System.out.println("║  D. Adresse                                                    ║");
+            System.out.println("║  E. Ville et code postal                                       ║");
+            System.out.println("║  F. Annuler                                                    ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+            System.out.print("Votre choix : ");
+
+            String choix = this.scanner.nextLine().trim().toLowerCase();
+
+            switch(choix){
+                
+                case "a" -> {
+
+                    System.out.println("Entrez votre nouveau nom (entrez 'A' pour annuler) : ");
+                    String nom = this.scanner.nextLine().trim();
+
+                    switch(nom){
+
+                        case "a","A" -> {
+                            // do nothing and wait the next menu display
+                        }
+
+                        default -> {
+                            try {
+                                this.client.modifInfo(EnumInfoClient.NOM, nom);    
+                            } 
+                            catch (SQLException e) {
+                                System.out.println("une erreur est survenu lors du changement de nom");
+                            }
+                        }
+                    }
+
+                }
+            
+                case "b" -> {
+                    System.out.println("Entrez votre nouveau Prénom (entrez 'A' pour annuler) : ");
+                    String prenom = this.scanner.nextLine().trim();
+
+                    switch(prenom){
+
+                        case "a","A" -> {
+                            // do nothing and wait the next menu display
+                        }
+
+                        default -> {
+                            try {
+                                this.client.modifInfo(EnumInfoClient.PRENOM, prenom);    
+                            } 
+                            catch (SQLException e) {
+                                System.out.println("une erreur est survenu lors du changement de prenom");
+                            }
+                        }
+                    }
+                }
+                
+                case "c" -> {
+
+                    System.out.print("Entrez votre ancien mot de passe (entrez 'A' pour annuler) : ");
+                    String oldMdp = this.scanner.nextLine().trim();
+                    System.out.print("Entrez votre nouveau mot de passe (entrez 'A' pour annuler) : ");
+                    String newMdp = this.scanner.nextLine().trim();
+                    
+
+                    switch(oldMdp){
+
+                        case "a","A" -> {
+                            // do nothing and wait the next menu display
+                        }
+
+                        default -> {
+                            // modif 
+                            switch (newMdp) {
+                                case "a","A" -> {
+                                    // do nothing
+                                }
+                                    
+                                default -> {
+                                    if (!oldMdp.equals(newMdp)) {
+                                        try {
+                                            this.client.modifInfo(EnumInfoClient.MDP, newMdp);
+                                        } catch (SQLException e) {
+                                            System.out.println("une erreur est survenu lors du changement de mot de passe");
+                                        }
+                                    }
+                                    else{
+                                        System.out.println("Votre nouveau de mot de passe n'est pas valide");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                case "d" -> {
+                    System.out.println("Entrez votre nouvelle adresse (entrez 'A' pour annuler) : ");
+                    String address = this.scanner.nextLine().trim();
+
+                    switch(address){
+
+                        case "a","A" -> {
+                            // do nothing and wait the next menu display
+                        }
+
+                        default -> {
+                            try {
+                                this.client.modifInfo(EnumInfoClient.ADDRESS, address);    
+                            } 
+                            catch (SQLException e) {
+                            }
+                        }
+                    }
+                }
+
+                case "e" -> {
+                    System.out.println("Entrez votre nouvelle ville de résidence (entrez 'A' pour annuler) : ");
+                    String ville = this.scanner.nextLine().trim();
+                    System.out.println("Entrez votre nouveau code postal (entrez 'A' pour annuler) : ");
+                    String codePostal = this.scanner.nextLine().trim();
+                    
+
+                    switch(ville){
+
+                        case "a","A" -> {
+                            // do nothing and wait the next menu display
+                        }
+
+                        default -> {
+
+                            try {
+                                this.client.modifInfo(EnumInfoClient.VILLE, ville);
+                            } catch (SQLException e) {
+                            }
+
+                            switch (codePostal) {
+                                case "a","A" -> {
+                                    // do nothing
+                                }
+
+                                default -> {
+                                    try {
+                                        this.client.modifInfo(EnumInfoClient.CODEPOSTAL, codePostal);
+                                    } catch (SQLException e) {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                case "f" -> {
+                    actif = false;
+                }
+            }
+        }
     }
 
     public void menuCommande() { 
@@ -852,7 +1021,7 @@ public class ApplicationTerminal {
         System.out.println("Déconnexion réussie.");
 
         this.client = null;
-        this.vendeur = null;
+        //this.vendeur = null;
 
         // Retour au menu d'identification
         this.menuIdentification();
