@@ -456,6 +456,21 @@ public class Reseau {
         return userName.equals(Reseau.ADMIN_USER) && motDePasse.equals(Reseau.ADMIN_PASSWORD);
     }
 
+    public static void transfert(Livre book, int qte, int originLib, int lib)throws QuantiteInvalideException, LibraryNotFoundException, BookNotInStockException, SQLException {
+
+        if (qte < 0) {
+            throw new QuantiteInvalideException();
+        } else if (qte > 0) {
+
+            Librairie oldLib = Reseau.getLibrairie(originLib);
+            Librairie newLib = Reseau.getLibrairie(lib);
+
+            oldLib.retirerLivre(book, qte);
+            newLib.ajouterNouveauLivre(book, qte);
+
+        }
+
+    }
 
 
     /**

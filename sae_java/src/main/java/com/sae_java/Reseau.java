@@ -231,6 +231,31 @@ public class Reseau {
     }
 
     /**
+     * permet d'obtenir l'ensemble des auteurs enregistrés
+     * 
+     * @return la liste des auteurs enregistrés
+     * @throws SQLException
+     */
+    public static List<Auteur> getAllAuthors() throws SQLException{
+
+        List<Auteur> auteurs = new ArrayList<>();
+
+        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM testAUTEUR");
+
+        ResultSet resultSetAutor = statementAutor.executeQuery();
+
+        while (resultSetAutor.next()) {
+            String idAuteur = resultSetAutor.getString("idauteur");
+            String nomPrenom = resultSetAutor.getString("nomauteur");
+            Integer naissance = resultSetAutor.getInt("anneenais");
+            Integer deces = resultSetAutor.getInt("anneedeces");
+            auteurs.add(new Auteur(idAuteur, nomPrenom, naissance, deces));
+        }
+
+        return auteurs;
+    }
+
+    /**
      * Cherche un livre dans une certaine quantité dans l'ensemble des librairies du réseau
      * 
      * @param librairie
@@ -455,6 +480,23 @@ public class Reseau {
     public static boolean identificationAdmin(String userName, String motDePasse) {
 
         return userName.equals(Reseau.ADMIN_USER) && motDePasse.equals(Reseau.ADMIN_PASSWORD);
+    }
+
+    public static void transfert(Livre book,int qte,int originLib,int lib) throws QuantiteInvalideException,LibraryNotFoundException,BookNotInStockException,SQLException{
+
+        if(qte < 0){
+            throw new QuantiteInvalideException();
+        }
+        else if(qte > 0){
+            
+            Librairie oldLib = Reseau.getLibrairie(originLib);
+            Librairie newLib = Reseau.getLibrairie(lib);
+
+            oldLib.retirerLivre(book, qte);
+            newLib.ajouterNouveauLivre(book, qte);
+
+        }
+
     }
 
 

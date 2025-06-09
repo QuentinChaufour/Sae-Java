@@ -28,7 +28,7 @@ public class TestSAE {
         assertEquals("133 boulevard de l''Université", client.getAddress());
         assertEquals("45000", client.getCodePostal());
         assertEquals("Orléans", client.getVille());
-        assertEquals(7, client.getLibrairie());
+        assertEquals(7, (int) client.getLibrairie());
         
         client.setLibrairie(1);
         client.setNom("Dupont");
@@ -42,7 +42,7 @@ public class TestSAE {
         assertEquals("456 avenue de la République", client.getAddress());
         assertEquals("75000", client.getCodePostal());
         assertEquals("Paris", client.getVille());
-        assertEquals(1, client.getLibrairie());
+        assertEquals(1,(int) client.getLibrairie());
 
     }
 
@@ -845,8 +845,63 @@ public class TestSAE {
         catch (SQLException e){
             System.err.println("pb suppression stats " + e.getMessage());
         }
+    }
 
+    @Test
+    public void testTransfert(){
 
+        try {
+            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+
+            Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
+            Reseau.createStatement("insert into testAUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
+            
+            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into testLIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
+            
+            Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('124',3)").executeUpdate();
+            Reseau.createStatement("insert into testECRIRE values ('125',4)").executeUpdate();
+
+            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'122',2)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (0,'124',1)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'125',9)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+        } 
+        catch (SQLException e) {
+            System.err.println("Pb insertion testTransfert " +e.getMessage());
+        }
+
+        try {
+            Livre clanWar = new Livre("125", "La Guerre des Clans", Arrays.asList(new Auteur("4","Tui T. Sutherland",1978,null)),"PKJ", 1943, 7.99, 96, "Romand");
+            Reseau.transfert(clanWar, 5, 1, 0);  
+            
+            assertFalse(Reseau.checkStock(clanWar, Reseau.getLibrairie(1), 9));
+            assertTrue(Reseau.checkStock(clanWar, Reseau.getLibrairie(1), 4));
+            assertTrue(Reseau.checkStock(clanWar, Reseau.getLibrairie(0), 5));
+        } 
+        catch (SQLException | LibraryNotFoundException | QuantiteInvalideException | BookNotInStockException e) {
+            System.out.println("Pb de transfert");
+        }
+
+        try{
+            this.reset();
+        }
+        catch(SQLException e){
+            System.err.println("pb suppression transfert " + e.getMessage());
+        }
     }
 
     private void reset() throws SQLException{

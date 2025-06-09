@@ -276,6 +276,8 @@ public class Client extends Personne{
         }
         System.out.println("Nombre de commandes non enregistrées : " + commandeError);
         Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
+        Reseau.numCom += nbCommande;
+        Reseau.numlig += nbDetailCommande;
         return commandes;
     }
 

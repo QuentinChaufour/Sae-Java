@@ -139,7 +139,24 @@ public class ApplicationTerminal {
     }
 
     public void menuIdentificationAdmin() {
-        System.out.println("== Identification Administrateur ==");
+
+        System.out.println("╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                      IDENTIFICATION ADMIN                      ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("Veuillez entrer vos identifiants : \n");
+        System.out.print("Identifiant : ");
+        String user = this.scanner.nextLine().trim();
+
+        System.out.print("Mot de passe : ");
+        String motDePasse = this.scanner.nextLine().trim();
+
+        if(!Reseau.identificationAdmin(user, motDePasse)){
+            System.out.println("L'identifiant ou le mot de passe est incorrecte !");
+            this.menuIdentification();
+        }
+        else{
+            this.menuPAdmin();
+        }
     }
 
 
@@ -208,13 +225,54 @@ public class ApplicationTerminal {
 
     }
 
+    /**
+     * gére le menu principal pour l'administrateur
+     */
+    public void menuPAdmin(){
+        boolean actif = true;
+
+        while(actif){
+            System.out.println("╔════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                         MENU PRINCIPAL                         ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║   Que voulez vous faire :                                      ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║  A. Consulter et modifier les stocks                           ║");
+            // créer un compte vendeur
+            System.out.println("║  F. Déconnexion                                                ║");
+            System.out.println("║  Q. Quitter                                                    ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+            System.out.print("Votre choix : ");
+
+            String choix = this.scanner.nextLine().trim().toLowerCase();
+
+            switch (choix) {
+                case "a" -> {
+                    this.menuConsultationBooksAdmin();
+                    
+                }
+
+                case "f" -> {
+                    actif = false;
+                    this.deconnexion();
+                }
+                case "q" -> {
+                    actif = false;
+                    this.quitter();
+                }
+                default -> System.out.println("Choix invalide. \n Veuillez réessayer.");
+            }
+        }
+    }
+
     public void menuConsultationBooks() throws LibraryNotFoundException{
 
         int page = 0; // page de base 
         boolean actif = true;
 
         while (actif) {
-
+            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
             List<Livre> livres = new ArrayList<>(Reseau.getLibrairie(this.client.getLibrairie()).consulterStock().keySet()); // en liste pour pouvoir trier les livres
             Collections.sort(livres); // Tri des livres selon ISBN
 
@@ -243,7 +301,7 @@ public class ApplicationTerminal {
                 System.out.println("║  A. Page précédente (désactivée)                               ║");
             }
 
-            if (page < pageMax - 1) {
+            if (page < pageMax) {
                 System.out.println("║  B. Page suivante                                              ║");
             }
             else {
@@ -268,7 +326,7 @@ public class ApplicationTerminal {
                     }
                 }
                 case "b" -> {
-                    if (page < pageMax - 1) {
+                    if (page < pageMax) {
                         page++;
                     }
                     else {
@@ -281,7 +339,7 @@ public class ApplicationTerminal {
 
                     try {
                         int indexLivre = Integer.parseInt(livreChoisi) - 1; // -1 pour correspondre à l'index de la liste
-                        if (indexLivre >= 0 && indexLivre <= 5) {
+                        if (indexLivre >= 0 && indexLivre < 5) {
                             indexLivre = page * 5 + indexLivre;
                             System.out.println(livres.get(indexLivre).completeDisplay() + "\n");
                         } 
@@ -328,6 +386,172 @@ public class ApplicationTerminal {
                     else {
                         System.out.println("Veuillez entrer un numéro valide.");
                     }
+                }
+            }
+        }
+    }
+
+    public void menuConsultationBooksAdmin(){
+
+        boolean actif = true;
+        Integer libActive = null;
+        int page = 0;
+        
+        while (actif) {
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+
+            if (libActive == null) {
+                libActive = this.selectionLibAdmin();
+            } 
+            else {
+
+                try {
+                    List<Livre> livres = new ArrayList<>(Reseau.getLibrairie(libActive).consulterStock().keySet());
+                    
+                    Collections.sort(livres); // Tri des livres selon ISBN
+                    
+                    int pageMax = livres.size() / 5 == 0 ? livres.size() / 5 : ((int) (livres.size() / 5)) + 1;
+                    
+                    System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                    System.out.println("║                    CONSULTATION DES LIVRES                     ║");
+                    System.out.println("╠════════════════════════════════════════════════════════════════╣ ");
+                    
+                    this.page(livres.subList(page * 5, Math.min((page + 1) * 5, livres.size())),libActive);
+                    
+                    String pageString = "  Page " + (page + 1) + " / " + (pageMax + 1);
+                    System.out.println("║                                                                ║"); // espacement
+                    System.out.println("║ " + pageString + " ".repeat(62 - pageString.length()) + " ║");
+                    
+                    System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                    
+                    System.out.println("║  Veuillez choisir une action :                                 ║");
+                    
+                    if (page > 0) {
+                        System.out.println("║  A. Page précédente                                            ║");
+                    } else {
+                        System.out.println("║  A. Page précédente (désactivée)                               ║");
+                    }
+                    
+                    if (page < pageMax) {
+                        System.out.println("║  B. Page suivante                                              ║");
+                    } else {
+                        System.out.println("║  B. Page suivante (désactivée)                                 ║");
+                    }
+                    System.out.println("║  C. Information supplémentaire livre                           ║");
+                    System.out.println("║  D. Changer de librairie                                       ║");
+                    System.out.println("║  E. Modifier les quantités                                     ║");
+                    System.out.println("║  F. Ajouter un livre                                           ║");
+                    System.out.println("║  G. Transférer un livre                                        ║");
+                    System.out.println("║  Q. Retour au menu principal                                   ║");
+                    System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+                    System.out.print("Votre choix : ");
+                    
+                    String choix = this.scanner.nextLine().trim().toLowerCase();
+                    
+                    switch (choix) {
+                        case "a" -> {
+                            if (page > 0) {
+                                page--;
+                            } else {
+                                System.out.println("Vous êtes déjà à la première page.");
+                            }
+                        }
+                        case "b" -> {
+                            if (page < pageMax) {
+                                page++;
+                            } else {
+                                System.out.println("Vous êtes déjà à la dernière page.");
+                            }
+                        }
+                        case "c" -> {
+                            System.out.print("Veuillez saisir le numéro du livre pour obtenir plus d'informations : ");
+                            String livreChoisi = this.scanner.nextLine().trim();
+                            
+                            try {
+                                int indexLivre = Integer.parseInt(livreChoisi) - 1; // -1 pour correspondre à l'index de la
+                                // liste
+                                if (indexLivre >= 0 && indexLivre < 5) {
+                                    indexLivre = page * 5 + indexLivre;
+                                    System.out.println(livres.get(indexLivre).completeDisplay() + "\n");
+                                } else {
+                                    System.out.println("Veuillez entrer un numéro valide entre 1 et 5.");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Veuillez entrer un numéro valide.");
+                            } catch (IndexOutOfBoundsException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                        case "d" -> {
+                            libActive = this.selectionLibAdmin();
+                        }
+                        case "e" -> {
+                            System.out.print("Entrez le numéro du livre ('A' pour annuler l'action) : ");
+                            String nb = this.scanner.nextLine().trim().toLowerCase();
+
+                            switch(nb){
+                                case "a" -> {
+                                    // do nothing
+                                }
+
+                                default -> {
+                                    try {
+                                        int index = Integer.parseInt(nb) - 1;
+                                        
+                                        if (index >= 0 && index < 5) {
+                                            Livre book = livres.get(page*5+ index);
+                                            this.menuUpdateQte(book,libActive);
+                                        } 
+                                        else {
+                                            System.out.println("Veuillez entrer un numéro valide entre 1 et 5.");
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("Veuillez entrer un numéro valide.");
+                                    } catch (IndexOutOfBoundsException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                }
+                            }
+                        }
+                        case "f" -> {
+                            this.menuAjoutLivre();
+                        }
+
+                        case "g" -> {
+                            System.out.print("Entrez le numéro du livre ('A' pour annuler l'action) : ");
+                            String nb = this.scanner.nextLine().trim().toLowerCase();
+
+                            switch(nb){
+                                case "a" -> {
+                                    // do nothing
+                                }
+
+                                default -> {
+                                    try {
+                                        int index = Integer.parseInt(nb) - 1;
+                                        
+                                        if (index >= 0 && index < 5) {
+                                            Livre book = livres.get(page*5+ index);
+                                            this.menuTransfert(book,libActive);
+                                        } 
+                                        else {
+                                            System.out.println("Veuillez entrer un numéro valide entre 1 et 5.");
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("Veuillez entrer un numéro valide.");
+                                    } catch (IndexOutOfBoundsException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                }
+                            }
+                        }
+
+                        case "q" -> {
+                            actif = false;
+                        }
+                    }
+                } catch (LibraryNotFoundException e) {
+                    System.out.println("Une erreur s'est produite");
                 }
             }
         }
@@ -388,7 +612,7 @@ public class ApplicationTerminal {
                 else {
                     System.out.println("║  A. Page précédente (désactivée)                               ║");
                 }
-                if (page < pageMax - 1) {
+                if (page < pageMax) {
                     System.out.println("║  B. Page suivante                                              ║");
                 }
                 else {
@@ -509,7 +733,7 @@ public class ApplicationTerminal {
                 else {
                     System.out.println("║  A. Page précédente (désactivée)                               ║");
                 }
-                if (page < pageMax - 1) {
+                if (page < pageMax) {
                     System.out.println("║  B. Page suivante                                              ║");
                 }
                 else {
@@ -593,6 +817,44 @@ public class ApplicationTerminal {
             }
     }
 
+    public Integer selectionLibAdmin(){
+        boolean actifLibrairie = true;
+
+        while (actifLibrairie) {
+            System.out.println("╔════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                       Choix de Librairie                       ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║  Veuillez choisir votre librairie :                            ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+
+            this.page(Reseau.librairies, null);
+
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║  A. annuler                                                    ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+            System.out.print("Votre choix : ");
+            String choixLibrairie = this.scanner.nextLine().trim().toLowerCase();
+
+            switch (choixLibrairie) {
+
+                case "a" -> {
+                    actifLibrairie = false;
+                }
+
+                default -> {
+                    int idLibrairie = Integer.parseInt(choixLibrairie)-1;
+                    if (idLibrairie >= 0 && idLibrairie < Reseau.librairies.size()) {
+                        actifLibrairie = false;
+                        return idLibrairie;
+                    } else {
+                        System.out.println("Veuillez entrer un numéro de librairie valide.");
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public void menuUpdateInfoClient() {
         
         boolean actif = true;
@@ -665,9 +927,7 @@ public class ApplicationTerminal {
 
                     System.out.print("Entrez votre ancien mot de passe (entrez 'A' pour annuler) : ");
                     String oldMdp = this.scanner.nextLine().trim();
-                    System.out.print("Entrez votre nouveau mot de passe (entrez 'A' pour annuler) : ");
-                    String newMdp = this.scanner.nextLine().trim();
-                    
+                
 
                     switch(oldMdp){
 
@@ -676,7 +936,10 @@ public class ApplicationTerminal {
                         }
 
                         default -> {
-                            // modif 
+                            
+                            System.out.print("Entrez votre nouveau mot de passe (entrez 'A' pour annuler) : ");
+                            String newMdp = this.scanner.nextLine().trim();
+
                             switch (newMdp) {
                                 case "a","A" -> {
                                     // do nothing
@@ -932,7 +1195,7 @@ public class ApplicationTerminal {
                 } else {
                     System.out.println("║  A. Page précédente (désactivée)                               ║");
                 }
-                if (page < pageMax - 1) {
+                if (page < pageMax) {
                     System.out.println("║  B. Page suivante                                              ║");
                 } else {
                     System.out.println("║  B. Page suivante (désactivée)                                 ║");
@@ -954,7 +1217,7 @@ public class ApplicationTerminal {
                     }
 
                     case "b" -> {
-                        if (page < pageMax - 1) {
+                        if (page < pageMax) {
                             page++;
                         }
                     }
@@ -966,7 +1229,7 @@ public class ApplicationTerminal {
                         try {
                             int indexLivre = Integer.parseInt(livreChoisi) - 1; // -1 pour correspondre à l'index de
                                                                                 // la liste
-                            if (indexLivre >= 0 && indexLivre <= 5) {
+                            if (indexLivre >= 0 && indexLivre < 5) {
                                 indexLivre = page * 5 + indexLivre;
                                 System.out.println(recommandations.get(indexLivre).completeDisplay() + "\n");
                             } else {
@@ -1012,6 +1275,334 @@ public class ApplicationTerminal {
                 }
             } catch (LibraryNotFoundException e) {
                 System.out.println("Une erreur est survenu");
+            }
+        }
+    }
+
+    public void menuAjoutLivre(){
+
+        boolean actif = true;
+        String isbn = null;
+        String titre = null;
+        int nbPages = 0;
+        int dtePubli = 0;
+        double prix = 0;
+        String classification = null;
+        String editeur = null;
+        List<Auteur> auteurs = null;
+        Integer librairie = null;
+        int qte = 0;
+
+        System.out.println("╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                        Ajouter un livre                        ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+        System.out.println("A chaque instant, entrez 'A' pour annuler et revenir au menu principal");
+        System.out.println("Veuillez entrer les informations suivantes concernant le livre : \n");
+
+        System.out.print("Entez l'ISBN du livre : ");
+        isbn = this.scanner.nextLine().trim();
+
+        switch (isbn){
+            case "a","A" -> {
+                actif = false;
+            }
+        }
+
+        if(actif){
+            System.out.print("Entez le titre du livre : ");
+            titre = this.scanner.nextLine().trim();
+
+            switch (titre){
+                case "a","A" -> {
+                    actif = false;
+                }
+            }
+        }
+
+        if (actif) {
+            System.out.print("Entrez le nombre de pages du livre : ");
+            String nb = this.scanner.nextLine().trim();
+            switch (nb) {
+                case "a", "A" -> {
+                    actif = false;
+                }
+
+                default -> {
+                    try {
+                        nbPages = Integer.parseInt(nb);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        System.out.println("L'entée est invalide, annulation de l'ajout");
+                        actif = false;
+                    }
+                }
+            }
+        }
+
+        if(actif){
+            System.out.print("Entrez l'année de publication : ");
+            String annee = this.scanner.nextLine().trim(); 
+            switch (annee) {
+                case "a", "A" -> {
+                    actif = false;
+                }
+
+                default -> {
+                    try {
+                        dtePubli = Integer.parseInt(annee);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        System.out.println("L'entée est invalide, annulation de l'ajout");
+                        actif = false;
+                    }
+                }
+            }
+        }
+
+        if(actif){
+            System.out.print("Entrez le prix du livre : ");
+            String prixS = this.scanner.nextLine().trim(); 
+            switch (prixS) {
+                case "a", "A" -> {
+                    actif = false;
+                }
+
+                default -> {
+                    try {
+                        prix = Double.parseDouble(prixS);
+                    } catch (NumberFormatException | NullPointerException e ) {
+                        System.out.println("L'entée est invalide, annulation de l'ajout");
+                        actif = false;
+                    }
+                }
+            }
+        }
+
+        if(actif){
+            System.out.print("Entez la classification du livre : ");
+            classification = this.scanner.nextLine().trim();
+
+            switch (classification){
+                case "a","A" -> {
+                    actif = false;
+                }
+            }
+        }
+
+        if(actif){
+            System.out.print("Entez le nom de l'éditeur du livre : ");
+            editeur = this.scanner.nextLine().trim();
+
+            switch (editeur){
+                case "a","A" -> {
+                    actif = false;
+                }
+            }
+        }
+
+        if(actif){
+            auteurs = this.selectAuteur();
+
+            // si annulé dans le menu
+            if(auteurs == null) actif = false;
+        }
+
+        if(actif){
+            librairie = this.selectionLibAdmin();
+
+            if(librairie == null) actif = false;
+        }
+
+        if(actif){
+            System.out.print("Entrez la quantité de livre a mettre en stock : ");
+            String qteS = this.scanner.nextLine().trim(); 
+            switch (qteS) {
+                case "a", "A" -> {
+                    actif = false;
+                }
+
+                default -> {
+                    try {
+                        qte = Integer.parseInt(qteS);
+                    } catch (NumberFormatException | NullPointerException e ) {
+                        System.out.println("L'entée est invalide, annulation de l'ajout");
+                        actif = false;
+                    }
+                }
+            }            
+        }
+
+        if(actif){
+            try {
+                Livre toAdd = new Livre(isbn, titre, editeur, dtePubli, prix, nbPages, classification);
+                Librairie lib = Reseau.getLibrairie(librairie);
+                lib.ajouterNouveauLivre(toAdd, qte);
+                System.out.println("Le livre a été ajouté !");
+            } 
+            catch (LibraryNotFoundException | QuantiteInvalideException | SQLException e) {
+                System.out.println("Une erreur est survenu");
+            }
+        }
+
+    }
+
+    public List<Auteur> selectAuteur(){
+
+        boolean actif = true;
+        List<Auteur> auteurs = new ArrayList<>();
+
+        try {
+    
+            List<Auteur> allAuthors = Reseau.getAllAuthors();
+            int page = 0;
+            int pageMax = allAuthors.size() % 5 == 0 ? (int) allAuthors.size() / 5 : ((int) allAuthors.size() / 5) + 1;
+
+            while (actif) {
+                System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                System.out.println("║                      SELECTION DES AUTEURS                     ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║   Entrez le numéro d'un auteur pour l'ajouter a la liste       ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║                                                                ║");
+
+                this.page(allAuthors.subList(page * 5, Math.min((page + 1) * 5, allAuthors.size())), null);
+
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║                                                                ║");
+
+                this.page(auteurs, null);
+
+                System.out.println("║                                                                ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║                                                                ║");
+
+                System.out.println("║  A. Annuler                                                    ║");
+                if (page > 0) {
+                    System.out.println("║  B. Page précédente                                            ║");
+                } else {
+                    System.out.println("║  B. Page précédente (désactivée)                               ║");
+                }
+
+                if (page < pageMax) {
+                    System.out.println("║  C. Page suivante                                              ║");
+                } else {
+                    System.out.println("║  C. Page suivante (désactivée)                                 ║");
+                }
+                System.out.println("║  D. Selection terminé                                          ║");
+                System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+                String choix = this.scanner.nextLine().trim().toLowerCase();
+
+                switch (choix) {
+                    case "a" -> {
+                        actif = false;
+                        auteurs = null;
+                    }
+                    case "b" -> {
+                        if(page > 0){
+                            page --;
+                        }
+                    }
+                    case "c" -> {
+                        if(page < pageMax ){
+                            page++;
+                        }
+                    }
+                    case "d" -> {
+                        actif = false;
+                    }
+
+                    default -> {
+
+                        try {
+                            int index = Integer.parseInt(choix) - 1;
+                            if (index >= 0 && index < 5) {
+                                auteurs.add(allAuthors.get(page*5 + index));
+                            } else {
+                                System.out.println("Veuillez entrer un numéro valide entre 1 et 5.");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Veuillez entrer un nombre valide.");
+                        } catch (IndexOutOfBoundsException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
+            }
+        } 
+        catch (SQLException e) {
+            System.out.println("Une erreur est survenu");
+        }
+        return auteurs;
+    }
+
+    public void menuUpdateQte(Livre livre,int librairieActive){
+        System.out.println("Veuillez entrer la quantité de livre a retirer (quantité négative) ou a ajouter (quantité positive), entrez 'A pour annuler");
+        System.out.print("Quantité : ");
+        String qteS = this.scanner.nextLine().trim().toLowerCase();
+
+        switch (qteS) {
+            case "a" -> {
+                // do nothing
+            }
+
+            default -> {
+                try {
+                    int qte = Integer.parseInt(qteS);
+                    Librairie lib = Reseau.getLibrairie(librairieActive);
+                    if(qte < 0){
+                        lib.retirerLivre(livre, -qte);
+                    }
+                    else if(qte > 0){
+                        lib.ajouterNouveauLivre(livre, qte);
+                    }
+                } 
+                catch (NumberFormatException | NullPointerException e) {
+                    System.out.println("La valeur entrée n'est pas un nombre");
+                }
+                catch (LibraryNotFoundException | QuantiteInvalideException | BookNotInStockException | SQLException e) {
+                    System.out.println("Une erreur est survenu, l'action est annulé");
+                }
+            }
+        }
+    }
+
+    public void menuTransfert(Livre livre,Integer originLib){
+        System.out.println("╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                           Transfert                            ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+        Integer qte = null;
+        Integer idLib = null;
+
+        System.out.print("Veuillez enter le nombre de livre a transférer ('A' pour annuler) : ");
+        String qteS = this.scanner.nextLine().trim().toLowerCase();
+
+        switch(qteS){
+            case "a" -> {
+                // laisse qte a null
+            }
+            default -> {
+                try {
+                    qte = Integer.valueOf(qteS);
+                } catch (NumberFormatException | NullPointerException e) {
+                    System.err.println("La valeur entrée n'est pas une valeur numérique, abandons du transfert");
+                }
+            }
+        }
+
+        if(!(qte==null)){
+            idLib = this.selectionLibAdmin();
+        }
+
+        if(!(idLib == null || originLib == null) && qte != null){
+
+            try {
+                Reseau.transfert(livre,qte,originLib,idLib);
+            } 
+            catch (BookNotInStockException | LibraryNotFoundException | SQLException e) {
+                System.out.println("Une erreur est survenu lors du transfert");
+            }
+            catch (QuantiteInvalideException e){
+                System.out.println("La quantité indiquée est invalide");
             }
         }
     }
