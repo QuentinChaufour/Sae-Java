@@ -238,6 +238,7 @@ public class ApplicationTerminal {
             System.out.println("║   Que voulez vous faire :                                      ║");
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
             System.out.println("║  A. Consulter et modifier les stocks                           ║");
+            System.out.println("║  B. Consulter les statistiques                                 ║");
             // créer un compte vendeur
             System.out.println("║  F. Déconnexion                                                ║");
             System.out.println("║  Q. Quitter                                                    ║");
@@ -250,7 +251,10 @@ public class ApplicationTerminal {
             switch (choix) {
                 case "a" -> {
                     this.menuConsultationBooksAdmin();
-                    
+                }
+
+                case "b" -> {
+                    this.menuStats();
                 }
 
                 case "f" -> {
@@ -1605,6 +1609,131 @@ public class ApplicationTerminal {
                 System.out.println("La quantité indiquée est invalide");
             }
         }
+    }
+
+    public void menuStats(){
+
+        boolean actif = true;
+
+        while(actif){
+                System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                System.out.println("║                          Statistiques                          ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║  Palmarès                                                      ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║  A. Auteurs                                                    ║");
+                System.out.println("║  B. Livres                                                     ║");
+                System.out.println("║  C. Librairies                                                 ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║  Chiffre d'affaire                                             ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║  D. CA total                                                   ║");
+                System.out.println("║  E. CA par librairie                                           ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║  F. annuler                                                    ║");
+                System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+                System.out.print("Votre choix : ");
+                String choix = this.scanner.nextLine().trim().toLowerCase();
+
+                switch(choix){
+
+                    case "a" -> {
+                        try {
+                            Map<Auteur, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.AUTEUR);
+                            int i = 1;
+                            System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                            System.out.println("║                        Palmarès Auteurs                        ║");
+                            System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+                            for(Auteur auteur : palmares.keySet()){
+                                System.out.println(i + ". " + auteur + " avec un nombre de vente de " + palmares.get(auteur));
+                                i++;
+                            }
+                            
+                            System.out.println("\nAppuyer sur une touche pour revenir au menu");
+                            this.scanner.nextLine();
+                        } 
+                        catch (SQLException e) {
+                            System.out.println("Une erreur est survenu");
+                        }
+                    }
+
+                    case "b" -> {
+                        try {
+                            Map<Livre, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.AUTEUR);
+                            int i = 1;
+                            System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                            System.out.println("║                        Palmarès Auteurs                        ║");
+                            System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+                            for(Livre book : palmares.keySet()){
+                                System.out.println(i + ". " + book + " avec un nombre total de commande de " + palmares.get(book));
+                                i++;
+                            }
+                            
+                            System.out.println("\nAppuyer sur une touche pour revenir au menu");
+                            this.scanner.nextLine();
+                        } 
+                        catch (SQLException e) {
+                            System.out.println("Une erreur est survenu");
+                        }
+                    }
+
+                    case "c" -> {
+                        try {
+                            Map<Librairie, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.AUTEUR);
+                            int i = 1;
+                            System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                            System.out.println("║                        Palmarès Auteurs                        ║");
+                            System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+                            for(Librairie lib : palmares.keySet()){
+                                System.out.println(i + ". " + lib + "  avec un total de commande de  " + palmares.get(lib));
+                                i++;
+                            }
+                            
+                            System.out.println("\nAppuyer sur une touche pour revenir au menu");
+                            this.scanner.nextLine();
+                        } 
+                        catch (SQLException e) {
+                            System.out.println("Une erreur est survenu");
+                        }
+                    }
+
+                    case "d" -> {
+                        System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                        System.out.println("║                    Chiffre d'affaire total                     ║");
+                        System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+                        Map<Librairie,Double> CA = Reseau.CAByLibrairie();
+                        Double sum = 0.0;
+                        for(Double nb : CA.values()){sum += nb;}
+
+                        System.out.println("Total : " + sum +" €");
+                        System.out.println("\nAppuyer sur une touche pour revenir au menu");
+                        this.scanner.nextLine();                        
+                    }
+
+                    case "e" -> {
+                        System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                        System.out.println("║                 Chiffre d'affaire par librairie                ║");
+                        System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+
+                        Map<Librairie,Double> CA = Reseau.CAByLibrairie();
+
+                        for(Librairie lib : CA.keySet()){
+                            System.out.println(lib + "  " + CA.get(lib) + " €");
+                        }
+
+                        System.out.println("\nAppuyer sur une touche pour revenir au menu");
+                        this.scanner.nextLine(); 
+                    }
+
+                    case "f" -> {actif = false;}
+
+                }
+        }
+
+
     }
 
     public void deconnexion() {
