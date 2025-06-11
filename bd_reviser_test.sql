@@ -1,15 +1,15 @@
-drop table testECRIRE;
-drop table testAUTEUR;
-drop table testDETAILCOMMANDE;
-drop table testCOMMANDE;
-drop table testPOSSEDER;
-drop table testLIVRE;
-drop table testVENDEUR;
-drop table testMAGASIN;
-drop table testCLIENT;
+drop table ECRIRE;
+drop table AUTEUR;
+drop table DETAILCOMMANDE;
+drop table COMMANDE;
+drop table POSSEDER;
+drop table LIVRE;
+drop table VENDEUR;
+drop table MAGASIN;
+drop table CLIENT;
 
 
-CREATE TABLE testAUTEUR (
+CREATE TABLE AUTEUR (
   PRIMARY KEY (idauteur),
   idauteur   varchar(11) NOT NULL,
   nomauteur  varchar(100),
@@ -17,7 +17,7 @@ CREATE TABLE testAUTEUR (
   anneedeces int
 );
 
-CREATE TABLE testCLIENT (
+CREATE TABLE CLIENT (
   PRIMARY KEY (idcli),
   idcli      int NOT NULL,
   nomcli     varchar(50),
@@ -28,7 +28,7 @@ CREATE TABLE testCLIENT (
   villecli   varchar(100)
 );
 
-CREATE TABLE testCOMMANDE (
+CREATE TABLE COMMANDE (
   PRIMARY KEY (numcom),
   numcom  int NOT NULL,
   datecom date,
@@ -38,7 +38,7 @@ CREATE TABLE testCOMMANDE (
   idmag   int NOT NULL
 );
 
-CREATE TABLE testDETAILCOMMANDE (
+CREATE TABLE DETAILCOMMANDE (
   PRIMARY KEY (numcom, numlig),
   numcom    int NOT NULL,
   numlig    int NOT NULL,
@@ -47,13 +47,13 @@ CREATE TABLE testDETAILCOMMANDE (
   isbn      varchar(13) NOT NULL
 );
 
-CREATE TABLE testECRIRE (
+CREATE TABLE ECRIRE (
   PRIMARY KEY (isbn, idauteur),
   isbn     varchar(13) NOT NULL,
   idauteur varchar(11) NOT NULL
 );
 
-CREATE TABLE testLIVRE (
+CREATE TABLE LIVRE (
   PRIMARY KEY (isbn),
   isbn      varchar(13) NOT NULL,
   titre     varchar(200),
@@ -66,21 +66,21 @@ CREATE TABLE testLIVRE (
 
 );
 
-CREATE TABLE testMAGASIN (
+CREATE TABLE MAGASIN (
   PRIMARY KEY (idmag),
   idmag    int NOT NULL,
   nommag   VARCHAR(42),
   villemag VARCHAR(42)
 );
 
-CREATE TABLE testPOSSEDER (
+CREATE TABLE POSSEDER (
   PRIMARY KEY (idmag, isbn),
   idmag int NOT NULL,
   isbn  varchar(13) NOT NULL,
   qte   int NOT NULL
 );
 
-CREATE TABLE testVENDEUR (
+CREATE TABLE VENDEUR (
   PRIMARY KEY (numVendeur),
   numVendeur int NOT NULL,
   nomV       VarChar(30),
@@ -91,16 +91,16 @@ CREATE TABLE testVENDEUR (
   idmag      int NOT NULL
 );
 
-ALTER TABLE testCOMMANDE ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
-ALTER TABLE testCOMMANDE ADD FOREIGN KEY (idcli) REFERENCES testCLIENT (idcli);
+ALTER TABLE COMMANDE ADD FOREIGN KEY (idmag) REFERENCES MAGASIN (idmag);
+ALTER TABLE COMMANDE ADD FOREIGN KEY (idcli) REFERENCES CLIENT (idcli);
 
-ALTER TABLE testDETAILCOMMANDE ADD FOREIGN KEY (isbn) REFERENCES testLIVRE (isbn);
-ALTER TABLE testDETAILCOMMANDE ADD FOREIGN KEY (numcom) REFERENCES testCOMMANDE (numcom);
+ALTER TABLE DETAILCOMMANDE ADD FOREIGN KEY (isbn) REFERENCES LIVRE (isbn);
+ALTER TABLE DETAILCOMMANDE ADD FOREIGN KEY (numcom) REFERENCES COMMANDE (numcom);
 
-ALTER TABLE testECRIRE ADD FOREIGN KEY (idauteur) REFERENCES testAUTEUR (idauteur);
-ALTER TABLE testECRIRE ADD FOREIGN KEY (isbn) REFERENCES testLIVRE (isbn);
+ALTER TABLE ECRIRE ADD FOREIGN KEY (idauteur) REFERENCES AUTEUR (idauteur);
+ALTER TABLE ECRIRE ADD FOREIGN KEY (isbn) REFERENCES LIVRE (isbn);
 
-ALTER TABLE testPOSSEDER ADD FOREIGN KEY (isbn) REFERENCES testLIVRE (isbn);
-ALTER TABLE testPOSSEDER ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
+ALTER TABLE POSSEDER ADD FOREIGN KEY (isbn) REFERENCES LIVRE (isbn);
+ALTER TABLE POSSEDER ADD FOREIGN KEY (idmag) REFERENCES MAGASIN (idmag);
 
-ALTER TABLE testVENDEUR ADD FOREIGN KEY (idmag) REFERENCES testMAGASIN (idmag);
+ALTER TABLE VENDEUR ADD FOREIGN KEY (idmag) REFERENCES MAGASIN (idmag);
