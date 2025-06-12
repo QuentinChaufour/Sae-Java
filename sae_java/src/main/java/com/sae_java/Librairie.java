@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sae_java.Exceptions.BookNotInStockException;
+import com.sae_java.Exceptions.QuantiteInvalideException;
+
 public class Librairie implements Comparable<Librairie>{
 
     private final int id;
@@ -109,7 +112,7 @@ public class Librairie implements Comparable<Librairie>{
         if(this.livreseEnStock.containsKey(livre)){
             //mettre a jour la qte
 
-            PreparedStatement statement = Reseau.createStatement("UPDATE testPOSSEDER SET qte = qte + ? WHERE isbn = ? AND idmag = ?");
+            PreparedStatement statement = Reseau.createStatement("UPDATE POSSEDER SET qte = qte + ? WHERE isbn = ? AND idmag = ?");
             statement.setInt(1, quantite);
             statement.setString(2, livre.getIsbn());
             statement.setInt(3, this.id);
@@ -123,7 +126,7 @@ public class Librairie implements Comparable<Librairie>{
             
             // livre existe déjà dans la base de données, on ajoute l'association avec la librairie
 
-            PreparedStatement statement = Reseau.createStatement("INSERT INTO testPOSSEDER VALUES (?, ?, ?)");
+            PreparedStatement statement = Reseau.createStatement("INSERT INTO POSSEDER VALUES (?, ?, ?)");
             statement.setInt(1, this.id);
             statement.setString(2, livre.getIsbn());
             statement.setInt(3, quantite);
@@ -136,7 +139,7 @@ public class Librairie implements Comparable<Librairie>{
             // livre n'existe pas dans la base de données, on l'ajoute et on ajoute l'association avec la librairie
 
             this.ajouterLivreDansBD(livre);
-            PreparedStatement statement = Reseau.createStatement("INSERT INTO testPOSSEDER VALUES (?, ?, ?)");
+            PreparedStatement statement = Reseau.createStatement("INSERT INTO POSSEDER VALUES (?, ?, ?)");
             statement.setInt(1, this.id);
             statement.setString(2, livre.getIsbn());
             statement.setInt(3, quantite);
@@ -162,7 +165,7 @@ public class Librairie implements Comparable<Librairie>{
                 this.livreseEnStock.put(livre, qte - quantite);
 
                 // mettre à jour la quantité dans la base de données
-                PreparedStatement statement = Reseau.createStatement("UPDATE testPOSSEDER SET qte = qte - ? WHERE isbn = ? AND idmag = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE POSSEDER SET qte = qte - ? WHERE isbn = ? AND idmag = ?");
                 statement.setInt(1, quantite);
                 statement.setString(2, livre.getIsbn());
                 statement.setInt(3, this.id);
@@ -172,7 +175,7 @@ public class Librairie implements Comparable<Librairie>{
             else if (qte == quantite) {
                 this.livreseEnStock.remove(livre);
                 // supprimer le livre de la base de données
-                PreparedStatement statement = Reseau.createStatement("DELETE FROM testPOSSEDER WHERE isbn = ? AND idmag = ?");
+                PreparedStatement statement = Reseau.createStatement("DELETE FROM POSSEDER WHERE isbn = ? AND idmag = ?");
                 statement.setString(1, livre.getIsbn());
                 statement.setInt(2, this.id);
                 statement.executeUpdate();
@@ -212,7 +215,7 @@ public class Librairie implements Comparable<Librairie>{
      */
     private boolean checkBookInDB(Livre livre) throws SQLException {
 
-        PreparedStatement statement = Reseau.createStatement("SELECT * FROM testLIVRE WHERE isbn = ?");
+        PreparedStatement statement = Reseau.createStatement("SELECT * FROM LIVRE WHERE isbn = ?");
         statement.setString(1, livre.getIsbn());
         ResultSet resultSet = statement.executeQuery();
         boolean isIn = resultSet.next();
@@ -227,7 +230,7 @@ public class Librairie implements Comparable<Librairie>{
      */
     private void ajouterLivreDansBD(Livre livre) throws SQLException {
 
-        PreparedStatement statementLivre = Reseau.createStatement("INSERT INTO testLIVRE VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement statementLivre = Reseau.createStatement("INSERT INTO LIVRE VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         statementLivre.setString(1, livre.getIsbn());
         statementLivre.setString(2, livre.getTitre());
         statementLivre.setInt(3, livre.getNbPages());
@@ -242,7 +245,7 @@ public class Librairie implements Comparable<Librairie>{
         //ajouter les auteurs et leurs liens avec le livre
         for(Auteur auteur : livre.getAuteurs()) {
             if (!this.checkAuteurInBD(auteur)) {
-                PreparedStatement statementAuteur = Reseau.createStatement("INSERT INTO testAUTEUR VALUES (?, ?, ?, ?)");
+                PreparedStatement statementAuteur = Reseau.createStatement("INSERT INTO AUTEUR VALUES (?, ?, ?, ?)");
                 statementAuteur.setString(1, auteur.getId());
                 statementAuteur.setString(2, auteur.getNomPrenom());
 
@@ -262,7 +265,7 @@ public class Librairie implements Comparable<Librairie>{
                 statementAuteur.close();
             }
 
-            PreparedStatement statementEcrire = Reseau.createStatement("INSERT INTO testECRIRE VALUES (?, ?)");
+            PreparedStatement statementEcrire = Reseau.createStatement("INSERT INTO ECRIRE VALUES (?, ?)");
             statementEcrire.setString(1, livre.getIsbn());
             statementEcrire.setString(2, auteur.getId());
             statementEcrire.executeUpdate();
@@ -278,7 +281,7 @@ public class Librairie implements Comparable<Librairie>{
      */
     private boolean checkAuteurInBD(Auteur auteur) throws SQLException {
 
-        PreparedStatement statement = Reseau.createStatement("SELECT * FROM testAUTEUR WHERE idauteur = ?");
+        PreparedStatement statement = Reseau.createStatement("SELECT * FROM AUTEUR WHERE idauteur = ?");
         statement.setString(1, auteur.getId());
         ResultSet resultSet = statement.executeQuery();
         boolean exists = resultSet.next();

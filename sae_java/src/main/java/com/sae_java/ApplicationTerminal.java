@@ -7,6 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.sae_java.Enumerations.EnumInfoClient;
+import com.sae_java.Enumerations.EnumPalmares;
+import com.sae_java.Enumerations.EnumUpdatesDB;
+import com.sae_java.Exceptions.BookNotInStockException;
+import com.sae_java.Exceptions.LibraryNotFoundException;
+import com.sae_java.Exceptions.NoCorrespondingClient;
+import com.sae_java.Exceptions.QuantiteInvalideException;
+
 public class ApplicationTerminal {
 
     private Client client;        // Représente le client connecté
@@ -280,7 +288,7 @@ public class ApplicationTerminal {
             List<Livre> livres = new ArrayList<>(Reseau.getLibrairie(this.client.getLibrairie()).consulterStock().keySet()); // en liste pour pouvoir trier les livres
             Collections.sort(livres); // Tri des livres selon ISBN
 
-            int pageMax = livres.size()/5 == 0 ? livres.size()/5 : ((int)(livres.size()/5)) + 1; // la dernière page est remplie ou non 
+            int pageMax = livres.size()/5 == 0 ? livres.size()/5 : (int)Math.ceil(livres.size()/5); // la dernière page est remplie ou non 
 
             System.out.println("╔════════════════════════════════════════════════════════════════╗");
             System.out.println("║                    CONSULTATION DES LIVRES                     ║");
@@ -414,7 +422,7 @@ public class ApplicationTerminal {
                     
                     Collections.sort(livres); // Tri des livres selon ISBN
                     
-                    int pageMax = livres.size() / 5 == 0 ? livres.size() / 5 : ((int) (livres.size() / 5)) + 1;
+                    int pageMax = livres.size() / 5 == 0 ? livres.size() / 5 :  (int)Math.ceil(livres.size()/5);
                     
                     System.out.println("╔════════════════════════════════════════════════════════════════╗");
                     System.out.println("║                    CONSULTATION DES LIVRES                     ║");
@@ -570,13 +578,14 @@ public class ApplicationTerminal {
 
         boolean actif = true;
 
-        Map<Integer, Map<Livre, Integer>> content = this.client.getPanier().getContenu();
         int page = 0;
         Integer selectedLib = null;
 
 
         while (actif) { 
         
+            Map<Integer, Map<Livre, Integer>> content = this.client.getPanier().getContenu();
+
             // tout les livres appartiennent a la même librairie → simplifier l'usage
             if (content.keySet().size() == 1) {
                 selectedLib = content.keySet().iterator().next();   // une unique librairie inconnu donc pour faire simple, utilisation de l'itérateur et next()
@@ -584,7 +593,7 @@ public class ApplicationTerminal {
                 List<Livre> toDisplayLivres = new ArrayList<>(livres.keySet());
                 Collections.sort(toDisplayLivres);
 
-                int pageMax = toDisplayLivres.size()/5 == 0 ? toDisplayLivres.size()/5 : ((int)(toDisplayLivres.size()/5)) + 1; // la dernière page est remplie ou non
+                int pageMax = toDisplayLivres.size()/5 == 0 ? toDisplayLivres.size()/5 : (int)Math.ceil(toDisplayLivres.size()/5); // la dernière page est remplie ou non
 
                 List<String> displayLivre = new ArrayList<>();
                 for(Livre livre : toDisplayLivres) {
@@ -702,16 +711,21 @@ public class ApplicationTerminal {
                 }
 
                 Map<Livre, Integer> livres = content.get(selectedLib); 
-                List<Livre> toDisplayLivres = new ArrayList<>(livres.keySet());
+                List<Livre> toDisplayLivres = new ArrayList<>();
+                if(!(livres == null)){
+                    toDisplayLivres.addAll(livres.keySet());
+                }
                 Collections.sort(toDisplayLivres);
 
-                int pageMax = toDisplayLivres.size()/5 == 0 ? toDisplayLivres.size()/5 : ((int)(toDisplayLivres.size()/5)) + 1; // la dernière page est remplie ou non
+                int pageMax = toDisplayLivres.size()/5 == 0 ? toDisplayLivres.size()/5 :  (int)Math.ceil(toDisplayLivres.size()/5); // la dernière page est remplie ou non
 
                 List<String> displayLivre = new ArrayList<>();
                 for(Livre livre : toDisplayLivres) {
-
-                    String display = livre + " - " + livres.get(livre) + " exemplaire(s)";
-                    displayLivre.add(display);
+                    Integer qte = livres.get(livre);
+                    if(!(qte == null)){
+                        String display = livre + " - " + qte + " exemplaire(s)";
+                        displayLivre.add(display);
+                    }
                 }
 
                 System.out.println("╔════════════════════════════════════════════════════════════════╗");
@@ -823,6 +837,7 @@ public class ApplicationTerminal {
 
     public Integer selectionLibAdmin(){
         boolean actifLibrairie = true;
+        Integer lib = null;
 
         while (actifLibrairie) {
             System.out.println("╔════════════════════════════════════════════════════════════════╗");
@@ -849,14 +864,14 @@ public class ApplicationTerminal {
                     int idLibrairie = Integer.parseInt(choixLibrairie)-1;
                     if (idLibrairie >= 0 && idLibrairie < Reseau.librairies.size()) {
                         actifLibrairie = false;
-                        return idLibrairie;
+                        lib = idLibrairie;
                     } else {
                         System.out.println("Veuillez entrer un numéro de librairie valide.");
                     }
                 }
             }
         }
-        return null;
+        return lib;
     }
 
     public void menuUpdateInfoClient() {
@@ -1151,8 +1166,7 @@ public class ApplicationTerminal {
 
         while (nbRecommandation == null && actif) {
 
-                System.out.println(
-                        "Veuillez entrer le nombre maximal de recommandation souhaité \n( Entrez A pour annuler et revenir au menu principal )");
+                System.out.println("Veuillez entrer le nombre maximal de recommandation souhaité \n( Entrez A pour annuler et revenir au menu principal )");
                 String value = this.scanner.nextLine().trim().toLowerCase();
 
                 switch (value) {
@@ -1179,100 +1193,121 @@ public class ApplicationTerminal {
                 try {
 
                 List<Livre> recommandations = this.client.OnVousRecommande(nbRecommandation);
-                int pageMax = recommandations.size() / 5 == 0 ? (int) recommandations.size() / 5: (int) (recommandations.size() / 5) + 1;
+                System.out.println(recommandations);
+                System.out.println(this.client.OnVousRecommande(nbRecommandation));
+                int pageMax = recommandations.size() / 5 == 0 ? (int) recommandations.size()/ 5:  (int)Math.ceil(recommandations.size()/5);
 
-                System.out.println("╔════════════════════════════════════════════════════════════════╗");
-                System.out.println("║                         RECOMMANDATION                         ║");
-                System.out.println("╠════════════════════════════════════════════════════════════════╣");
-                System.out.println("║                                                                ║");
+                if(recommandations.isEmpty()){
+                    System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                    System.out.println("║                         RECOMMANDATION                         ║");
+                    System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                    System.out.println("║                                                                ║");
+                    System.out.println("║  Nous n'avons aucune recommandation de livre a vous faire      ║");
+                    System.out.println("║  pour le moment                                                ║");
+                    System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+                } 
+                else {
 
-                this.page(recommandations.subList(page * 5, Math.min((page + 1) * 5, recommandations.size())), this.client.getLibrairie());
-                System.out.println("║                                                                ║");
-                String pageString = "  Page " + (page + 1) + " / " + (pageMax + 1);
-                System.out.println("║ " + pageString + " ".repeat(62 - pageString.length()) + " ║");
-                System.out.println("╠════════════════════════════════════════════════════════════════╣");
-                System.out.println("║  Saisissez le numéro d'un livre pour l'ajouter au panier       ║");
-                System.out.println("║  Veuillez choisir une action :                                 ║");
-                System.out.println("║                                                                ║");
-                if (page > 0) {
-                    System.out.println("║  A. Page précédente                                            ║");
-                } else {
-                    System.out.println("║  A. Page précédente (désactivée)                               ║");
-                }
-                if (page < pageMax) {
-                    System.out.println("║  B. Page suivante                                              ║");
-                } else {
-                    System.out.println("║  B. Page suivante (désactivée)                                 ║");
-                }
+                    System.out.println("╔════════════════════════════════════════════════════════════════╗");
+                    System.out.println("║                         RECOMMANDATION                         ║");
+                    System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                    System.out.println("║                                                                ║");
 
-                System.out.println("║  C. Information supplémentaire livre                           ║");
-                System.out.println("║  D. Retour au menu principal                                   ║");
-                System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
-                System.out.println("Votre choix :");
-
-                String choix = this.scanner.nextLine().trim().toLowerCase();
-
-                switch (choix) {
-
-                    case "a" -> {
-                        if (page > 0) {
-                            page--;
-                        }
+                    this.page(recommandations.subList(page * 5, Math.min((page + 1) * 5, recommandations.size())),
+                            this.client.getLibrairie());
+                    System.out.println("║                                                                ║");
+                    String pageString = "  Page " + (page + 1) + " / " + (pageMax + 1);
+                    System.out.println("║ " + pageString + " ".repeat(62 - pageString.length()) + " ║");
+                    System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                    System.out.println("║  Saisissez le numéro d'un livre pour l'ajouter au panier       ║");
+                    System.out.println("║  Veuillez choisir une action :                                 ║");
+                    System.out.println("║                                                                ║");
+                    if (page > 0) {
+                        System.out.println("║  A. Page précédente                                            ║");
+                    } else {
+                        System.out.println("║  A. Page précédente (désactivée)                               ║");
+                    }
+                    if (page < pageMax) {
+                        System.out.println("║  B. Page suivante                                              ║");
+                    } else {
+                        System.out.println("║  B. Page suivante (désactivée)                                 ║");
                     }
 
-                    case "b" -> {
-                        if (page < pageMax) {
-                            page++;
-                        }
-                    }
+                    System.out.println("║  C. Information supplémentaire livre                           ║");
+                    System.out.println("║  D. Retour au menu principal                                   ║");
+                    System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+                    System.out.println("Votre choix :");
 
-                    case "c" -> {
-                        System.out.print("Veuillez saisir le numéro du livre pour obtenir plus d'informations : ");
-                        String livreChoisi = this.scanner.nextLine().trim();
+                    String choix = this.scanner.nextLine().trim().toLowerCase();
 
-                        try {
-                            int indexLivre = Integer.parseInt(livreChoisi) - 1; // -1 pour correspondre à l'index de
-                                                                                // la liste
-                            if (indexLivre >= 0 && indexLivre < 5) {
-                                indexLivre = page * 5 + indexLivre;
-                                System.out.println(recommandations.get(indexLivre).completeDisplay() + "\n");
-                            } else {
-                                System.out.println("Veuillez entrer un numéro valide entre 1 et 5.");
+                    switch (choix) {
+
+                        case "a" -> {
+                            if (page > 0) {
+                                page--;
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Veuillez entrer un numéro valide.");
-                        } catch (IndexOutOfBoundsException e) {
-                            System.out.println(e.getMessage());
                         }
-                    }
 
-                    case "d" -> {
-                        actif = false;
-                    }
+                        case "b" -> {
+                            if (page < pageMax) {
+                                page++;
+                            }
+                        }
 
-                    default -> {
-                        if (choix.matches("[1-5]")) {
-
-                            Livre livreChoisi = recommandations.get(page * 5 + Integer.parseInt(choix) - 1); // pas d'exception en théorie car regex valide
-
-                            System.out.println("Combien de copies souhaitez-vous ajouter au panier pour le livre : "
-                                    + livreChoisi.getTitre() + " ?");
-                            String nombreCopies = this.scanner.nextLine().trim();
+                        case "c" -> {
+                            System.out.print("Veuillez saisir le numéro du livre pour obtenir plus d'informations : ");
+                            String livreChoisi = this.scanner.nextLine().trim();
 
                             try {
-                                Integer nbCopie = Integer.valueOf(nombreCopies);
-                                if (Reseau.checkStock(livreChoisi, Reseau.getLibrairie(this.client.getLibrairie()),
-                                        nbCopie)) {
-                                    this.client.ajouterAuPanier(livreChoisi, this.client.getLibrairie(), nbCopie);
+                                int indexLivre = Integer.parseInt(livreChoisi) - 1; // -1 pour correspondre à l'index de
+                                                                                    // la liste
+                                if (indexLivre >= 0 && indexLivre < 5) {
+                                    indexLivre = page * 5 + indexLivre;
+                                    System.out.println(recommandations.get(indexLivre).completeDisplay() + "\n");
+                                } else {
+                                    System.out.println("Veuillez entrer un numéro valide entre 1 et 5.");
                                 }
                             } catch (NumberFormatException e) {
-                                System.out.println(
-                                        "Le livre choisi n'est pas présent en quantité demandée dans la librairie \nVeuillez retenter l'action");
-                            } catch (QuantiteInvalideException e) {
-                                System.out.println(
-                                        "La valeur entrée n'est pas une quantité valide, veuillez entrer un nombre positif");
-                            } catch (LibraryNotFoundException e) {
-                                System.out.println("Une erreur est survenu");
+                                System.out.println("Veuillez entrer un numéro valide.");
+                            } catch (IndexOutOfBoundsException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+
+                        case "d" -> {
+                            actif = false;
+                        }
+
+                        default -> {
+                            if (choix.matches("[1-5]")) {
+
+                                Livre livreChoisi = recommandations.get(page * 5 + Integer.parseInt(choix) - 1); // pas
+                                                                                                                 // d'exception
+                                                                                                                 // en
+                                                                                                                 // théorie
+                                                                                                                 // car
+                                                                                                                 // regex
+                                                                                                                 // valide
+
+                                System.out.println("Combien de copies souhaitez-vous ajouter au panier pour le livre : "
+                                        + livreChoisi.getTitre() + " ?");
+                                String nombreCopies = this.scanner.nextLine().trim();
+
+                                try {
+                                    Integer nbCopie = Integer.valueOf(nombreCopies);
+                                    if (Reseau.checkStock(livreChoisi, Reseau.getLibrairie(this.client.getLibrairie()),
+                                            nbCopie)) {
+                                        this.client.ajouterAuPanier(livreChoisi, this.client.getLibrairie(), nbCopie);
+                                    }
+                                } catch (NumberFormatException e) {
+                                    System.out.println(
+                                            "Le livre choisi n'est pas présent en quantité demandée dans la librairie \nVeuillez retenter l'action");
+                                } catch (QuantiteInvalideException e) {
+                                    System.out.println(
+                                            "La valeur entrée n'est pas une quantité valide, veuillez entrer un nombre positif");
+                                } catch (LibraryNotFoundException e) {
+                                    System.out.println("Une erreur est survenu");
+                                }
                             }
                         }
                     }
@@ -1457,7 +1492,7 @@ public class ApplicationTerminal {
     
             List<Auteur> allAuthors = Reseau.getAllAuthors();
             int page = 0;
-            int pageMax = allAuthors.size() % 5 == 0 ? (int) allAuthors.size() / 5 : ((int) allAuthors.size() / 5) + 1;
+            int pageMax = allAuthors.size() % 5 == 0 ? (int) allAuthors.size() / 5 :  (int)Math.ceil(allAuthors.size()/5);
 
             while (actif) {
                 System.out.println("╔════════════════════════════════════════════════════════════════╗");
@@ -1800,46 +1835,40 @@ public class ApplicationTerminal {
     public static void main(String[] args) {
 
         try{
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
-
-            Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
-            Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
-            
-            Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','Tient!!!','60 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
-
-            Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
-            Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
-            Reseau.createStatement("insert into testAUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
-            Reseau.createStatement("insert into testAUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
-            
-            Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into testLIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into testLIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into testLIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into testLIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
-            
-            Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
-            Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
-            Reseau.createStatement("insert into testECRIRE values ('124',3)").executeUpdate();
-            Reseau.createStatement("insert into testECRIRE values ('125',4)").executeUpdate();
-
-            Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
-            Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
-            Reseau.createStatement("insert into testPOSSEDER values (1,'122',2)").executeUpdate();
-            Reseau.createStatement("insert into testPOSSEDER values (0,'124',1)").executeUpdate();
-            Reseau.createStatement("insert into testPOSSEDER values (1,'125',9)").executeUpdate();
-            Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
-            Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
+            Reseau.createStatement("delete from DETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from COMMANDE").executeUpdate();
+            Reseau.createStatement("delete from POSSEDER").executeUpdate();
+            Reseau.createStatement("delete from ECRIRE").executeUpdate();
+            Reseau.createStatement("delete from AUTEUR").executeUpdate();
+            Reseau.createStatement("delete from LIVRE").executeUpdate();
+            Reseau.createStatement("delete from MAGASIN").executeUpdate();
+            Reseau.createStatement("delete from CLIENT").executeUpdate();
+            Reseau.createStatement("insert into MAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into MAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
+            Reseau.createStatement("insert into CLIENT values (3,'Eboue','Fabrice','Tient!!!','60 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into CLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
+            Reseau.createStatement("insert into CLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+            Reseau.createStatement("insert into AUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+            Reseau.createStatement("insert into AUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+            Reseau.createStatement("insert into AUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
+            Reseau.createStatement("insert into AUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
+            Reseau.createStatement("insert into LIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into LIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into LIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into LIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into LIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
+            Reseau.createStatement("insert into LIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
+            Reseau.createStatement("insert into ECRIRE values ('120',1)").executeUpdate();
+            Reseau.createStatement("insert into ECRIRE values ('121',2)").executeUpdate();
+            Reseau.createStatement("insert into ECRIRE values ('124',3)").executeUpdate();
+            Reseau.createStatement("insert into ECRIRE values ('125',4)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (0,'120',4)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (0,'121',5)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (1,'122',2)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (0,'124',1)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (1,'125',9)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (1,'120',5)").executeUpdate();
+            Reseau.createStatement("insert into POSSEDER values (1,'121',7)").executeUpdate();
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
         }
@@ -1853,14 +1882,14 @@ public class ApplicationTerminal {
         app.menuIdentification();
 
         try {
-            Reseau.createStatement("delete from testDETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from testPOSSEDER").executeUpdate();
-            Reseau.createStatement("delete from testECRIRE").executeUpdate();
-            Reseau.createStatement("delete from testAUTEUR").executeUpdate();
-            Reseau.createStatement("delete from testLIVRE").executeUpdate();
-            Reseau.createStatement("delete from testMAGASIN").executeUpdate();
-            Reseau.createStatement("delete from testCLIENT").executeUpdate();
+            Reseau.createStatement("delete from DETAILCOMMANDE").executeUpdate();
+            Reseau.createStatement("delete from COMMANDE").executeUpdate();
+            Reseau.createStatement("delete from POSSEDER").executeUpdate();
+            Reseau.createStatement("delete from ECRIRE").executeUpdate();
+            Reseau.createStatement("delete from AUTEUR").executeUpdate();
+            Reseau.createStatement("delete from LIVRE").executeUpdate();
+            Reseau.createStatement("delete from MAGASIN").executeUpdate();
+            Reseau.createStatement("delete from CLIENT").executeUpdate();
         } 
         catch (SQLException e) {
         }

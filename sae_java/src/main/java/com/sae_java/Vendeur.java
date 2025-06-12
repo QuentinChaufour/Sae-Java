@@ -1,12 +1,12 @@
 package com.sae_java;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import com.sae_java.Enumerations.EnumUpdatesDB;
+import com.sae_java.Exceptions.LibraryNotFoundException;
 
 public class Vendeur extends Personne{
     private int idVendeur;
@@ -17,26 +17,26 @@ public class Vendeur extends Personne{
         this.idVendeur = id;
     }
 
-    public void ajouteLivreStock(Livre livre){
-        
-        Connection connection = Reseau.getConnection();
-        PreparedStatement ps;
-        try {
-            ps = connection.prepareStatement("insert into LIVRE values (?,?,?,?,?,?,?,?)");
-            ps.setString(1, livre.getIsbn());
-            ps.setString(2, livre.getTitre());
-            ps.setObject(3, livre.getAuteurs());
-            ps.setString(4, livre.getEditeur());
-            ps.setInt(5, livre.getDatePublication());
-            ps.setDouble(6, livre.getPrix());
-            ps.setInt(7, livre.getNbPages());
-            ps.setString(8, livre.getClassification());
-            ps.executeUpdate();
-            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
-        } catch (SQLException e) {
-            e.printStackTrace();    
-        } 
-    }
+//    public void ajouteLivreStock(Livre livre){
+//        
+//        Connection connection = Reseau.getConnection();
+//        PreparedStatement ps;
+//        try {
+//            ps = connection.prepareStatement("insert into LIVRE values (?,?,?,?,?,?,?,?)");
+//            ps.setString(1, livre.getIsbn());
+//            ps.setString(2, livre.getTitre());
+//            ps.setObject(3, livre.getAuteurs());
+//            ps.setString(4, livre.getEditeur());
+//            ps.setInt(5, livre.getDatePublication());
+//            ps.setDouble(6, livre.getPrix());
+//            ps.setInt(7, livre.getNbPages());
+//            ps.setString(8, livre.getClassification());
+//            ps.executeUpdate();
+//            Reseau.updateInfos(EnumUpdatesDB.STOCKS);
+//        } catch (SQLException e) {
+//            e.printStackTrace();    
+//        } 
+//    }
 
 
     public boolean checkQte(Commande commande){
@@ -76,7 +76,7 @@ public class Vendeur extends Personne{
         for(Commande commande : commandes){
             Reseau.enregisterCommande(commande);
             for(DetailCommande detail : commande.getDetails()){
-                Reseau.enregistrerDetailCommandeBD(detail);
+                //Reseau.enregistrerDetailCommandeBD(detail);
             }
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
         }

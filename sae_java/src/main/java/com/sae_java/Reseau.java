@@ -28,11 +28,18 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.sae_java.Enumerations.EnumPalmares;
+import com.sae_java.Enumerations.EnumUpdatesDB;
+import com.sae_java.Exceptions.BookNotInStockException;
+import com.sae_java.Exceptions.LibraryAlreadyExistsException;
+import com.sae_java.Exceptions.LibraryNotFoundException;
+import com.sae_java.Exceptions.NoCorrespondingClient;
+import com.sae_java.Exceptions.QuantiteInvalideException;
 
 
 public class Reseau {
 
-    private static final String DB_URL = "jdbc:mariadb://localhost:3306/testLibrairie";
+    private static final String DB_URL = "jdbc:mariadb://localhost:3306/Librairie";
 
     // compte admin
 
@@ -85,7 +92,7 @@ public class Reseau {
 
                 try{
                     // Requête pour update les librairies
-                    PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testMAGASIN");
+                    PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM MAGASIN");
 
                     List<Librairie> newLibrairies = new ArrayList<>();
 
@@ -113,7 +120,7 @@ public class Reseau {
                     
                     for(Librairie lib : Reseau.librairies){
 
-                        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testPOSSEDER WHERE idmag = ?");
+                        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM POSSEDER WHERE idmag = ?");
 
                         statement.setInt(1,lib.getId());
 
@@ -154,14 +161,14 @@ public class Reseau {
                 try{
 
                     // Récupère le plus grand numCom existant
-                    PreparedStatement statement = Reseau.connection.prepareStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
+                    PreparedStatement statement = Reseau.connection.prepareStatement("SELECT numcom FROM COMMANDE where numcom >= ALL (SELECT numcom FROM COMMANDE)");
 
                     ResultSet resultSet = statement.executeQuery();
                     if (resultSet.next()) {
                         Reseau.numCom = resultSet.getInt("numcom") + 1; 
                     }
                 
-                    PreparedStatement statementNumLig = Reseau.connection.prepareStatement("SELECT numlig FROM testDETAILCOMMANDE where numlig >= ALL (SELECT numlig FROM testDETAILCOMMANDE)");
+                    PreparedStatement statementNumLig = Reseau.connection.prepareStatement("SELECT numlig FROM DETAILCOMMANDE where numlig >= ALL (SELECT numlig FROM DETAILCOMMANDE)");
                 
                     resultSet = statementNumLig.executeQuery();
                 
@@ -195,7 +202,7 @@ public class Reseau {
         if (librairies.contains(librairie)) {
             throw new LibraryAlreadyExistsException("La librairie " + librairie.getNom() + " existe déjà dans le réseau.");
         } else {
-            PreparedStatement statement = Reseau.connection.prepareStatement("INSERT INTO testMAGASIN VALUES (?, ?, ?)");
+            PreparedStatement statement = Reseau.connection.prepareStatement("INSERT INTO MAGASIN VALUES (?, ?, ?)");
             statement.setInt(1, librairie.getId());
             statement.setString(2, librairie.getNom());
             statement.setString(3, librairie.getVille());
@@ -214,8 +221,8 @@ public class Reseau {
     public static void removeLibrairie(Librairie librairie) throws LibraryNotFoundException,SQLException {
         if (librairies.contains(librairie)) {
                 
-                PreparedStatement statementMagasin = Reseau.connection.prepareStatement("DELETE FROM testMAGASIN WHERE idmag = ?");
-                PreparedStatement statementLivre = Reseau.connection.prepareStatement("DELETE FROM testPOSSEDER WHERE idmag = ?");
+                PreparedStatement statementMagasin = Reseau.connection.prepareStatement("DELETE FROM MAGASIN WHERE idmag = ?");
+                PreparedStatement statementLivre = Reseau.connection.prepareStatement("DELETE FROM POSSEDER WHERE idmag = ?");
                 statementMagasin.setInt(1, librairie.getId());
                 statementLivre.setInt(1, librairie.getId());
                 statementMagasin.executeUpdate();
@@ -240,7 +247,7 @@ public class Reseau {
 
         List<Auteur> auteurs = new ArrayList<>();
 
-        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM testAUTEUR");
+        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM AUTEUR");
 
         ResultSet resultSetAutor = statementAutor.executeQuery();
 
@@ -289,7 +296,7 @@ public class Reseau {
     public static void enregisterCommande(Commande commande) {
         
         try {
-            PreparedStatement statementCommande = Reseau.connection.prepareStatement("INSERT INTO testCOMMANDE VALUES (?, ?, ?, ?, ?, ?)");
+            PreparedStatement statementCommande = Reseau.connection.prepareStatement("INSERT INTO COMMANDE VALUES (?, ?, ?, ?, ?, ?)");
             statementCommande.setInt(1, commande.getNumCommande());
 
             Date sqlDate = new java.sql.Date(commande.getDate().getTime());
@@ -311,7 +318,7 @@ public class Reseau {
                     Librairie librairie = Reseau.getLibrairie(commande.getIdLibrairie());
                 
                     if(librairie.checkStock(detail.getLivre(), detail.getQuantite())){
-                        PreparedStatement statementDetail = Reseau.connection.prepareStatement("INSERT INTO testDETAILCOMMANDE (numcom, numlig, qte, prixvente, isbn) VALUES (?, ?, ?, ?, ?)");
+                        PreparedStatement statementDetail = Reseau.connection.prepareStatement("INSERT INTO DETAILCOMMANDE (numcom, numlig, qte, prixvente, isbn) VALUES (?, ?, ?, ?, ?)");
 
                         double prix = detail.getLivre().getPrix() * detail.getQuantite();
 
@@ -325,15 +332,23 @@ public class Reseau {
                         statementDetail.close();
 
                         // update DB'Stocks
-                        PreparedStatement statement  = Reseau.connection.prepareStatement("UPDATE testPOSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?");
-
-                        statement.setInt(1,librairie.consulterStock().get(detail.getLivre()) - detail.getQuantite());
-                        statement.setInt(2,librairie.getId());
-                        statement.setString(3, detail.getLivre().getIsbn());
-
-                        statement.executeUpdate();
-                        statement.close();
-
+                        int qte = librairie.consulterStock().get(detail.getLivre()) - detail.getQuantite();
+                        if(qte == 0){
+                            PreparedStatement statement = Reseau.connection.prepareStatement("DELETE FROM POSSEDER WHERE idmag = ? AND isbn = ?");
+                            statement.setInt(1,librairie.getId());
+                            statement.setString(2, detail.getLivre().getIsbn());
+                            statement.executeUpdate();
+                            statement.close();
+                        }
+                        else{
+                            PreparedStatement statement  = Reseau.connection.prepareStatement("UPDATE POSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?");
+                            
+                            statement.setInt(1,qte);
+                            statement.setInt(2,librairie.getId());
+                            statement.setString(3, detail.getLivre().getIsbn());
+                            statement.executeUpdate();
+                            statement.close();
+                        }
                     }
                     else {
                         System.out.println("Erreur : Pas assez de stock pour le livre " + detail.getLivre().getTitre());
@@ -361,7 +376,7 @@ public class Reseau {
 
         try {
 
-            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE WHERE idcli = ?");
+            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM COMMANDE NATURAL JOIN DETAILCOMMANDE WHERE idcli = ?");
             statement.setInt(1,idClient);
 
             ResultSet resultSet = statement.executeQuery();
@@ -387,7 +402,7 @@ public class Reseau {
         Map<Livre,Set<Integer>> clientsBooks = new HashMap<>(); // livre et set d'ID client pour connaitre la popularité d'un livre reflété par les commandes
 
         try {
-            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE WHERE idcli <> ?");
+            PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM COMMANDE NATURAL JOIN DETAILCOMMANDE WHERE idcli <> ?");
             statement.setInt(1,idClientToAvoid);
 
             ResultSet resultSet = statement.executeQuery();
@@ -415,7 +430,7 @@ public class Reseau {
 
     private static Livre createLivre(String isbn) throws SQLException{
         
-        PreparedStatement statementLivre = Reseau.connection.prepareStatement("SELECT * FROM testLIVRE WHERE isbn = ?");
+        PreparedStatement statementLivre = Reseau.connection.prepareStatement("SELECT * FROM LIVRE WHERE isbn = ?");
         statementLivre.setString(1, isbn);
         ResultSet resultSetLivre = statementLivre.executeQuery();
 
@@ -430,7 +445,7 @@ public class Reseau {
 
         Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass);
 
-        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM testECRIRE NATURAL JOIN testAUTEUR WHERE isbn = ?");
+        PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM ECRIRE NATURAL JOIN AUTEUR WHERE isbn = ?");
         statementAutor.setString(1, isbn);
 
         ResultSet resultSetAutor = statementAutor.executeQuery();
@@ -451,7 +466,7 @@ public class Reseau {
 
     public static Client identificationClient(String nom,String prenom, String motDePasse,Integer idLibrary) throws SQLException, NoCorrespondingClient{
 
-        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM testCLIENT WHERE nomcli = ? AND prenomcli = ? AND motdepassecli = ?");
+        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM CLIENT WHERE nomcli = ? AND prenomcli = ? AND motdepassecli = ?");
         statement.setString(1, nom);
         statement.setString(2, prenom);
         statement.setString(3, motDePasse);
@@ -707,7 +722,7 @@ public class Reseau {
      */
     private static <T> Map<T,Integer> getPalmaresLivre(int n) throws SQLException {
 
-        PreparedStatement statement = Reseau.createStatement("SELECT isbn, titre, nomedit, datepubli, prix, nbpages, nomclass,COUNT(numlig) nbCommande FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE NATURAL JOIN testLIVRE GROUP BY isbn ORDER BY COUNT(numlig) DESC LIMIT ?");
+        PreparedStatement statement = Reseau.createStatement("SELECT isbn, titre, nomedit, datepubli, prix, nbpages, nomclass,COUNT(numlig) nbCommande FROM COMMANDE NATURAL JOIN DETAILCOMMANDE NATURAL JOIN LIVRE GROUP BY isbn ORDER BY COUNT(numlig) DESC LIMIT ?");
         statement.setInt(1, n);
         ResultSet resultSet = statement.executeQuery();
         Map<T,Integer> livresPalmares = new LinkedHashMap<>();
@@ -726,7 +741,7 @@ public class Reseau {
             Livre livre = new Livre(isbn, titre, nomEdit, datePubli, prix, nbPages, nomClass);
             
             // Ajout des auteurs
-            PreparedStatement statementAuteur = Reseau.connection.prepareStatement("SELECT * FROM testECRIRE NATURAL JOIN testAUTEUR WHERE isbn = ?");
+            PreparedStatement statementAuteur = Reseau.connection.prepareStatement("SELECT * FROM ECRIRE NATURAL JOIN AUTEUR WHERE isbn = ?");
             statementAuteur.setString(1, isbn);
             ResultSet resultSetAuteur = statementAuteur.executeQuery();
 
@@ -753,7 +768,7 @@ public class Reseau {
      */
     private static <T> Map<T,Integer> getPalmaresAuteur(int n) throws SQLException {
 
-        PreparedStatement statement = Reseau.createStatement("SELECT idauteur, nomauteur,anneenais,anneedeces,SUM(qte) nbLivreCommande FROM testCOMMANDE NATURAL JOIN testDETAILCOMMANDE NATURAL JOIN testLIVRE NATURAL JOIN testECRIRE NATURAL JOIN testAUTEUR GROUP BY idauteur ORDER BY SUM(qte) DESC LIMIT ?");
+        PreparedStatement statement = Reseau.createStatement("SELECT idauteur, nomauteur,anneenais,anneedeces,SUM(qte) nbLivreCommande FROM COMMANDE NATURAL JOIN DETAILCOMMANDE NATURAL JOIN LIVRE NATURAL JOIN ECRIRE NATURAL JOIN AUTEUR GROUP BY idauteur ORDER BY SUM(qte) DESC LIMIT ?");
         statement.setInt(1, n);
         ResultSet resultSet = statement.executeQuery();
 
@@ -781,7 +796,7 @@ public class Reseau {
      */
     private static <T> Map<T,Integer> getPalmaresLibrairie(int n) throws SQLException {
 
-        PreparedStatement statement = Reseau.createStatement("SELECT idmag,nommag,villemag,SUM(qte) nbVentes FROM testMAGASIN NATURAL JOIN testCOMMANDE NATURAL JOIN testDETAILCOMMANDE GROUP BY idmag ORDER BY SUM(qte) DESC LIMIT ?");
+        PreparedStatement statement = Reseau.createStatement("SELECT idmag,nommag,villemag,SUM(qte) nbVentes FROM MAGASIN NATURAL JOIN COMMANDE NATURAL JOIN DETAILCOMMANDE GROUP BY idmag ORDER BY SUM(qte) DESC LIMIT ?");
         statement.setInt(1, n);
         ResultSet resultSet = statement.executeQuery();
         Map<T,Integer> librairiesPalmares = new LinkedHashMap<>();
@@ -809,7 +824,7 @@ public class Reseau {
         Map<Librairie,Double> caLibrairies = new LinkedHashMap<>();
 
         try {
-            PreparedStatement statement = Reseau.createStatement("SELECT idmag, nommag, villemag, SUM(prixvente*qte) CA FROM testMAGASIN NATURAL JOIN testCOMMANDE NATURAL JOIN testDETAILCOMMANDE GROUP BY idmag ORDER BY CA DESC");
+            PreparedStatement statement = Reseau.createStatement("SELECT idmag, nommag, villemag, SUM(prixvente*qte) CA FROM MAGASIN NATURAL JOIN COMMANDE NATURAL JOIN DETAILCOMMANDE GROUP BY idmag ORDER BY CA DESC");
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
