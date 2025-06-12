@@ -10,6 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sae_java.Enumerations.EnumInfoClient;
+import com.sae_java.Enumerations.EnumUpdatesDB;
+import com.sae_java.Exceptions.LibraryNotFoundException;
+import com.sae_java.Exceptions.PasAssezDeStockException;
+import com.sae_java.Exceptions.QuantiteInvalideException;
+
 public class Client extends Personne{
     
     private final int idClient;
@@ -371,7 +377,7 @@ public class Client extends Personne{
 
             case EnumInfoClient.NOM -> {
 
-                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET nomcli = ? WHERE idcli = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE CLIENT SET nomcli = ? WHERE idcli = ?");
                 statement.setString(1, data);
                 statement.setInt(2, this.idClient);
                 statement.executeUpdate();
@@ -380,7 +386,7 @@ public class Client extends Personne{
 
             case EnumInfoClient.PRENOM -> {
 
-                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET prenomcli = ? WHERE idcli = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE CLIENT SET prenomcli = ? WHERE idcli = ?");
                 statement.setString(1, data);
                 statement.setInt(2, this.idClient);
                 statement.executeUpdate();
@@ -388,7 +394,7 @@ public class Client extends Personne{
             }
 
             case EnumInfoClient.ADDRESS -> {
-                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET adressecli = ? WHERE idcli = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE CLIENT SET adressecli = ? WHERE idcli = ?");
                 statement.setString(1, data);
                 statement.setInt(2, this.idClient);
                 statement.executeUpdate();
@@ -396,7 +402,7 @@ public class Client extends Personne{
             }
 
             case EnumInfoClient.MDP -> {
-                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET motdepassecli = ? WHERE idcli = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE CLIENT SET motdepassecli = ? WHERE idcli = ?");
                 statement.setString(1, data);
                 statement.setInt(2, this.idClient);
                 statement.executeUpdate();
@@ -406,7 +412,7 @@ public class Client extends Personne{
 
             case EnumInfoClient.VILLE -> {
 
-                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET villecli = ? WHERE idcli = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE CLIENT SET villecli = ? WHERE idcli = ?");
                 statement.setString(1, data);
                 statement.setInt(2, this.idClient);
                 statement.executeUpdate();
@@ -415,7 +421,7 @@ public class Client extends Personne{
              
             case EnumInfoClient.CODEPOSTAL -> {
 
-                PreparedStatement statement = Reseau.createStatement("UPDATE testCLIENT SET codepostal = ? WHERE idcli = ?");
+                PreparedStatement statement = Reseau.createStatement("UPDATE tCLIENT SET codepostal = ? WHERE idcli = ?");
                 statement.setString(1, data);
                 statement.setInt(2, this.idClient);
                 statement.executeUpdate();

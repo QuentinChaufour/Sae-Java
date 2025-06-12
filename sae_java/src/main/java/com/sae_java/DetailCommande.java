@@ -1,5 +1,7 @@
 package com.sae_java;
 
+import com.sae_java.Exceptions.QuantiteInvalideException;
+
 public class DetailCommande {
     
     private final int numLig;

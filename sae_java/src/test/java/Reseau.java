@@ -299,14 +299,23 @@ public class Reseau {
                         statementDetail.close();
 
                         // update DB'Stocks
-                        PreparedStatement statement  = Reseau.connection.prepareStatement("UPDATE testPOSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?");
-
-                        statement.setInt(1,librairie.consulterStock().get(detail.getLivre()) - detail.getQuantite());
-                        statement.setInt(2,librairie.getId());
-                        statement.setString(3, detail.getLivre().getIsbn());
-
-                        statement.executeUpdate();
-                        statement.close();
+                        int qte = librairie.consulterStock().get(detail.getLivre()) - detail.getQuantite();
+                        if(qte == 0){
+                            PreparedStatement statement = Reseau.connection.prepareStatement("DELETE FROM testPOSSEDER WHERE idmag = ? AND isbn = ?");
+                            statement.setInt(1,librairie.getId());
+                            statement.setString(2, detail.getLivre().getIsbn());
+                            statement.executeUpdate();
+                            statement.close();
+                        }
+                        else{
+                            PreparedStatement statement  = Reseau.connection.prepareStatement("UPDATE testPOSSEDER SET qte = ? WHERE idmag = ? AND isbn = ?");
+                            
+                            statement.setInt(1,qte);
+                            statement.setInt(2,librairie.getId());
+                            statement.setString(3, detail.getLivre().getIsbn());
+                            statement.executeUpdate();
+                            statement.close();
+                        }
 
                     }
                     else {

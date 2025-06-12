@@ -1,4 +1,4 @@
-package com.sae_java;
+package com.sae_java.Enumerations;
 
 public enum EnumInfoClient {
     NOM,

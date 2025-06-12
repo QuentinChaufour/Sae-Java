@@ -3,6 +3,9 @@ package com.sae_java;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sae_java.Exceptions.LibraryNotFoundException;
+import com.sae_java.Exceptions.PasAssezDeStockException;
+
 public class Panier {
 
     private final Map<Integer,Map<Livre,Integer>> contenu; // Livre et sa quantité
