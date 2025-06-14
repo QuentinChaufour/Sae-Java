@@ -60,14 +60,12 @@ public class Vendeur extends Personne{
         return panier;
     }
 
-    public List<Commande> preparerCommandes(int idClient, Map<Livre, Integer> listeLivres, Date date, String enLigne, String Livraison ){
-        List<Commande> listeCommandes = new ArrayList<>();
-        Connection connection = Reseau.getConnection();
-        Statement s;
+    public Commande preparerCommandes(int idClient, Map<Livre, Integer> listeLivres, Date date, String enLigne, String Livraison ){
+        PreparedStatement s;
         int maxNumCommande = 0;
         try {
-            s = connection.createStatement();
-            ResultSet rs = s.executeQuery("SELECT MAX(numCommande) FROM COMMANDE");
+            s = Reseau.createStatement("SELECT MAX(numCommande) FROM COMMANDE");
+            ResultSet rs = s.executeQuery();
             maxNumCommande = rs.getInt(1)+1;
             if (rs.next()) {
                 maxNumCommande = rs.getInt(1) + 1;
@@ -75,22 +73,20 @@ public class Vendeur extends Personne{
                 maxNumCommande = 1; 
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println("erreur connection SQL");
         }
         
-        listeCommandes.add(new Commande(maxNumCommande, date, enLigne, Livraison, idClient, this.idlibrairie));
+        Commande commande = new Commande(maxNumCommande, date, enLigne, Livraison, idClient, this.idlibrairie);
         int cpt = 1;
         for(Livre livre : listeLivres.keySet()){
             try {
-                listeCommandes.get(0).addDetailCommande(new DetailCommande(cpt, livre, listeLivres.get(livre)));
+                commande.addDetailCommande(new DetailCommande(cpt, livre, listeLivres.get(livre)));
             } catch (QuantiteInvalideException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.println("Erreur de quantité");
             }
             cpt++;
         }
-        return listeCommandes;
+        return commande;
     }
 
     public void enregistrerCommandes(List<Commande> commandes){
@@ -103,23 +99,45 @@ public class Vendeur extends Personne{
 
     public void passerCommande(Client client, boolean faireFacture, String livraison){
         //demander pour public de createCOmmandes
-        List<Commande> commandesClient = client.createCommandes(livraison, false);
-        for(Commande commande : commandesClient){
+        List<Commande> commandesClient = new ArrayList<>();
+        int maxNumCommande = 0;
+        PreparedStatement s;
+        try {
+            try {
+                s = Reseau.createStatement("SELECT MAX(numcom) FROM COMMANDE");
+                ResultSet rs = s.executeQuery();
+                maxNumCommande = rs.getInt(1)+1;
+                if (rs.next()) {
+                    maxNumCommande = rs.getInt(1) + 1;
+                } else {
+                    maxNumCommande = 1; 
+                }
+            } catch (SQLException e) {
+                System.err.println("erreur connection SQL");
+            }
+            Reseau.getLibrairie(this.idlibrairie);
+            Map<Livre, Integer> mapLivres = client.getPanier().getContenu().get(this.idlibrairie);
+            Commande commande = new Commande(maxNumCommande, new Date(), "N", livraison, client.getId(), this.idlibrairie);
+            for(Livre livre : mapLivres.keySet()){
+                int cpt = 1;
+                try {
+                    commande.getDetails().add(new DetailCommande(cpt, livre, mapLivres.get(livre)));
+                } catch (QuantiteInvalideException e) {
+                    System.err.println("Quantite invalide");
+                }
+                cpt++;
+            }
             Reseau.enregisterCommande(commande);
+            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
+            if(faireFacture){
+                Reseau.createBillPDF(commandesClient, client, livraison);
+            }
+        } catch (LibraryNotFoundException e) {
+            System.err.println("Pas de librairie trouvée");
         }
-        Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);;
-        if(faireFacture){
-            Reseau.createBillPDF(commandesClient, client, livraison);
-        }
+        
     }
-//demander puisque createBillPDF est dans Reseau
-    public void produireFacture(List<Commande> listeCommandes){
-        System.out.println("---------------------------Facture---------------------------");
-        for(Commande commande : listeCommandes){
-            System.out.println("Commande N°" + commande.getNumCommande());
 
-        }
-    }
     public Livre transfererLivre(Livre livre, Librairie nouvLibrairie){
         try {
             PreparedStatement ps1 = Reseau.createStatement("insert into LIVRE values (?, ?, ?, ?, ?, ?, ?, ?)");

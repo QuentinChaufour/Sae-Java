@@ -31,7 +31,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class Reseau {
 
-    private static final String DB_URL = "jdbc:mariadb://localhost:3306/testLibrairie";
+    private static final String DB_URL = "jdbc:mariadb://servinfo-maria:3306/DBcamera";
 
     // compte admin
 
@@ -48,7 +48,7 @@ public class Reseau {
     // initialisation des valeurs de BD
     static {
         try {
-            Reseau.connection = DriverManager.getConnection(Reseau.DB_URL, "root", "root_password");
+            Reseau.connection = DriverManager.getConnection(Reseau.DB_URL, "camera", "camera");
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
             Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
