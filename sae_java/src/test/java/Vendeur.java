@@ -1,14 +1,8 @@
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 public class Vendeur extends Personne{
     private int idVendeur;
@@ -60,38 +54,38 @@ public class Vendeur extends Personne{
         return panier;
     }
 
-    public List<Commande> preparerCommandes(int idClient, Map<Livre, Integer> listeLivres, Date date, String enLigne, String Livraison ){
-        List<Commande> listeCommandes = new ArrayList<>();
-        Connection connection = Reseau.getConnection();
-        Statement s;
-        int maxNumCommande = 0;
-        try {
-            s = connection.createStatement();
-            ResultSet rs = s.executeQuery("SELECT MAX(numCommande) FROM COMMANDE");
-            maxNumCommande = rs.getInt(1)+1;
-            if (rs.next()) {
-                maxNumCommande = rs.getInt(1) + 1;
-            } else {
-                maxNumCommande = 1; 
-            }
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        listeCommandes.add(new Commande(maxNumCommande, date, enLigne, Livraison, idClient, this.idlibrairie));
-        int cpt = 1;
-        for(Livre livre : listeLivres.keySet()){
-            try {
-                listeCommandes.get(0).addDetailCommande(new DetailCommande(cpt, livre, listeLivres.get(livre)));
-            } catch (QuantiteInvalideException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            cpt++;
-        }
-        return listeCommandes;
-    }
+//    public List<Commande> preparerCommandes(int idClient, Map<Livre, Integer> listeLivres, Date date, String enLigne, String Livraison ){
+//        List<Commande> listeCommandes = new ArrayList<>();
+//        Connection connection = Reseau.getConnection();
+//        Statement s;
+//        int maxNumCommande = 0;
+//        try {
+//            s = connection.createStatement();
+//            ResultSet rs = s.executeQuery("SELECT MAX(numCommande) FROM COMMANDE");
+//            maxNumCommande = rs.getInt(1)+1;
+//            if (rs.next()) {
+//                maxNumCommande = rs.getInt(1) + 1;
+//            } else {
+//                maxNumCommande = 1; 
+//            }
+//        } catch (SQLException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        
+//        listeCommandes.add(new Commande(maxNumCommande, date, enLigne, Livraison, idClient, this.idlibrairie));
+//        int cpt = 1;
+//        for(Livre livre : listeLivres.keySet()){
+//            try {
+//                listeCommandes.get(0).addDetailCommande(new DetailCommande(cpt, livre, listeLivres.get(livre)));
+//            } catch (QuantiteInvalideException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//            cpt++;
+//        }
+//        return listeCommandes;
+//    }
 
     public void enregistrerCommandes(List<Commande> commandes){
         // va faire l'insert des commandes dans la bd et soustraire les stocks
@@ -101,17 +95,17 @@ public class Vendeur extends Personne{
         }
     }
 
-    public void passerCommande(Client client, boolean faireFacture, String livraison){
-        //demander pour public de createCOmmandes
-        List<Commande> commandesClient = client.createCommandes(livraison, false);
-        for(Commande commande : commandesClient){
-            Reseau.enregisterCommande(commande);
-        }
-        Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);;
-        if(faireFacture){
-            Reseau.createBillPDF(commandesClient, client, livraison);
-        }
-    }
+//    public void passerCommande(Client client, boolean faireFacture, String livraison){
+//        //demander pour public de createCOmmandes
+//        List<Commande> commandesClient = client.createCommandes(livraison, false);
+//        for(Commande commande : commandesClient){
+//            Reseau.enregisterCommande(commande);
+//        }
+//        Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);;
+//        if(faireFacture){
+//            Reseau.createBillPDF(commandesClient, client, livraison);
+//        }
+//    }
 //demander puisque createBillPDF est dans Reseau
     public void produireFacture(List<Commande> listeCommandes){
         System.out.println("---------------------------Facture---------------------------");

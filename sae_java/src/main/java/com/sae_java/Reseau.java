@@ -39,7 +39,7 @@ import com.sae_java.Exceptions.QuantiteInvalideException;
 
 public class Reseau {
 
-    private static final String DB_URL = "jdbc:mariadb://localhost:3306/Librairie";
+    private static final String DB_URL = "jdbc:mariadb://servinfo-maria:3306/DBcamera";
 
     // compte admin
 
@@ -56,7 +56,7 @@ public class Reseau {
     // initialisation des valeurs de BD
     static {
         try {
-            Reseau.connection = DriverManager.getConnection(Reseau.DB_URL, "root", "root_password");
+            Reseau.connection = DriverManager.getConnection(Reseau.DB_URL, "camera", "camera");
 
             Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
             Reseau.updateInfos(EnumUpdatesDB.NUMCOM);
@@ -70,6 +70,12 @@ public class Reseau {
 
     private Reseau() {} // Constructeur privé pour empêcher l'instanciation de la classe
 
+    /**
+     * permet d'obtenir la librairie selon son id
+     * @param idLibrairie int
+     * @return Librairie : la librairie recherché
+     * @throws LibraryNotFoundException
+     */
     public static Librairie getLibrairie(int idLibrairie) throws LibraryNotFoundException{
         for(Librairie lib : Reseau.librairies){
             if(lib.getId() == idLibrairie){
@@ -189,15 +195,21 @@ public class Reseau {
     /**
      * ajoute une librairie au reseaux
      * 
-     * @param librairie
+     * @param librairie Librairie
      */
-    public static void addLibrairie(Librairie librairie) throws SQLException{
+    public static void addLibrairie(Librairie librairie){
 
         if (!librairies.contains(librairie)) {
             librairies.add(librairie);
         }
     }
 
+    /**
+     * ajoute une librairie au réseau et en BD
+     * @param librairie Librairie
+     * @throws SQLException
+     * @throws LibraryAlreadyExistsException
+     */
     public static void addNewLibrairie(Librairie librairie) throws SQLException, LibraryAlreadyExistsException {
         if (librairies.contains(librairie)) {
             throw new LibraryAlreadyExistsException("La librairie " + librairie.getNom() + " existe déjà dans le réseau.");
@@ -209,14 +221,14 @@ public class Reseau {
             statement.executeUpdate();
             statement.close();
 
-            librairies.add(librairie);
+            Reseau.addLibrairie(librairie);
         }
     }
 
     /**
      * retire une librairie du reseaux
      * 
-     * @param librairie
+     * @param librairie Librairie
      **/
     public static void removeLibrairie(Librairie librairie) throws LibraryNotFoundException,SQLException {
         if (librairies.contains(librairie)) {
@@ -369,7 +381,11 @@ public class Reseau {
         }
     }
 
-
+    /**
+     * permet d'obtenir l'ensembles des livres commandé par un client
+     * 
+     * @param idClient int
+     */
     public static Set<Livre> getUserBooks(int idClient){
 
         Set<Livre> userBooks = new HashSet<>();
@@ -397,6 +413,11 @@ public class Reseau {
         return userBooks;
     }
 
+    /**
+     * permet de définir quels livres ont été commandés par quels clients
+     * @param idClientToAvoid int : le client a éviter
+     * @return Map<Livre,Set<Integer>> : l'ensemble des clients selon les livres qu'ils ont commandés
+     */
     public static Map<Livre,Set<Integer>> mapperCommandesClients(int idClientToAvoid){
 
         Map<Livre,Set<Integer>> clientsBooks = new HashMap<>(); // livre et set d'ID client pour connaitre la popularité d'un livre reflété par les commandes
@@ -428,6 +449,12 @@ public class Reseau {
         return clientsBooks;
     }
 
+    /**
+     * permet de créer une instance d'un livre selon des données en BD
+     * @param isbn String : l'ISBN du livre
+     * @return LIvre
+     * @throws SQLException
+     */
     private static Livre createLivre(String isbn) throws SQLException{
         
         PreparedStatement statementLivre = Reseau.connection.prepareStatement("SELECT * FROM LIVRE WHERE isbn = ?");
@@ -462,8 +489,16 @@ public class Reseau {
         return livre;
     }
 
-        // identifications 
-
+    /**
+     * permet d'identifier un client
+     * @param nom String
+     * @param prenom String
+     * @param motDePasse String
+     * @param idLibrary int
+     * @return Client
+     * @throws SQLException
+     * @throws NoCorrespondingClient
+     */
     public static Client identificationClient(String nom,String prenom, String motDePasse,Integer idLibrary) throws SQLException, NoCorrespondingClient{
 
         PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM CLIENT WHERE nomcli = ? AND prenomcli = ? AND motdepassecli = ?");
@@ -492,11 +527,28 @@ public class Reseau {
         
     }
 
+    /**
+     * permet d'identifier l'admin
+     * @param userName String
+     * @param motDePasse String
+     * @return boolean : True si infos correcte, False sinon
+     */
     public static boolean identificationAdmin(String userName, String motDePasse) {
 
         return userName.equals(Reseau.ADMIN_USER) && motDePasse.equals(Reseau.ADMIN_PASSWORD);
     }
 
+    /**
+     * permet de transferer un livre entre 2 librairies
+     * @param book Livre
+     * @param qte int
+     * @param originLib int : l'id de la librairie d'origine du livre
+     * @param lib int : l'id de la librairie recevant le livre
+     * @throws QuantiteInvalideException
+     * @throws LibraryNotFoundException
+     * @throws BookNotInStockException
+     * @throws SQLException
+     */
     public static void transfert(Livre book,int qte,int originLib,int lib) throws QuantiteInvalideException,LibraryNotFoundException,BookNotInStockException,SQLException{
 
         if(qte < 0){
@@ -509,9 +561,7 @@ public class Reseau {
 
             oldLib.retirerLivre(book, qte);
             newLib.ajouterNouveauLivre(book, qte);
-
         }
-
     }
 
 
@@ -845,8 +895,11 @@ public class Reseau {
         return caLibrairies;
     }
 
-
-
+    /**
+     * permet de créer une requête SQL
+     * @param request String : la requête demandé
+     * @return PreparedStatement
+     */
     public static PreparedStatement createStatement(String request){
         try {
             return  Reseau.connection.prepareStatement(request);

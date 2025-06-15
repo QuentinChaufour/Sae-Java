@@ -158,10 +158,18 @@ public class Livre implements Comparable<Livre> {
         this.classification = classification;
     }
 
+    /**
+     * permet d'ajouter un auteur au livre
+     * @param auteur : Auteur
+     */
     public void ajouterAuteur(Auteur auteur) {
         this.auteurs.add(auteur);
     }
 
+    /**
+     * permet l'affichage de l'ensemble des infos du livre
+     * @return String
+     */
     public String completeDisplay(){
         return this.titre + " de " + this.auteurs + ", " + this.editeur + ", " + this.datePublication + ", " + this.prix + " euros, " + this.nbPages + " pages, " + this.classification;
     }

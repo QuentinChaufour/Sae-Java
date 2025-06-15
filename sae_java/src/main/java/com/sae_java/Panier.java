@@ -16,6 +16,12 @@ public class Panier {
         this.prixTotal = 0.0;
     }
 
+    /**
+     * permet d'ajouter un livre au panier
+     * @param livre Livre
+     * @param idLibrairie int : la librairie stockant le livre
+     * @param qte int
+     */
     public void ajouterLivre(Livre livre,int idLibrairie,int qte) {
 
         if(qte <= 0) {
@@ -40,6 +46,13 @@ public class Panier {
         this.prixTotal += livre.getPrix() * qte;
     }
 
+    /**
+     * permet de retirer un livre du panier
+     * @param livre Livre
+     * @param idLibrairie int : la librairie stockant le livre
+     * @param qte int
+     * @throws PasAssezDeStockException
+     */
     public void retirerLivre(Livre livre, int idLibrairie, int qte) throws PasAssezDeStockException {
        
         if(this.contenu.containsKey(idLibrairie)){
@@ -68,15 +81,25 @@ public class Panier {
         }
     }
 
+    /**
+     * permet de consulter le contenu du panier
+     * @return
+     */
     public Map<Integer,Map<Livre,Integer>> getContenu() {
         return new HashMap<>(contenu); // Retourne une copie pour éviter les modifications externes
     }
 
-
+    /**
+     * permet de calculer la valeur totale du panier
+     * @return double : la valeur du panier
+     */
     public double getPrixTotal() {
         return this.prixTotal;
     }
 
+    /**
+     * permet de vider totalement le panier
+     */
     public void viderPanier() {
         this.contenu.clear();
         this.prixTotal = 0.0;

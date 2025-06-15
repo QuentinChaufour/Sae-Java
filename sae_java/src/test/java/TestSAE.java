@@ -91,11 +91,8 @@ public class TestSAE {
 
         Librairie librairie = new Librairie(1, "La librairie parisienne", "Paris");
 
-        try {
-            Reseau.addLibrairie(librairie);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Reseau.addLibrairie(librairie);
+ 
         // Test ajout de livres
         panier.ajouterLivre(livre1,1,1);
         panier.ajouterLivre(livre2,1,1);
@@ -211,11 +208,8 @@ public class TestSAE {
         Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
         Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
 
-        try {
-            Reseau.addLibrairie(librairie);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Reseau.addLibrairie(librairie);
+        
 
         try{
             librairie.ajouterAuStock(livre,3);
@@ -266,11 +260,9 @@ public class TestSAE {
         Librairie librairie = new Librairie(5,"Le Ch'ti livre","Lille");
         Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
         Commande commande = new Commande(0, new java.util.Date(), "O", "O", client.getId(), client.getLibrairie());
-        try {
-            Reseau.addLibrairie(librairie);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+        Reseau.addLibrairie(librairie);
+
         
         assertTrue(commande.getIdLibrairie() == 5);
         assertTrue(commande.getNumCommande() == 0);

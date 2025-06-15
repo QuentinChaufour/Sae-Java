@@ -138,6 +138,11 @@ public class Client extends Personne{
         return this.panier;
     }
 
+    /**
+     * permet la consultation de la librairie courrante
+     * 
+     * @return les stocks de la librairie courrante
+     */
     public Map<Livre, Integer> consulterLivres() {
         try {
             return Reseau.getLibrairie(this.idLibrairie).consulterStock();
@@ -325,10 +330,15 @@ public class Client extends Personne{
                 }
             }
         }
-
         return recommanded;
     }
 
+    /**
+     * permet d'obtenir l'ensemble des thèmes des livres commandés par l'utilisateur en tant que critère de selection
+     * 
+     * @param books Set<Livre> : les livres ayant été commandés par le client
+     * @return Set<String> l'ensemble des thèmes des livres
+     */
     private Set<String> getClassificationsCriteria(Set<Livre> books){
 
         Set<String> classifications = new HashSet<>();
@@ -340,6 +350,12 @@ public class Client extends Personne{
         return classifications;
     }
 
+    /**
+     * permet de définir l'ordre de popularité de l'ensemble des livres commandés
+     * 
+     * @param booksMap Map<Livre,Set<Integer>> : les livres commandés par les différents clients
+     * @return List<Livre> la liste des livres selon le nombre leurs nombre de commande
+     */
     private List<Livre> getPopularBooks(Map<Livre,Set<Integer>> booksMap){
 
         List<Livre> popularBooks = new ArrayList<>();
