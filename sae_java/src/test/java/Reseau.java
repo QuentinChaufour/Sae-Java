@@ -183,7 +183,7 @@ public class Reseau {
      * 
      * @param librairie
      */
-    public static void addLibrairie(Librairie librairie) throws SQLException{
+    public static void addLibrairie(Librairie librairie){
 
         if (!librairies.contains(librairie)) {
             librairies.add(librairie);

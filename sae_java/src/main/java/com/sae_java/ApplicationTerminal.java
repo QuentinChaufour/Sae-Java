@@ -30,6 +30,9 @@ public class ApplicationTerminal {
         this.vendeur = null;
     }
 
+    /**
+     * gestion de l'identification de l'utilisateur
+     */
     public void menuIdentification() {
         boolean actif = true;
         
@@ -53,8 +56,7 @@ public class ApplicationTerminal {
                     this.menuIdentificationClient();
                 }
                 case "b" -> {
-                    actif = false;
-                    menuIdentificationVendeur();
+                    System.out.println("Cette option n'est pas implémenté pour l'instant");
                 }
                 case "c" -> {
                     actif = false;
@@ -70,6 +72,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet de gérer l'identification d'un client
+     */
     public void menuIdentificationClient() {
 
         System.out.println("╔════════════════════════════════════════════════════════════════╗");
@@ -142,10 +147,9 @@ public class ApplicationTerminal {
         this.menuPClient();
     }
 
-    public void menuIdentificationVendeur() {
-        System.out.println("== Identification Vendeur ==");
-    }
-
+    /**
+     * permet de gérer l'identification d'un admin
+     */
     public void menuIdentificationAdmin() {
 
         System.out.println("╔════════════════════════════════════════════════════════════════╗");
@@ -278,6 +282,10 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet de consutler les livres en stocks de la librairie courrante
+     * @throws LibraryNotFoundException
+     */
     public void menuConsultationBooks() throws LibraryNotFoundException{
 
         int page = 0; // page de base 
@@ -403,6 +411,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet de consulter les livres avec les options d'action de l'administrateur
+     */
     public void menuConsultationBooksAdmin(){
 
         boolean actif = true;
@@ -569,6 +580,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet au client de consulter son panier
+     */
     public void menuConsultationPanier() {
 
         if (this.client.getPanier().getContenu().isEmpty()) {
@@ -794,6 +808,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet au client de changer de librairie courrante
+     */
     public void changementLibClient() {
 
         boolean actifLibrairie = true;
@@ -825,7 +842,7 @@ public class ApplicationTerminal {
                         int idLibrairie = Integer.parseInt(choixLibrairie);
                         if (idLibrairie >= 1 && idLibrairie <= Reseau.librairies.size()) {
                             actifLibrairie = false;
-                            this.client.setLibrairie(idLibrairie - 1); // 1 de diff avec l'affichage
+                            this.client.setLibrairie(idLibrairie);
                         } 
                         else {
                             System.out.println("Veuillez entrer un numéro de librairie valide.");
@@ -835,6 +852,10 @@ public class ApplicationTerminal {
             }
     }
 
+    /**
+     * permet de selectionner une librairie active pour l'admin
+     * @return Integer : l'id de la librairie
+     */
     public Integer selectionLibAdmin(){
         boolean actifLibrairie = true;
         Integer lib = null;
@@ -874,6 +895,9 @@ public class ApplicationTerminal {
         return lib;
     }
 
+    /**
+     * permet de mettre a jour les données d'un client
+     */
     public void menuUpdateInfoClient() {
         
         boolean actif = true;
@@ -1044,6 +1068,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * menu de gestion de la réalisation d'une commande par le client
+     */
     public void menuCommande() { 
         
         boolean actif = true;
@@ -1158,6 +1185,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * menu de gestion des recommandations
+     */
     public void menuRecommandation() {
 
         boolean actif = true;
@@ -1193,8 +1223,6 @@ public class ApplicationTerminal {
                 try {
 
                 List<Livre> recommandations = this.client.OnVousRecommande(nbRecommandation);
-                System.out.println(recommandations);
-                System.out.println(this.client.OnVousRecommande(nbRecommandation));
                 int pageMax = recommandations.size() / 5 == 0 ? (int) recommandations.size()/ 5:  (int)Math.ceil(recommandations.size()/5);
 
                 if(recommandations.isEmpty()){
@@ -1205,6 +1233,7 @@ public class ApplicationTerminal {
                     System.out.println("║  Nous n'avons aucune recommandation de livre a vous faire      ║");
                     System.out.println("║  pour le moment                                                ║");
                     System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
+                    actif = false;
                 } 
                 else {
 
@@ -1307,6 +1336,7 @@ public class ApplicationTerminal {
                                             "La valeur entrée n'est pas une quantité valide, veuillez entrer un nombre positif");
                                 } catch (LibraryNotFoundException e) {
                                     System.out.println("Une erreur est survenu");
+                                    actif = false;
                                 }
                             }
                         }
@@ -1314,10 +1344,14 @@ public class ApplicationTerminal {
                 }
             } catch (LibraryNotFoundException e) {
                 System.out.println("Une erreur est survenu");
+                actif = false;
             }
         }
     }
 
+    /**
+     * menu de gestion de l'ajout d'un nouveau livre
+     */
     public void menuAjoutLivre(){
 
         boolean actif = true;
@@ -1483,6 +1517,10 @@ public class ApplicationTerminal {
 
     }
 
+    /**
+     * permet de selectionner les auteurs lors de l'ajout d'un livre
+     * @return
+     */
     public List<Auteur> selectAuteur(){
 
         boolean actif = true;
@@ -1573,6 +1611,11 @@ public class ApplicationTerminal {
         return auteurs;
     }
 
+    /**
+     * permet a l'admin de mettre a jour la quantité d'un livre d'un librairie
+     * @param livre
+     * @param librairieActive
+     */
     public void menuUpdateQte(Livre livre,int librairieActive){
         System.out.println("Veuillez entrer la quantité de livre a retirer (quantité négative) ou a ajouter (quantité positive), entrez 'A pour annuler");
         System.out.print("Quantité : ");
@@ -1604,6 +1647,11 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet le transfert d'un livre d'une librairie a une autre
+     * @param livre
+     * @param originLib
+     */
     public void menuTransfert(Livre livre,Integer originLib){
         System.out.println("╔════════════════════════════════════════════════════════════════╗");
         System.out.println("║                           Transfert                            ║");
@@ -1646,6 +1694,9 @@ public class ApplicationTerminal {
         }
     }
 
+    /**
+     * permet a l'admin, la consultation des statistiques de la chaine de librairie
+     */
     public void menuStats(){
 
         boolean actif = true;
@@ -1695,10 +1746,10 @@ public class ApplicationTerminal {
 
                     case "b" -> {
                         try {
-                            Map<Livre, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.AUTEUR);
+                            Map<Livre, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.LIVRE);
                             int i = 1;
                             System.out.println("╔════════════════════════════════════════════════════════════════╗");
-                            System.out.println("║                        Palmarès Auteurs                        ║");
+                            System.out.println("║                         Palmarès Livre                         ║");
                             System.out.println("╚════════════════════════════════════════════════════════════════╝ \n");
 
                             for(Livre book : palmares.keySet()){
@@ -1716,7 +1767,7 @@ public class ApplicationTerminal {
 
                     case "c" -> {
                         try {
-                            Map<Librairie, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.AUTEUR);
+                            Map<Librairie, Integer> palmares = Reseau.getPalmares(10, EnumPalmares.LIBRAIRIE);
                             int i = 1;
                             System.out.println("╔════════════════════════════════════════════════════════════════╗");
                             System.out.println("║                        Palmarès Auteurs                        ║");
@@ -1771,6 +1822,9 @@ public class ApplicationTerminal {
 
     }
 
+    /**
+     * permet la déconnexion de l'utilisateur actif
+     */
     public void deconnexion() {
 
         System.out.println("Déconnexion réussie.");
@@ -1782,6 +1836,9 @@ public class ApplicationTerminal {
         this.menuIdentification();
     }
 
+    /**
+     * permet de quitter l'application
+     */
     public void quitter() {
 
         System.out.println("Merci d'avoir utilisé l'application.\nAu revoir !");
@@ -1834,65 +1891,8 @@ public class ApplicationTerminal {
 
     public static void main(String[] args) {
 
-        try{
-            Reseau.createStatement("delete from DETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from COMMANDE").executeUpdate();
-            Reseau.createStatement("delete from POSSEDER").executeUpdate();
-            Reseau.createStatement("delete from ECRIRE").executeUpdate();
-            Reseau.createStatement("delete from AUTEUR").executeUpdate();
-            Reseau.createStatement("delete from LIVRE").executeUpdate();
-            Reseau.createStatement("delete from MAGASIN").executeUpdate();
-            Reseau.createStatement("delete from CLIENT").executeUpdate();
-            Reseau.createStatement("insert into MAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
-            Reseau.createStatement("insert into MAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
-            Reseau.createStatement("insert into CLIENT values (3,'Eboue','Fabrice','Tient!!!','60 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into CLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
-            Reseau.createStatement("insert into CLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
-            Reseau.createStatement("insert into AUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
-            Reseau.createStatement("insert into AUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
-            Reseau.createStatement("insert into AUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
-            Reseau.createStatement("insert into AUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
-            Reseau.createStatement("insert into LIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into LIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into LIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into LIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into LIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
-            Reseau.createStatement("insert into LIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
-            Reseau.createStatement("insert into ECRIRE values ('120',1)").executeUpdate();
-            Reseau.createStatement("insert into ECRIRE values ('121',2)").executeUpdate();
-            Reseau.createStatement("insert into ECRIRE values ('124',3)").executeUpdate();
-            Reseau.createStatement("insert into ECRIRE values ('125',4)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (0,'120',4)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (0,'121',5)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (1,'122',2)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (0,'124',1)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (1,'125',9)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (1,'120',5)").executeUpdate();
-            Reseau.createStatement("insert into POSSEDER values (1,'121',7)").executeUpdate();
-
-            Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
-        }
-        catch (SQLException e) {
-            System.out.println("Erreur de connexion à la base de données : " + e.getMessage());
-            return;
-        }
-
-
         ApplicationTerminal app = new ApplicationTerminal();
         app.menuIdentification();
-
-        try {
-            Reseau.createStatement("delete from DETAILCOMMANDE").executeUpdate();
-            Reseau.createStatement("delete from COMMANDE").executeUpdate();
-            Reseau.createStatement("delete from POSSEDER").executeUpdate();
-            Reseau.createStatement("delete from ECRIRE").executeUpdate();
-            Reseau.createStatement("delete from AUTEUR").executeUpdate();
-            Reseau.createStatement("delete from LIVRE").executeUpdate();
-            Reseau.createStatement("delete from MAGASIN").executeUpdate();
-            Reseau.createStatement("delete from CLIENT").executeUpdate();
-        } 
-        catch (SQLException e) {
-        }
     }
 }
 

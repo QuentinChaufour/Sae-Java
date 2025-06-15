@@ -1,0 +1,24 @@
+-classpath
+'C:/Users/quent/.m2/repository/org/mariadb/jdbc/mariadb-java-client/3.5.3/mariadb-java-client-3.5.3.jar;C:/Users/quent/.m2/repository/com/itextpdf/itextpdf/5.5.13.4/itextpdf-5.5.13.4.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+21
+-sourcepath
+'C:/Users/quent/Documents/Repository\'s/Sae-Java/sae_java/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2025. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/Users/quent/Documents/Repository\'s/Sae-Java/sae_java/target/reports/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'sae_java 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'sae_java 1.0-SNAPSHOT API'

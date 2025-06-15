@@ -1,14 +1,8 @@
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 public class Vendeur extends Personne{
     private int idVendeur;
@@ -59,6 +53,7 @@ public class Vendeur extends Personne{
         }
         return panier;
     }
+
 
     public Commande preparerCommandes(int idClient, Map<Livre, Integer> listeLivres, Date date, String enLigne, String Livraison ){
         PreparedStatement s;

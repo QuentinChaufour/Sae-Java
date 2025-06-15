@@ -18,22 +18,42 @@ public class DetailCommande {
         }
     }
 
+    /**
+     * permet d'obtenir le numéro du détail
+     * @return int
+     */
     public int getNumLig(){
         return this.numLig;
     }
 
+    /**
+     * permet d'obtenir le livre lié au détail
+     * @return Livre
+     */
     public Livre getLivre(){
         return this.livre;
     }
 
+    /**
+     * permet d'obtenir la quantité commandé
+     * @return int
+     */
     public int getQuantite(){
         return this.quantite;
     }
 
+    /**
+     * permet de modifier le livre
+     * @param livre : Livre
+     */
     public void setLivre(Livre livre){
         this.livre = livre;
     }
 
+    /**
+     * permet de modifier la quantité commandé
+     * @param quantite : int
+     */
     public void setQuantite(int quantite){
         this.quantite = quantite;
     }
