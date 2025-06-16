@@ -16,8 +16,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import com.sae_java.Modele.Client;
 import com.sae_java.Modele.Livre;
@@ -25,31 +23,32 @@ import com.sae_java.Modele.Reseau;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Librairie;
 
-public class PanierClientWindow {
+public class PanierClientWindow extends BorderPane{
     
 
     private final ApplicationSAE app;
     private final Client client;
 
+    private Button btnBack;
+
     public PanierClientWindow(ApplicationSAE app, Client client) {
+        super();
         this.app = app;
         this.client = client;
-
-        // Initialize the UI components for the PanierClientWindow
-        Stage stage = new Stage();
-         
-        stage.setTitle("Panier");
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/panier_32px.png")));
-        initUI(stage);
+        this.initUI();
     }
 
-    private void initUI(Stage stage) {
+    private void initUI() {
 
         try {
-            BorderPane root = new BorderPane();
-            root.setTop(new Label("Panier de " + client.getNom()));
+
+            BorderPane top = new BorderPane();
+            top.setRight(new Label("Panier de " + client.getNom()));
+            this.btnBack = new Button("Retour");
+            this.btnBack.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new ClientWindow(this.app, this.client)));});
+            top.setLeft(this.btnBack);
+
+            this.setTop(top);
 
             // center
 
@@ -60,7 +59,7 @@ public class PanierClientWindow {
 
                 Librairie lib = Reseau.getLibrairie(libID);
 
-                Map<Livre, Integer> livres = client.getPanier().getContenu().get(lib);
+                Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
 
                 VBox books = new VBox(5);
 
@@ -91,12 +90,12 @@ public class PanierClientWindow {
                     }
 
                     Label bookTitle = new Label("Titre : " + bookName);
-                    bookTitle.setPrefWidth(400);
+                    bookTitle.setPrefWidth(300);
                     Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-                    bookPrice.setPrefWidth(75);
+                    bookPrice.setPrefWidth(100);
                     bookPrice.setAlignment(Pos.CENTER_RIGHT);
                     Label bookStock = new Label("Quantité commandé : " + quantite);
-                    bookStock.setPrefWidth(75);
+                    bookStock.setPrefWidth(100);
                     bookStock.setAlignment(Pos.CENTER_RIGHT);
 
                     bookTitle.setStyle("-fx-font-size: 14px;");
@@ -134,13 +133,7 @@ public class PanierClientWindow {
 
                 center.getChildren().add(libPane);
 
-                root.setCenter(center);
-
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.sizeToScene();
-
-                stage.show();
+                this.setCenter(center);
             }
         }
         catch (LibraryNotFoundException e){

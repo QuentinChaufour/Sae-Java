@@ -43,8 +43,6 @@ public class ApplicationSAE extends Application {
             e.printStackTrace();
            }
      */
-
-        this.client = new Client("Dupont", "Jean", "1234",1, "1 rue de la paix", "75000", "Paris", 1);
         //this.imageView = new ImageView();
         //this.imageView.setFitWidth(200);
         //this.imageView.setFitHeight(200);
@@ -145,6 +143,10 @@ public class ApplicationSAE extends Application {
 
     public Client getClient() {
         return this.client;
+    }
+
+    public void setClient(Client client){
+        this.client = client;
     }
 
     public void loadIdentification(){
