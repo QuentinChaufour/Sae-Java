@@ -16,6 +16,8 @@ public class ControleurDeconnexion implements EventHandler<ActionEvent>{
     @Override
     public void handle(ActionEvent event){
 
+        this.app.setClient(null);
+
         this.app.loadIdentification();
     }
 }

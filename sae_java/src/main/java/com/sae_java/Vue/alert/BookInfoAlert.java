@@ -85,7 +85,5 @@ public class BookInfoAlert {
         stage.sizeToScene();
         stage.setTitle("Book Information");
         stage.showAndWait();
-
-
     }
 }

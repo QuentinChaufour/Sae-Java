@@ -1,10 +1,14 @@
 package com.sae_java.Vue;
 
+import com.sae_java.Modele.Librairie;
+import com.sae_java.Modele.Reseau;
 import com.sae_java.Vue.controleur.ControleurConnexionAdmin;
 import com.sae_java.Vue.controleur.ControleurConnexionClient;
 import com.sae_java.Vue.controleur.ControleurConnexionVendeur;
 import com.sae_java.Vue.controleur.ControleurQuitter;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,36 +35,37 @@ public class FenetreConnexion {
 
     private TextField userNameField;
     private TextField userFornameField;
-    private TextField userAddressField;
+    private PasswordField userMDPField;
 
     private TextField sellerNameField;
     private TextField sellerFornameField;
-    private TextField sellerAddressField;
+    private PasswordField sellerMDPField;
 
     private TextField adminNameField;
     private PasswordField passwordField;
 
-    private ChoiceBox<String> choiceBoxLibrairieUser;
+    private ChoiceBox<Librairie> choiceBoxLibrairieUser;
 
     public FenetreConnexion(ApplicationSAE app) {
 
         this.app = app;
 
         this.userNameField = new TextField();
-
         this.userFornameField = new TextField();
-        this.userAddressField = new TextField();
+        this.userMDPField = new PasswordField();
         
         this.sellerNameField = new TextField();
         this.sellerFornameField = new TextField();
-        this.sellerAddressField = new TextField();
+        this.sellerMDPField = new PasswordField();
 
         this.adminNameField = new TextField();
         this.passwordField = new PasswordField();
 
+        ObservableList<Librairie> libList = FXCollections.observableList(Reseau.librairies);
+
         this.choiceBoxLibrairieUser = new ChoiceBox<>();
-        this.choiceBoxLibrairieUser.getItems().addAll("1 : Centre", "2 : Paris", "3 : Marseille");
-        this.choiceBoxLibrairieUser.setValue("1 : Centre");
+        this.choiceBoxLibrairieUser.setItems(libList);
+        this.choiceBoxLibrairieUser.setValue(libList.get(0));
 
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #F2F2F2; -fx-padding: 10; -fx-hgap: 10; -fx-vgap: 10;");
@@ -91,8 +96,8 @@ public class FenetreConnexion {
         identificationClient.add(this.userNameField, 1, 0);
         identificationClient.add(new Label("Prénom : "), 0, 1);
         identificationClient.add(this.userFornameField, 1, 1);
-        identificationClient.add(new Label("Adresse : "), 0, 2);
-        identificationClient.add(this.userAddressField, 1, 2);
+        identificationClient.add(new Label("Mot de passe : "), 0, 2);
+        identificationClient.add(this.userMDPField, 1, 2);
         identificationClient.add(new Label("Librairie : "), 0, 3);
         identificationClient.add(this.choiceBoxLibrairieUser, 1, 3);
 
@@ -110,8 +115,8 @@ public class FenetreConnexion {
         identificationVendeur.add(this.sellerNameField, 1, 0);
         identificationVendeur.add(new Label("Prénom : "), 0, 1);
         identificationVendeur.add(this.sellerFornameField, 1, 1);
-        identificationVendeur.add(new Label("Adresse : "), 0, 2);
-        identificationVendeur.add(this.sellerAddressField, 1, 2);
+        identificationVendeur.add(new Label("Mot de passe : "), 0, 2);
+        identificationVendeur.add(this.sellerMDPField, 1, 2);
 
         Button buttonLogginVendeur = new Button("S'identifier");
         buttonLogginVendeur.setOnAction(new ControleurConnexionVendeur(this, this.app));
@@ -185,12 +190,12 @@ public class FenetreConnexion {
         return userFornameField.getText();
     }
 
-    public String getUserAddressField() {
-        return userAddressField.getText();
+    public String getUserMDpField() {
+        return userMDPField.getText();
     }
 
-    public String getChoiceBoxLibrairieUser() {
-        return choiceBoxLibrairieUser.getValue();
+    public Integer getChoiceBoxLibrairieUser() {
+        return choiceBoxLibrairieUser.getValue().getId();
     }
 
     public String getSellerNameField() {
@@ -201,8 +206,8 @@ public class FenetreConnexion {
         return sellerFornameField.getText();
     }
 
-    public String getSellerAddressField() {
-        return sellerAddressField.getText();
+    public String getSellerDMPField() {
+        return sellerMDPField.getText();
     }
 
     public String getAdminNameField() {

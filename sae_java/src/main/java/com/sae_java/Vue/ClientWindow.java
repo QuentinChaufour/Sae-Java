@@ -4,6 +4,7 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -12,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.event.ActionEvent;
 import com.sae_java.Vue.controleur.*;
 
 import com.sae_java.Modele.Client;
@@ -49,6 +51,7 @@ public class ClientWindow extends BorderPane{
         Button panier = new Button("Panier");
         panier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/panier_32px.png"))));
         panier.setStyle("-fx-margin: 10; -fx-padding: 10;");
+        panier.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new PanierClientWindow(this.app, this.client)));});
 
         BorderPane.setMargin(top, new Insets(0, 0, 10, 0));
         BorderPane.setMargin(deconnexion, new Insets(5));
@@ -56,8 +59,20 @@ public class ClientWindow extends BorderPane{
         BorderPane.setAlignment(panier, Pos.CENTER_RIGHT);
         BorderPane.setMargin(panier, new Insets(5));
 
+        Label librairieLabel = new Label();
+        librairieLabel.setStyle("fx-font-size:40;-fx-font-weight:bold");
+        try {
+            librairieLabel.setText("Librairie : " + Reseau.getLibrairie(app.getClient().getLibrairie()));
+        } 
+        catch (LibraryNotFoundException e) {
+
+            // alert ?
+
+            e.printStackTrace();
+        }
 
         top.setLeft(deconnexion);
+        top.setCenter(librairieLabel);
         top.setRight(panier);
 
         this.setTop(top);
@@ -87,16 +102,6 @@ public class ClientWindow extends BorderPane{
 
         // buttons
 
-        Label librairieLabel = new Label();
-        try {
-            librairieLabel.setText("Librairie : " + Reseau.getLibrairie(app.getClient().getLibrairie()));
-        } 
-        catch (LibraryNotFoundException e) {
-
-            // alert ?
-
-            e.printStackTrace();
-        }
         Button consulterLivres = new Button("Consulter les livres");
         // add image to the button for ergonomics
 
@@ -105,7 +110,7 @@ public class ClientWindow extends BorderPane{
 
         Button changeLib = new Button("Changer de librairie");
 
-        left.getChildren().addAll(clientInfo,librairieLabel, consulterLivres, changerInfos, changeLib);
+        left.getChildren().addAll(clientInfo,consulterLivres, changerInfos, changeLib);
         left.setStyle("-fx-margin: 10;-fx-padding: 10; -fx-background-color: #ffcae2;");
         this.setLeft(left);
 
@@ -207,14 +212,16 @@ public class ClientWindow extends BorderPane{
         bookPrice.setStyle("-fx-font-size: 14px;");
         bookStock.setStyle("-fx-font-size: 14px;");
 
-        Button addToPanier = new Button("Ajouter au panier");
-        addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
-        addToPanier.setAlignment(Pos.CENTER_RIGHT);
-
         TextField quantityField = new TextField();
         quantityField.setPromptText("Quantité");
         quantityField.setPrefWidth(100);
         //quantityField.setAlignment(Pos.CENTER_LEFT);
+
+        Button addToPanier = new Button("Ajouter au panier");
+        addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
+        addToPanier.setAlignment(Pos.CENTER_RIGHT);
+        addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
+
         HBox.setMargin(quantityField, new Insets(5));
         HBox.setMargin(addToPanier, new Insets(5));
         // pop up si nb négatif ou not a number quand ajouter au panier
