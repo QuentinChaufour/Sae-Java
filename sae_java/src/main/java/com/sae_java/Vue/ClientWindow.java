@@ -2,9 +2,19 @@ package com.sae_java.Vue;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sae_java.Modele.Client;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
+import com.sae_java.Modele.Librairie;
+import com.sae_java.Modele.Livre;
+import com.sae_java.Modele.Reseau;
+import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
+import com.sae_java.Vue.controleur.ControleurDeconnexion;
+import com.sae_java.Vue.controleur.ControleurPage;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -18,15 +28,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import com.sae_java.Vue.controleur.*;
-
-import com.sae_java.Modele.Client;
-import com.sae_java.Modele.Librairie;
-import com.sae_java.Modele.Livre;
-import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 
 public class ClientWindow extends BorderPane{
 
@@ -75,7 +76,7 @@ public class ClientWindow extends BorderPane{
 
         Label librairieLabel = new Label();
         try {
-            librairieLabel.setText(Reseau.getLibrairie(app.getClient().getLibrairie()));
+            librairieLabel.setText(Reseau.getLibrairie(app.getClient().getLibrairie()) + "");
             librairieLabel.setFont(Font.font("Arial",FontWeight.BOLD,30));
         } 
         catch (LibraryNotFoundException e) {
