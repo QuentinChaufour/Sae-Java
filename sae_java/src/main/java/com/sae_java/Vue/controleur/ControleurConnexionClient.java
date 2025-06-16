@@ -46,9 +46,7 @@ public class ControleurConnexionClient implements EventHandler<ActionEvent>{
         } 
         catch (NoCorrespondingClient e) {
             
-            // action 
-
-            e.printStackTrace();
+            this.fenetreConnexion.errorClient();
         }
     }
 }

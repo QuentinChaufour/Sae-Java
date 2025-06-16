@@ -90,12 +90,12 @@ public class PanierClientWindow extends BorderPane{
                     }
 
                     Label bookTitle = new Label("Titre : " + bookName);
-                    bookTitle.setPrefWidth(400);
+                    bookTitle.setPrefWidth(300);
                     Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-                    bookPrice.setPrefWidth(75);
+                    bookPrice.setPrefWidth(100);
                     bookPrice.setAlignment(Pos.CENTER_RIGHT);
                     Label bookStock = new Label("Quantité commandé : " + quantite);
-                    bookStock.setPrefWidth(75);
+                    bookStock.setPrefWidth(100);
                     bookStock.setAlignment(Pos.CENTER_RIGHT);
 
                     bookTitle.setStyle("-fx-font-size: 14px;");

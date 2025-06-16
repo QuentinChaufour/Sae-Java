@@ -183,38 +183,44 @@ public class FenetreConnexion {
     }
 
     public String getUserNameField() {
-        return userNameField.getText();
+        return this.userNameField.getText();
     }
 
     public String getUserFornameField() {
-        return userFornameField.getText();
+        return this.userFornameField.getText();
     }
 
     public String getUserMDpField() {
-        return userMDPField.getText();
+        return this.userMDPField.getText();
     }
 
     public Integer getChoiceBoxLibrairieUser() {
-        return choiceBoxLibrairieUser.getValue().getId();
+        return this.choiceBoxLibrairieUser.getValue().getId();
     }
 
     public String getSellerNameField() {
-        return sellerNameField.getText();
+        return this.sellerNameField.getText();
     }
 
     public String getSellerFornameField() {
-        return sellerFornameField.getText();
+        return this.sellerFornameField.getText();
     }
 
     public String getSellerDMPField() {
-        return sellerMDPField.getText();
+        return this.sellerMDPField.getText();
     }
 
     public String getAdminNameField() {
-        return adminNameField.getText();
+        return this.adminNameField.getText();
     }
 
     public String getPasswordField() {
-        return passwordField.getText();
+        return this.passwordField.getText();
+    }
+
+    public void errorClient(){
+        this.userFornameField.setStyle("-fx-border-color: red; -fx-border-width: 1px");
+        this.userNameField.setStyle("-fx-border-color: red; -fx-border-width: 1px");
+        this.userMDPField.setStyle("-fx-border-color: red; -fx-border-width: 1px");
     }
 }
