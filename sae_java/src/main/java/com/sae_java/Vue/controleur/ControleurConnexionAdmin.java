@@ -1,10 +1,13 @@
 package com.sae_java.Vue.controleur;
 
+import com.sae_java.Vue.AdminWindow;
 import com.sae_java.Vue.ApplicationSAE;
+import com.sae_java.Vue.ClientWindow;
 import com.sae_java.Vue.FenetreConnexion;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
 
 public class ControleurConnexionAdmin implements EventHandler<ActionEvent>{
     
@@ -18,6 +21,9 @@ public class ControleurConnexionAdmin implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-        System.out.println("");
+        app.getStage().setScene(new Scene(new AdminWindow(app)));
+        app.getStage().sizeToScene();
+        app.getStage().setTitle("Admin Window");
+        app.getStage().centerOnScreen();
     }
 }

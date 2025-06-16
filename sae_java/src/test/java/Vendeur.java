@@ -18,7 +18,7 @@ public class Vendeur extends Personne{
 
     public void ajouteLivreStock(Livre livre){        
         try {
-            PreparedStatement ps = Reseau.createStatement("insert into LIVRE values (?,?,?,?,?,?,?,?)");
+            PreparedStatement ps = Reseau.createStatement("insert into testLIVRE values (?,?,?,?,?,?,?,?)");
             ps.setString(1, livre.getIsbn());
             ps.setString(2, livre.getTitre());
             ps.setObject(3, livre.getAuteurs());
@@ -61,17 +61,19 @@ public class Vendeur extends Personne{
     public Commande preparerCommandes(int idClient, Map<Livre, Integer> listeLivres, Date date, String enLigne, String Livraison ){
         PreparedStatement s;
         int maxNumCommande = 0;
-        try {
-            s = Reseau.createStatement("SELECT MAX(numCommande) FROM COMMANDE");
-            ResultSet rs = s.executeQuery();
-            maxNumCommande = rs.getInt(1)+1;
-            if (rs.next()) {
-                maxNumCommande = rs.getInt(1) + 1;
-            } else {
-                maxNumCommande = 1; 
+        System.out.println("Maxnumcommande1 : " + maxNumCommande);
+        try{
+            PreparedStatement statement = Reseau.createStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                maxNumCommande = resultSet.getInt("numcom") + 1; 
+                System.out.println("Maxnumcommande2 : " + maxNumCommande);
             }
-        } catch (SQLException e) {
-            System.err.println("erreur connection SQL");
+            statement.close();
+        }
+        catch(SQLException e){
+            System.err.println("connexion SQL ECHOUE");
         }
         
         Commande commande = new Commande(maxNumCommande, date, enLigne, Livraison, idClient, this.idlibrairie);
@@ -102,7 +104,7 @@ public class Vendeur extends Personne{
         PreparedStatement s;
         try {
             try {
-                s = Reseau.createStatement("SELECT MAX(numcom) FROM COMMANDE");
+                s = Reseau.createStatement("SELECT MAX(numcom) FROM testCOMMANDE");
                 ResultSet rs = s.executeQuery();
                 maxNumCommande = rs.getInt(1)+1;
                 if (rs.next()) {
@@ -138,7 +140,7 @@ public class Vendeur extends Personne{
 
     public Livre transfererLivre(Livre livre, Librairie nouvLibrairie){
         try {
-            PreparedStatement ps1 = Reseau.createStatement("insert into LIVRE values (?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement ps1 = Reseau.createStatement("insert into testLIVRE values (?, ?, ?, ?, ?, ?, ?, ?)");
             ps1.setString(1, livre.getIsbn());
             ps1.setString(2, livre.getTitre());
             ps1.setObject(3, livre.getNbPages());
@@ -153,7 +155,7 @@ public class Vendeur extends Personne{
 
         try {
             
-            PreparedStatement ps2 = Reseau.createStatement("insert into POSSEDER values (?, ?, ?)");
+            PreparedStatement ps2 = Reseau.createStatement("insert into testPOSSEDER values (?, ?, ?)");
             ps2.setInt(1, nouvLibrairie.getId());
             ps2.setString(2, livre.getIsbn());
             ps2.setInt(3, 1);
