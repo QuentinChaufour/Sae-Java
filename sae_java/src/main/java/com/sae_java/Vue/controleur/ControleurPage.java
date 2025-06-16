@@ -31,17 +31,14 @@ public class ControleurPage implements EventHandler<ActionEvent>{
         if(btn == this.previous){
             
             this.app.RedcPage();
-            VBox page = this.app.createPage(this.app.getPage());
-            this.app.majPage(page);
+            this.app.majPage();
             
 
         }
         else if(btn == this.next){
 
                 this.app.IncPage();
-
-                VBox page = this.app.createPage(this.app.getPage());
-                this.app.majPage(page);
+                this.app.majPage();
         }
     }
 
