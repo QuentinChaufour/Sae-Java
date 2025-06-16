@@ -1,4 +1,5 @@
 package com.sae_java.Vue;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.geometry.Insets;
@@ -15,6 +16,8 @@ import com.sae_java.Vue.controleur.*;
 
 import com.sae_java.Modele.Client;
 import com.sae_java.Modele.Livre;
+import com.sae_java.Modele.Reseau;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 
 public class ClientWindow extends BorderPane{
 
@@ -84,7 +87,16 @@ public class ClientWindow extends BorderPane{
 
         // buttons
 
-        Label librairieLabel = new Label("Librairie : " + app.getClient().getLibrairie().getNom());
+        Label librairieLabel = new Label();
+        try {
+            librairieLabel.setText("Librairie : " + Reseau.getLibrairie(app.getClient().getLibrairie()));
+        } 
+        catch (LibraryNotFoundException e) {
+
+            // alert ?
+
+            e.printStackTrace();
+        }
         Button consulterLivres = new Button("Consulter les livres");
         // add image to the button for ergonomics
 
@@ -99,7 +111,16 @@ public class ClientWindow extends BorderPane{
 
         // center of the borderPane
 
-        VBox center = this.createPage(this.page);
+        VBox center = null;
+        try {
+            center = this.createPage(this.page);
+        } 
+        catch (LibraryNotFoundException e) {
+
+            // alert ?
+
+            e.printStackTrace();
+        }
 
         this.setCenter(center);
 
@@ -117,9 +138,9 @@ public class ClientWindow extends BorderPane{
         return client;
     }
 
-    public VBox createPage(int page){
+    public VBox createPage(int page) throws LibraryNotFoundException{
 
-        List<Livre> livres = app.getClient().getLibrairie().getLivresDisponibles();
+        List<Livre> livres = new ArrayList<>(app.getClient().consulterLivres().keySet());
 
         VBox center = new VBox(10);
 
@@ -152,7 +173,7 @@ public class ClientWindow extends BorderPane{
         return center;
     }
 
-    private HBox createBook(Livre book){
+    private HBox createBook(Livre book) throws LibraryNotFoundException{
         HBox bookBox = new HBox(10);
         HBox infosBookBox = new HBox(10);
         infosBookBox.setPrefWidth(750);
@@ -178,7 +199,7 @@ public class ClientWindow extends BorderPane{
         Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
         bookPrice.setPrefWidth(75);
         bookPrice.setAlignment(Pos.CENTER_RIGHT);
-        Label bookStock = new Label("Stock : " + this.app.getClient().getLibrairie().consulterStock().get(book));
+        Label bookStock = new Label("Stock : " + Reseau.getLibrairie(this.app.getClient().getLibrairie()).consulterStock().get(book));
         bookStock.setPrefWidth(75);
         bookStock.setAlignment(Pos.CENTER_RIGHT);
 
@@ -215,9 +236,17 @@ public class ClientWindow extends BorderPane{
         }
     }
 
-    public void majPage(VBox page){
-        this.setCenter(page);
+    public void majPage(){
+        VBox page;
+        try {
+            page = this.createPage(this.page);
+            this.setCenter(page);
+        } catch (LibraryNotFoundException e) {
+            
+            // alert ?
 
+            e.printStackTrace();
+        }
     }
 
 }
