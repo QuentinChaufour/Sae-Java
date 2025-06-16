@@ -102,6 +102,8 @@ public class FenetreConnexion {
         identificationClient.add(this.choiceBoxLibrairieUser, 1, 3);
 
         Button buttonLogginClient = new Button("S'identifier");
+        // identification possible uniquement si tous les champs sont remplis
+        buttonLogginClient.disableProperty().bind(this.userNameField.textProperty().isEmpty(). or (this.userFornameField.textProperty().isEmpty()). or (this.userMDPField.textProperty().isEmpty()));
         buttonLogginClient.setOnAction(new ControleurConnexionClient(this, this.app));
 
         identificationClient.add(buttonLogginClient, 0, 4, 2, 1);
@@ -119,6 +121,7 @@ public class FenetreConnexion {
         identificationVendeur.add(this.sellerMDPField, 1, 2);
 
         Button buttonLogginVendeur = new Button("S'identifier");
+        buttonLogginVendeur.disableProperty().bind(this.sellerNameField.textProperty().isEmpty(). or (this.sellerFornameField.textProperty().isEmpty()). or (this.sellerMDPField.textProperty().isEmpty()));
         buttonLogginVendeur.setOnAction(new ControleurConnexionVendeur(this, this.app));
 
         identificationVendeur.add(buttonLogginVendeur, 0, 4, 2, 1);
@@ -134,6 +137,7 @@ public class FenetreConnexion {
         identificationAdmin.add(this.passwordField, 1, 1);
 
         Button buttonLogginAdmin = new Button("S'identifier");
+        buttonLogginAdmin.disableProperty().bind(this.adminNameField.textProperty().isEmpty(). or (this.passwordField.textProperty().isEmpty()));
         buttonLogginAdmin.setOnAction(new ControleurConnexionAdmin(this, this.app));
 
         identificationAdmin.add(buttonLogginAdmin, 0, 4, 2, 1);
