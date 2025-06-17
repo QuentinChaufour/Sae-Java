@@ -12,9 +12,18 @@ public class Vendeur extends Personne{
     private int idVendeur;
     private int idlibrairie;
 
-    public Vendeur(String nom, String prenom, String motDePasse, int id){
+    public Vendeur(String nom, String prenom, String motDePasse, int id, int idlibrairie){
         super(nom, prenom, motDePasse);
         this.idVendeur = id;
+        this.idlibrairie = idlibrairie;
+    }
+
+    public int getIdLibrairie() {
+        return this.idlibrairie;
+    }
+
+    public int getIdVendeur() {
+        return this.idVendeur;
     }
 
 //    public void ajouteLivreStock(Livre livre){
