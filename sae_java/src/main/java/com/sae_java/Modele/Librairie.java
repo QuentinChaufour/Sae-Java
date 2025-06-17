@@ -308,6 +308,22 @@ public class Librairie implements Comparable<Librairie>{
         return exists;
     }
 
+    public Livre getLivreLib(String isbn) throws SQLException, BookNotInStockException{
+        PreparedStatement statement = Reseau.createStatement("SELECT * FROM LIVRE WHERE isbn = ?");
+        statement.setString(1, isbn);
+        ResultSet resultSet = statement.executeQuery();
+        Livre livre;
+        if(resultSet.next()){
+            livre = new Livre(resultSet.getString("isbn"), resultSet.getString("titre"), resultSet.getString("nomedit"), resultSet.getInt("datepubli"), resultSet.getInt("prix"), resultSet.getInt("nbpages"), resultSet.getString("nomclass"));
+        }else{
+            throw new BookNotInStockException();
+        }
+        if(!checkStock(livre, 1)){
+            throw new BookNotInStockException();
+        }
+        return livre;
+    }
+
     /**
      * permet l'affichage de la librairie
      */

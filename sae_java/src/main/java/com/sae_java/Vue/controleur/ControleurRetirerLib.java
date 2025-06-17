@@ -27,15 +27,15 @@ public class ControleurRetirerLib implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-
-        try {
-            Reseau.removeLibrairie(Reseau.getLibrairie(Integer.parseInt(this.id.getText())));
-        } catch (SQLException e) {
-            System.err.println("connection SQL échoué");
-        } catch (LibraryNotFoundException e) {
-            System.err.println("La librairie n'existe pas");
+        if(!this.id.getText().isEmpty()){
+            try {
+                Reseau.removeLibrairie(Reseau.getLibrairie(Integer.parseInt(this.id.getText())));
+            } catch (SQLException e) {
+                System.err.println("connection SQL échoué");
+            } catch (LibraryNotFoundException e) {
+                System.err.println("La librairie n'existe pas");
+            }
+            this.id.setText("");
         }
-        this.id.setText("");
-
     }
 }

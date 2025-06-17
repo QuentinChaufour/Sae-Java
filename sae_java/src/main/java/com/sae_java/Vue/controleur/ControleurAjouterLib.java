@@ -28,25 +28,27 @@ public class ControleurAjouterLib implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-        try {
-            for(char carac : ville.getText().toCharArray()){
-               if((""+carac).matches("[0-9]")){
-                throw new QuantiteInvalideException();
-            } 
+        if(!this.ville.getText().isEmpty() && !this.titre.getText().isEmpty()){
+            try {
+                for(char carac : ville.getText().toCharArray()){
+                if((""+carac).matches("[0-9]")){
+                    throw new QuantiteInvalideException();
+                } 
+                }
+                if(ville.getText().matches("[0-9]")){
+                    System.out.print("OIKENDFPOEJ");
+                    throw new QuantiteInvalideException();
+                }
+                Reseau.addNewLibrairie(new Librairie(titre.getText(), ville.getText()));
+            } catch (QuantiteInvalideException e) {
+                System.err.println("Quantité invalide");
+            } catch (SQLException e) {
+                System.err.println("connection SQL échoué");
+            } catch (LibraryAlreadyExistsException e) {
+                System.err.println("La librairie existe déja");
             }
-            if(ville.getText().matches("[0-9]")){
-                System.out.print("OIKENDFPOEJ");
-                throw new QuantiteInvalideException();
-            }
-            Reseau.addNewLibrairie(new Librairie(titre.getText(), ville.getText()));
-        } catch (QuantiteInvalideException e) {
-            System.err.println("Quantité invalide");
-        } catch (SQLException e) {
-            System.err.println("connection SQL échoué");
-        } catch (LibraryAlreadyExistsException e) {
-            System.err.println("La librairie existe déja");
+            this.titre.setText("");
+            this.ville.setText("");
         }
-        this.titre.setText("");
-        this.ville.setText("");
-    }
+    }    
 }
