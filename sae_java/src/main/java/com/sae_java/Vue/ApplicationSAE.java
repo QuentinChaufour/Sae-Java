@@ -54,9 +54,9 @@ public class ApplicationSAE extends Application {
         //this.imageView = new ImageView();
         //this.imageView.setFitWidth(200);
         //this.imageView.setFitHeight(200);
-
+        */
     }
-
+    
     @Override
     public void start(Stage stage){
 
