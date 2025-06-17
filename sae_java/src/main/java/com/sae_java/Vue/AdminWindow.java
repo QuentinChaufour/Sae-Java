@@ -31,7 +31,7 @@ public class AdminWindow extends BorderPane{
         this.app = app;
 
         this.minHeightProperty().set(900);
-        this.minWidthProperty().set(1780);
+        this.minWidthProperty().set(1800);
 
         BorderPane top = new BorderPane();
         Text texte = new Text("Tableau de bord : Livre Express");

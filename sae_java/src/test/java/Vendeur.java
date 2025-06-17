@@ -11,9 +11,10 @@ public class Vendeur extends Personne{
     private int idVendeur;
     private int idlibrairie;
 
-    public Vendeur(String nom, String prenom, String motDePasse, int id){
+    public Vendeur(String nom, String prenom, String motDePasse, int id, int idLib){
         super(nom, prenom, motDePasse);
         this.idVendeur = id;
+        this.idlibrairie = idLib;
     }
 
     public void ajouteLivreStock(Livre livre){        
@@ -63,10 +64,12 @@ public class Vendeur extends Personne{
         int maxNumCommande = 0;
         System.out.println("Maxnumcommande1 : " + maxNumCommande);
         try{
+            System.out.println("avant createStatement");
             PreparedStatement statement = Reseau.createStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
-
+            System.out.println("après createStatement");
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
+                System.out.println("result set next : ");
                 maxNumCommande = resultSet.getInt("numcom") + 1; 
                 System.out.println("Maxnumcommande2 : " + maxNumCommande);
             }

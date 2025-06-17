@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+
 public class Commande {
 
     private final int numCommande;
@@ -90,5 +92,20 @@ public class Commande {
     @Override
     public String toString() {
         return "Commande {" + "numCommande = " + this.numCommande + ", dateCom = " + this.dateCom + ", enLigne = " + this.enLigne + ", livraison = " + this.livraison + ", idClient = " + this.idClient + ", idMag = " + this.idLibrairie + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj == null){
+            return false;
+        }
+        if(obj == this){
+            return true;
+        }
+        if(obj instanceof Commande){
+            Commande tmp = (Commande) obj;
+            return this.getId() == tmp.getId();
+        }
+        return false;
     }
 }
