@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -80,111 +81,32 @@ public class PanierClientWindow extends BorderPane{
 
     private void initUI() {
 
-        try {
+        HBox bottom = new HBox(20, this.commander, this.previousPage, this.nextPage, this.home);
+        HBox.setMargin(this.previousPage, new Insets(10, 10, 20, 10));
+        HBox.setMargin(this.nextPage, new Insets(10, 10, 20, 10));
+        HBox.setMargin(this.commander, new Insets(10, 60, 20, 10));
+        HBox.setMargin(this.home, new Insets(10, 10, 20, 60));
+        bottom.setAlignment(Pos.CENTER);
 
-            BorderPane top = new BorderPane();
-            top.setRight(new Label("Panier de " + client.getNom()));
-            this.home = new Button("Home");
-            this.home.setOnAction((ActionEvent) -> {
-                this.app.getStage().setScene(new Scene(new ClientWindow(this.app)));
-            });
+        this.setBottom(bottom);
 
-            VBox btnHomeBox = new VBox(10, this.home);
-            btnHomeBox.setAlignment(Pos.CENTER_RIGHT);
-            VBox.setMargin(this.home, new Insets(20));
+        VBox center = new VBox(10);
+        center.setAlignment(Pos.CENTER);
 
-            top.setLeft(this.home);
+        Accordion accordion = new Accordion();
 
-            this.setTop(top);
+        for (Integer libID : client.getPanier().getContenu().keySet()) {
 
-            // center
+            Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
 
-            VBox center = new VBox(10);
-            center.setAlignment(Pos.CENTER);
-
-            for (Integer libID : client.getPanier().getContenu().keySet()) {
-
-                Librairie lib = Reseau.getLibrairie(libID);
-
-                Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
-
-                VBox books = new VBox(5);
-
-                for (Livre book : livres.keySet()) {
-                    int quantite = livres.get(book);
-
-                    HBox bookBox = new HBox(10);
-                    HBox infosBookBox = new HBox(10);
-                    infosBookBox.setPrefWidth(750);
-                    infosBookBox.setAlignment(Pos.CENTER_LEFT);
-                    bookBox.setStyle("-fx-margin:10 ;-fx-padding: 15;");
-                    infosBookBox.setStyle("-fx-margin:10 ;-fx-padding: 10; -fx-background-color: #d7fffb;");
-
-                    // to change when we have images of the books
-
-                    ImageView bookImage = new ImageView(new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
-                    bookImage.setFitHeight(64);
-                    bookImage.setFitWidth(64);
-                    bookImage.setPreserveRatio(true);
-                    bookImage.setSmooth(true);
-
-                    String bookName = book.getTitre();
-
-                    if (bookName.length() > 30) {
-                        bookName = bookName.substring(0, 30);
-                        bookName += "...";
-                    }
-
-                    Label bookTitle = new Label("Titre : " + bookName);
-                    bookTitle.setPrefWidth(300);
-                    Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-                    bookPrice.setPrefWidth(100);
-                    bookPrice.setAlignment(Pos.CENTER_RIGHT);
-                    Label bookStock = new Label("Quantité commandé : " + quantite);
-                    bookStock.setPrefWidth(100);
-                    bookStock.setAlignment(Pos.CENTER_RIGHT);
-
-                    bookTitle.setStyle("-fx-font-size: 14px;");
-                    bookPrice.setStyle("-fx-font-size: 14px;");
-                    bookStock.setStyle("-fx-font-size: 14px;");
-
-                    Button updateQte = new Button("modifier quantité");
-                    // addToPanier.setGraphic(new ImageView(new
-                    // Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
-                    updateQte.setAlignment(Pos.CENTER_RIGHT);
-
-                    TextField quantityField = new TextField();
-                    quantityField.setPromptText("Quantité");
-                    quantityField.setPrefWidth(100);
-                    // quantityField.setAlignment(Pos.CENTER_LEFT);
-                    HBox.setMargin(quantityField, new Insets(5));
-                    HBox.setMargin(updateQte, new Insets(5));
-                    // pop up si nb négatif ou not a number quand ajouter au panier
-
-                    Button infoBtn = new Button("More Info");
-                    infoBtn.setOnAction(e -> new BookInfoAlert(book, bookImage));
-
-                    infosBookBox.getChildren().addAll(bookImage, bookTitle, infoBtn, bookPrice, bookStock);
-                    infosBookBox.setAlignment(Pos.CENTER_LEFT);
-
-                    bookBox.getChildren().addAll(infosBookBox, quantityField, updateQte);
-                    bookBox.setAlignment(Pos.CENTER);
-
-                    books.getChildren().add(bookBox);
-                }
-
-                TitledPane libPane = new TitledPane(lib.getNom(), books);
-                libPane.setCollapsible(false);
-                libPane.setPadding(new Insets(10));
-
-                center.getChildren().add(libPane);
-
-                this.setCenter(center);
+            try {
+                accordion.getPanes().add(new LibPanierPanel(libID, this.app, livres));
+            } catch (LibraryNotFoundException e) {
             }
         }
-        catch (LibraryNotFoundException e){
 
-        }
+        accordion.getPanes().get(0).setExpanded(true);
+        this.setCenter(accordion);
     }
 
     private void initEmptyUI(){
@@ -214,4 +136,21 @@ public class PanierClientWindow extends BorderPane{
         this.setBottom(bottom);
     }
 
+
+    public void majCenter(){
+        Accordion accordion = new Accordion();
+
+        for (Integer libID : client.getPanier().getContenu().keySet()) {
+
+            Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
+
+            try {
+                accordion.getPanes().add(new LibPanierPanel(libID, this.app, livres));
+            } catch (LibraryNotFoundException e) {
+            }
+        }
+
+        accordion.getPanes().get(0).setExpanded(true);
+        this.setCenter(accordion);
+    }
 }

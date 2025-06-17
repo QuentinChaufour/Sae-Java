@@ -143,6 +143,7 @@ public class ClientWindow extends BorderPane{
         commitBtn.setOnAction((ActionEvent) -> {
             client.setLibrairie(choiceLib.getValue().getId());
             this.librairieLabel.setText(choiceLib.getValue() + "");
+            this.majPage();
             changeLibPane.setExpanded(false);
         });
 
@@ -178,7 +179,7 @@ public class ClientWindow extends BorderPane{
 
     public VBox createPage(int page) throws LibraryNotFoundException{
 
-        List<Livre> livres = new ArrayList<>(app.getClient().consulterLivres().keySet());
+        List<Livre> livres = new ArrayList<>(this.app.getClient().consulterLivres().keySet());
 
         VBox center = new VBox(10);
 
@@ -274,8 +275,9 @@ public class ClientWindow extends BorderPane{
             this.page++;
         }
     }
-    public void RedcPage(){
-        if(this.page > 1){
+
+    public void RedcPage() {
+        if (this.page > 1) {
             this.page--;
         }
     }
@@ -284,23 +286,11 @@ public class ClientWindow extends BorderPane{
         VBox page;
         try {
             page = this.createPage(this.page);
-            if(this.page == 1){
-                this.backPage.setDisable(true);
-            }
-            else{
-                this.backPage.setDisable(false);
-            }
-
-            if (this.page < this.maxPage) {
-                this.backPage.setDisable(false);
-            } else {
-                this.backPage.setDisable(true);
-            }
             this.setCenter(page);
-        } catch (LibraryNotFoundException e) {
+        } 
+        catch (LibraryNotFoundException e) {
             
             // alert ?
-
             e.printStackTrace();
         }
     }
