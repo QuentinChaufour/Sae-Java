@@ -19,6 +19,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import com.sae_java.Modele.Client;
+import com.sae_java.Modele.Vendeur;
+
 
 public class ApplicationSAE extends Application {
 
@@ -26,6 +28,7 @@ public class ApplicationSAE extends Application {
     private Scene scene;
 
     private Client client;
+    private Vendeur vendeur;
 
     public static int height = 900;
     public static int width = 1800;
@@ -45,7 +48,9 @@ public class ApplicationSAE extends Application {
         }catch (SQLException e) {
             e.printStackTrace();
            }
-     */
+
+        this.vendeur = new Vendeur("Dupont", "Jean", "1234",1, 1);
+
         //this.imageView = new ImageView();
         //this.imageView.setFitWidth(200);
         //this.imageView.setFitHeight(200);
@@ -150,6 +155,10 @@ public class ApplicationSAE extends Application {
 
     public void setClient(Client client){
         this.client = client;
+    }
+
+     public Vendeur getVendeur() {
+        return this.vendeur;
     }
 
     public void loadIdentification(){
