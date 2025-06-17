@@ -1,5 +1,6 @@
 package com.sae_java.Vue.controleur;
 
+import com.sae_java.Modele.Vendeur;
 import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.ClientWindow;
 import com.sae_java.Vue.FenetreConnexion;
@@ -21,7 +22,7 @@ public class ControleurConnexionVendeur implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-        app.getStage().setScene(new Scene(new VendeurWindow(app,app.getVendeur())));
+        app.getStage().setScene(new Scene(new VendeurWindow(app,new Vendeur("a", "a", "a", 0, 0))));
         app.getStage().sizeToScene();
         app.getStage().setTitle("Vendeur Window");
         app.getStage().centerOnScreen();
