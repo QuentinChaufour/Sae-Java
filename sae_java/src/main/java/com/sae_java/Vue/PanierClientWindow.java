@@ -2,17 +2,15 @@ package com.sae_java.Vue;
 
 import java.util.Map;
 
-import com.sae_java.Vue.alert.BookInfoAlert;
+import com.sae_java.Modele.Client;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
+import com.sae_java.Modele.Livre;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -20,12 +18,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
-import com.sae_java.Modele.Client;
-import com.sae_java.Modele.Livre;
-import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Modele.Librairie;
 
 public class PanierClientWindow extends BorderPane{
     
@@ -74,9 +66,6 @@ public class PanierClientWindow extends BorderPane{
         else{
             this.initUI();
         }
-        
-        this.setMinHeight(ApplicationSAE.height);
-        this.setMinWidth(ApplicationSAE.width);
     }
 
     private void initUI() {
