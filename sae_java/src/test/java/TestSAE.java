@@ -236,33 +236,75 @@ public class TestSAE {
 
     //         Reseau.createStatement("insert into testMAGASIN values (0,'Librairie de la Fac','Orleans')").executeUpdate();
     //         Reseau.createStatement("insert into testMAGASIN values (1,'La librairie du centre','Tours')").executeUpdate();
-    //         Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','a','456 avenue de la Republique','75000','Paris')").executeUpdate();
-    //         Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','b','133 boulevard de l universite','45000','Orleans')").executeUpdate();
+            
+    //         Reseau.createStatement("insert into testCLIENT values (3,'Eboue','Fabrice','a','60 avenue de la Republique','75000','Paris')").executeUpdate();
+    //         Reseau.createStatement("insert into testCLIENT values (2,'Dupont','Jean','b','456 avenue de la Republique','75000','Paris')").executeUpdate();
+    //         Reseau.createStatement("insert into testCLIENT values (1,'Martin','Julie','c','133 boulevard de l universite','45000','Orleans')").executeUpdate();
 
-    //         Reseau.updateInfos(EnumUpdatesDB.LIBRAIRIE);
-
-    //         Reseau.createStatement("insert into testAUTEUR values ('1','H.G Wells',null,null)").executeUpdate();
-    //         Reseau.createStatement("insert into testAUTEUR values ('2','Antoine de Saint-Exupéry',null,null)").executeUpdate();
+    //         Reseau.createStatement("insert into testAUTEUR values (1,'H.G Wells',null,null)").executeUpdate();
+    //         Reseau.createStatement("insert into testAUTEUR values (2,'Antoine de Saint-Exupéry',null,null)").executeUpdate();
+    //         Reseau.createStatement("insert into testAUTEUR values (3,'Jim Davis',1945,null)").executeUpdate();
+    //         Reseau.createStatement("insert into testAUTEUR values (4,'Tui T. Sutherland',1978,null)").executeUpdate();
+            
     //         Reseau.createStatement("insert into testLIVRE values ('120','La Guerre des mondes',159,1898,9.99,'Science Fiction','Gallimard',null)").executeUpdate();
     //         Reseau.createStatement("insert into testLIVRE values ('121','Le Petit Prince',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
-    //         Reseau.createStatement("insert into testECRIRE values ('120','1')").executeUpdate();
-    //         Reseau.createStatement("insert into testECRIRE values ('121','2')").executeUpdate();
+    //         Reseau.createStatement("insert into testLIVRE values ('122','Harry Potter',96,1943,7.99,'Roman','Gallimard',null)").executeUpdate();
+    //         Reseau.createStatement("insert into testLIVRE values ('123','Hunger Games',96,1943,7.99,'Science Fiction','Gallimard',null)").executeUpdate();
+    //         Reseau.createStatement("insert into testLIVRE values ('124','Garfiel & Cie',96,1943,7.99,'BD','Gallimard',null)").executeUpdate();
+    //         Reseau.createStatement("insert into testLIVRE values ('125','La Guerre des Clans',96,1943,7.99,'Roman','PKJ',null)").executeUpdate();
+            
+    //         Reseau.createStatement("insert into testECRIRE values ('120',1)").executeUpdate();
+    //         Reseau.createStatement("insert into testECRIRE values ('121',2)").executeUpdate();
+    //         Reseau.createStatement("insert into testECRIRE values ('124',3)").executeUpdate();
+    //         Reseau.createStatement("insert into testECRIRE values ('125',4)").executeUpdate();
 
     //         Reseau.createStatement("insert into testPOSSEDER values (0,'120',4)").executeUpdate();
     //         Reseau.createStatement("insert into testPOSSEDER values (0,'121',5)").executeUpdate();
+    //         Reseau.createStatement("insert into testPOSSEDER values (0,'122',2)").executeUpdate();
+    //         Reseau.createStatement("insert into testPOSSEDER values (0,'124',1)").executeUpdate();
+    //         Reseau.createStatement("insert into testPOSSEDER values (0,'125',9)").executeUpdate();
     //         Reseau.createStatement("insert into testPOSSEDER values (1,'120',5)").executeUpdate();
     //         Reseau.createStatement("insert into testPOSSEDER values (1,'121',7)").executeUpdate();
-             
+            
+
+    //         PreparedStatement statement = Reseau.createStatement("insert into testCOMMANDE values (1,?,'O','M',1,1)");
+            
+    //         Date sqlDate = new Date(new java.util.Date().getTime());
+
+    //         statement.setDate(1, sqlDate);
+    //         statement.executeUpdate();
+    //         PreparedStatement statement2 = Reseau.createStatement("insert into testCOMMANDE values (2,?,'O','M',2,1)");
+
+    //         statement2.setDate(1, sqlDate);
+    //         statement2.executeUpdate();
+    //         PreparedStatement statement3 = Reseau.createStatement("insert into testCOMMANDE values (3,?,'O','M',3,1)");
+
+    //         statement3.setDate(1, sqlDate);
+    //         statement3.executeUpdate();
+
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (1,1,1,9.99,'120')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (1,2,2,20,'121')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (2,3,1,9.99,'120')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (2,4,1,9.99,'121')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (2,5,1,9.99,'124')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (3,6,1,9.99,'120')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (3,7,1,9.99,'122')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (3,8,1,9.99,'123')").executeUpdate();
+    //         Reseau.createStatement("insert into testDETAILCOMMANDE values (3,9,1,9.99,'125')").executeUpdate();
+
+    //         Reseau.createStatement("insert into testVENDEUR values (0,Martin,Julie,'35 rue des prés','45000','Orleans',1)").executeUpdate();
+
+    //         //System.out.println(client.OnVousRecommande());
     //     } catch (SQLException e) {
-    //         System.err.println("pb insertion" + e.getMessage());
+    //         e.printStackTrace();
     //     }
-    //     Librairie librairie = new Librairie(7,"Loire et livres", "Orléans");
-    //     Vendeur vendeur = new Vendeur("Julie", "Martin", "1234", 3);
+    //     Librairie librairie = new Librairie(1,"La librairie du centre", "Tours");
+    //     Vendeur vendeur = new Vendeur("Julie", "Martin", "1234", 3, librairie.getId());
     //     Client client = new Client("Martin", "Julie", "mot_de_passe_1439", 3, "133 boulevard de l''Université", "45000", "Orléans",librairie.getId());
     //     Livre livre = new Livre("120","La Guerre des mondes", Arrays.asList(new Auteur("1","H.G. Wells",null,null)), "Gallimard", 1898,9.99, 159, "Science Fiction");
     //     Panier panier = new Panier();
     //     panier.ajouterLivre(livre, librairie.getId(), 1);
-    //     Commande commande = new Commande(1, new java.util.Date(), "O", "O", client.getId(), librairie.getId());
+    //     Commande commande = new Commande(4, new java.util.Date(), "O", "O", client.getId(), librairie.getId());
     //     DetailCommande detailcommande;
     //     try {
     //         detailcommande = new DetailCommande(1, livre, 1);
@@ -275,11 +317,8 @@ public class TestSAE {
     //     Map<Livre, Integer> livresCommande = new HashMap<>();
     //     livresCommande.put(livre, 1);
     //     assertTrue(vendeur.checkQte(commande));
-    //     System.out.println("ASSERT TRUE 1 FAIT ");
     //     assertEquals(commande, vendeur.preparerCommandes(client.getId(), livresCommande, new java.util.Date(), "O", "O"));
-    //     System.out.println("ASSERT TRUE 2 FAIT ");
     //     assertEquals(livre, vendeur.transfererLivre(livre, librairie));
-    //     System.out.println("ASSERT TRUE 3 FAIT ");
     // }
  
 
