@@ -12,7 +12,7 @@ import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 
 public class Librairie implements Comparable<Librairie>{
 
-    private final int id;
+    private int id;
     private String nom;
     private String Ville;
 
@@ -24,7 +24,26 @@ public class Librairie implements Comparable<Librairie>{
      * @param nom : String
      * @param ville : String
      */
-    public Librairie(int id,String nom, String ville) {
+    public Librairie(String nom, String ville) {
+        this.id = 1;
+        try{
+            PreparedStatement statement = Reseau.createStatement("SELECT idmag FROM MAGASIN where idmag >= ALL (SELECT idmag FROM MAGASIN)");
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                this.id = resultSet.getInt("idmag") + 1; 
+            }
+            statement.close();
+        }
+        catch(SQLException e){
+        }
+        this.nom = nom;
+        this.Ville = ville;
+
+        this.livreseEnStock = new HashMap<>();
+    }
+
+    public Librairie(int id, String nom, String ville) {
         this.id = id;
         this.nom = nom;
         this.Ville = ville;

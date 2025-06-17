@@ -1,5 +1,7 @@
 package com.sae_java.Modele;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,11 +29,8 @@ public class Vendeur extends Personne{
     }
 
 //    public void ajouteLivreStock(Livre livre){
-//        
-//        Connection connection = Reseau.getConnection();
-//        PreparedStatement ps;
 //        try {
-//            ps = connection.prepareStatement("insert into LIVRE values (?,?,?,?,?,?,?,?)");
+//            PreparedStatement ps = Reseau.createStatement("insert into LIVRE values (?,?,?,?,?,?,?,?)");
 //            ps.setString(1, livre.getIsbn());
 //            ps.setString(2, livre.getTitre());
 //            ps.setObject(3, livre.getAuteurs());

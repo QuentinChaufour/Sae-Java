@@ -275,8 +275,11 @@ public class TestSAE {
     //     Map<Livre, Integer> livresCommande = new HashMap<>();
     //     livresCommande.put(livre, 1);
     //     assertTrue(vendeur.checkQte(commande));
+    //     System.out.println("ASSERT TRUE 1 FAIT ");
     //     assertEquals(commande, vendeur.preparerCommandes(client.getId(), livresCommande, new java.util.Date(), "O", "O"));
+    //     System.out.println("ASSERT TRUE 2 FAIT ");
     //     assertEquals(livre, vendeur.transfererLivre(livre, librairie));
+    //     System.out.println("ASSERT TRUE 3 FAIT ");
     // }
  
 

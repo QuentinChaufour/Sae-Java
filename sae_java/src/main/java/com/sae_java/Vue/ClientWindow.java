@@ -2,43 +2,67 @@ package com.sae_java.Vue;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sae_java.Modele.Client;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
+import com.sae_java.Modele.Librairie;
+import com.sae_java.Modele.Livre;
+import com.sae_java.Modele.Reseau;
+import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
+import com.sae_java.Vue.controleur.ControleurDeconnexion;
+import com.sae_java.Vue.controleur.ControleurPage;
+import com.sae_java.Vue.controleur.ControleurRecommandation;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import com.sae_java.Vue.controleur.*;
-
-import com.sae_java.Modele.Client;
-import com.sae_java.Modele.Livre;
-import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class ClientWindow extends BorderPane{
 
     private final ApplicationSAE app;
-    private final Client client;
     private int page; 
+    private int maxPage;
+
+    private Label librairieLabel;
+    private Button backPage;
+    private Button nextPage;
 
 
-    public ClientWindow(ApplicationSAE app,Client client) {
+    public ClientWindow(ApplicationSAE app) {
         this.app = app;
-        this.client = client;
         this.page = 1;
+
+        Client client = this.app.getClient();
+
+        try {
+            int size = Reseau.getLibrairie(client.getLibrairie()).consulterStock().size();
+            this.maxPage = size % 5 == 0 ? (int)size/5 : ((int)size/5)+1; 
+        } 
+        catch (LibraryNotFoundException e) {
+            maxPage = 2;
+        }
         
-        this.minHeightProperty().set(600);
-        this.minWidthProperty().set(1200);
+        this.minHeightProperty().set(ApplicationSAE.height);
+        this.minWidthProperty().set(ApplicationSAE.width);
 
         // top of the borderPane
 
         BorderPane top = new BorderPane();
         
-
         // Create a button for "Deconnexion"
         Button deconnexion = new Button("Deconnexion");
         deconnexion.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/deconnexion_32px.png"))));
@@ -49,6 +73,7 @@ public class ClientWindow extends BorderPane{
         Button panier = new Button("Panier");
         panier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/panier_32px.png"))));
         panier.setStyle("-fx-margin: 10; -fx-padding: 10;");
+        panier.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new PanierClientWindow(this.app)));});
 
         BorderPane.setMargin(top, new Insets(0, 0, 10, 0));
         BorderPane.setMargin(deconnexion, new Insets(5));
@@ -56,8 +81,20 @@ public class ClientWindow extends BorderPane{
         BorderPane.setAlignment(panier, Pos.CENTER_RIGHT);
         BorderPane.setMargin(panier, new Insets(5));
 
+        this.librairieLabel = new Label();
+        try {
+            this.librairieLabel.setText(Reseau.getLibrairie(app.getClient().getLibrairie()) + "");
+            this.librairieLabel.setFont(Font.font("Arial",FontWeight.BOLD,30));
+        } 
+        catch (LibraryNotFoundException e) {
+
+            // alert ?
+
+            e.printStackTrace();
+        }
 
         top.setLeft(deconnexion);
+        top.setCenter(librairieLabel);
         top.setRight(panier);
 
         this.setTop(top);
@@ -77,38 +114,44 @@ public class ClientWindow extends BorderPane{
         clientImage.setPreserveRatio(true);
         clientImage.setSmooth(true);
 
-        BorderPane.setAlignment(clientImage, Pos.CENTER_LEFT);
-        clientName.setAlignment(Pos.CENTER);
-        clientForname.setAlignment(Pos.CENTER);
-
-        clientInfo.getChildren().addAll(clientImage, clientName, clientForname);
+        clientInfo.getChildren().addAll(clientImage, clientForname,clientName);
+        clientInfo.setAlignment(Pos.CENTER);
 
         VBox left = new VBox(10);
 
         // buttons
 
-        Label librairieLabel = new Label();
-        try {
-            librairieLabel.setText("Librairie : " + Reseau.getLibrairie(app.getClient().getLibrairie()));
-        } 
-        catch (LibraryNotFoundException e) {
-
-            // alert ?
-
-            e.printStackTrace();
-        }
-        Button consulterLivres = new Button("Consulter les livres");
-        // add image to the button for ergonomics
+        Button recommandation = new Button("Recommandation");
+        recommandation.setOnAction(new ControleurRecommandation(this.app));
 
         Button changerInfos = new Button("Update infos");
-        changerInfos.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
 
-        Button changeLib = new Button("Changer de librairie");
+        VBox changeLibBox = new VBox(10);
+        ObservableList<Librairie> libList = FXCollections.observableList(Reseau.librairies);
 
-        left.getChildren().addAll(clientInfo,librairieLabel, consulterLivres, changerInfos, changeLib);
+        ChoiceBox<Librairie >choiceLib = new ChoiceBox<>();
+        choiceLib.setItems(libList);
+        choiceLib.setValue(libList.get(0));
+        Button commitBtn = new Button("Change");
+
+        changeLibBox.getChildren().addAll(choiceLib, commitBtn);
+
+        TitledPane changeLibPane = new TitledPane("Changer de librairie", changeLibBox);
+        changeLibPane.setExpanded(false);
+
+        // changer lib client et affichage
+        commitBtn.setOnAction((ActionEvent) -> {
+            client.setLibrairie(choiceLib.getValue().getId());
+            this.librairieLabel.setText(choiceLib.getValue() + "");
+            changeLibPane.setExpanded(false);
+        });
+
+        Button parametres = new Button();
+        parametres.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
+
+        left.getChildren().addAll(clientInfo,recommandation, changerInfos, changeLibPane,parametres);
         left.setStyle("-fx-margin: 10;-fx-padding: 10; -fx-background-color: #ffcae2;");
         this.setLeft(left);
-
         // center of the borderPane
 
         VBox center = null;
@@ -124,7 +167,6 @@ public class ClientWindow extends BorderPane{
 
         this.setCenter(center);
 
-
         // bottom of the borderPane
         HBox bottom = new HBox(10);
         Label credit = new Label("V1 par Quentin");
@@ -132,10 +174,6 @@ public class ClientWindow extends BorderPane{
 
         this.setBottom(bottom);
 
-    }
-
-    public Client getClient() {
-        return client;
     }
 
     public VBox createPage(int page) throws LibraryNotFoundException{
@@ -156,15 +194,15 @@ public class ClientWindow extends BorderPane{
 
         Label pages = new Label(this.page + "");
 
-        Button previousPage = new Button();
-        previousPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
+        this.backPage = new Button();
+        this.backPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
 
-        Button nextPage = new Button();
-        nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
-        nextPage.setOnAction(new ControleurPage(this, this.app, previousPage, nextPage));
-        previousPage.setOnAction(new ControleurPage(this, this.app, previousPage, nextPage));
+        this.nextPage = new Button();
+        this.nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
+        this.nextPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
+        this.backPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
 
-        pageBox.getChildren().addAll(previousPage, pages, nextPage);
+        pageBox.getChildren().addAll(this.backPage, pages, this.nextPage);
         pageBox.setStyle("-fx-padding: 10;");
 
         pageBox.setAlignment(Pos.CENTER);
@@ -195,26 +233,28 @@ public class ClientWindow extends BorderPane{
         }
 
         Label bookTitle = new Label("Titre : " + bookName);
-        bookTitle.setPrefWidth(400);
+        bookTitle.setPrefWidth(300);
         Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-        bookPrice.setPrefWidth(75);
+        bookPrice.setPrefWidth(100);
         bookPrice.setAlignment(Pos.CENTER_RIGHT);
         Label bookStock = new Label("Stock : " + Reseau.getLibrairie(this.app.getClient().getLibrairie()).consulterStock().get(book));
-        bookStock.setPrefWidth(75);
+        bookStock.setPrefWidth(100);
         bookStock.setAlignment(Pos.CENTER_RIGHT);
 
-        bookTitle.setStyle("-fx-font-size: 14px;");
+        bookTitle.setStyle("-fx-font-size: 16px;");
         bookPrice.setStyle("-fx-font-size: 14px;");
         bookStock.setStyle("-fx-font-size: 14px;");
-
-        Button addToPanier = new Button("Ajouter au panier");
-        addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
-        addToPanier.setAlignment(Pos.CENTER_RIGHT);
 
         TextField quantityField = new TextField();
         quantityField.setPromptText("Quantité");
         quantityField.setPrefWidth(100);
         //quantityField.setAlignment(Pos.CENTER_LEFT);
+
+        Button addToPanier = new Button("Ajouter au panier");
+        addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
+        addToPanier.setAlignment(Pos.CENTER_RIGHT);
+        addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
+
         HBox.setMargin(quantityField, new Insets(5));
         HBox.setMargin(addToPanier, new Insets(5));
         // pop up si nb négatif ou not a number quand ajouter au panier
@@ -229,7 +269,11 @@ public class ClientWindow extends BorderPane{
     }
 
     public int getPage(){return this.page;}
-    public void IncPage(){this.page++;}
+    public void IncPage(){
+        if(this.page < maxPage){
+            this.page++;
+        }
+    }
     public void RedcPage(){
         if(this.page > 1){
             this.page--;
@@ -240,6 +284,18 @@ public class ClientWindow extends BorderPane{
         VBox page;
         try {
             page = this.createPage(this.page);
+            if(this.page == 1){
+                this.backPage.setDisable(true);
+            }
+            else{
+                this.backPage.setDisable(false);
+            }
+
+            if (this.page < this.maxPage) {
+                this.backPage.setDisable(false);
+            } else {
+                this.backPage.setDisable(true);
+            }
             this.setCenter(page);
         } catch (LibraryNotFoundException e) {
             
