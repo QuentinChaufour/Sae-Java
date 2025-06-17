@@ -35,7 +35,7 @@ public class ControleurConnexionClient implements EventHandler<ActionEvent>{
             Client client = Reseau.identificationClient(nom, prenom, mdp, lib);
             this.app.setClient(client);
 
-            app.getStage().setScene(new Scene(new ClientWindow(app, app.getClient())));
+            app.getStage().setScene(new Scene(new ClientWindow(app)));
             app.getStage().sizeToScene();
             app.getStage().setTitle("Client Window");
             app.getStage().centerOnScreen();

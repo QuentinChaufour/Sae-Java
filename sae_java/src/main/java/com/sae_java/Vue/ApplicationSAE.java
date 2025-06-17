@@ -27,6 +27,9 @@ public class ApplicationSAE extends Application {
 
     private Client client;
 
+    public static int height = 900;
+    public static int width = 1800;
+
     private Connection connection;
     //private ImageView imageView;
 

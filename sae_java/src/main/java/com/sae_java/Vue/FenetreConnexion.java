@@ -65,7 +65,9 @@ public class FenetreConnexion {
 
         this.choiceBoxLibrairieUser = new ChoiceBox<>();
         this.choiceBoxLibrairieUser.setItems(libList);
-        this.choiceBoxLibrairieUser.setValue(libList.get(0));
+        if(libList.size() > 0){
+            this.choiceBoxLibrairieUser.setValue(libList.get(0));
+        }
 
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #F2F2F2; -fx-padding: 10; -fx-hgap: 10; -fx-vgap: 10;");
@@ -92,7 +94,7 @@ public class FenetreConnexion {
 
         identificationClient.setStyle("-fx-background-color: #FFFFFF; -fx-padding: 10; -fx-spacing: 10;");
 
-        identificationClient.add(new Label("Nom : "),0,0);
+        identificationClient.add(new Label("Nom : "), 0, 0);
         identificationClient.add(this.userNameField, 1, 0);
         identificationClient.add(new Label("Prénom : "), 0, 1);
         identificationClient.add(this.userFornameField, 1, 1);

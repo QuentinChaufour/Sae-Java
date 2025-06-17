@@ -1,144 +1,151 @@
 package com.sae_java.Vue;
 
-import java.util.Map;
+import java.util.List;
 
-import com.sae_java.Vue.alert.BookInfoAlert;
-
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
-import com.sae_java.Modele.Client;
 import com.sae_java.Modele.Livre;
-import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Modele.Librairie;
 
 public class RecommandationsWindow extends BorderPane {
 
     private final ApplicationSAE app;
-    private final Client client;
 
-    private Button btnBack;
+    private Button home;
+    private ChoiceBox<Livre> bookSelection;
+    private Button moreInfo;
+    private TextField qteSelector;
+    private Button addBook;
 
-    public RecommandationsWindow(ApplicationSAE app, Client client) {
+    public RecommandationsWindow(ApplicationSAE app,List<Livre> recommandations) {
         super();
         this.app = app;
-        this.client = client;
-        this.initUI();
-    }
+        this.home = new Button("Home");
+        this.home.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new ClientWindow(this.app)));});
+        
+        this.bookSelection = new ChoiceBox<>(FXCollections.observableList(recommandations));
+        this.moreInfo = new Button("+ INFO");
+        // image bulle info ?
 
-    private void initUI() {
+        this.qteSelector = new TextField();
+        this.qteSelector.setPromptText("Quantité");
+        this.addBook = new Button();
+        this.addBook.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
 
-        try {
+        //size 
 
-            BorderPane top = new BorderPane();
-            top.setRight(new Label("Panier de " + client.getNom()));
-            this.btnBack = new Button("Retour");
-            this.btnBack.setOnAction((ActionEvent) -> {
-                this.app.getStage().setScene(new Scene(new ClientWindow(this.app, this.client)));
-            });
-            top.setLeft(this.btnBack);
+        this.bookSelection.setPrefWidth(0.4 * ApplicationSAE.width);
+        this.moreInfo.setPrefWidth(0.05 * ApplicationSAE.width);
+        this.addBook.setPrefWidth(0.05 * ApplicationSAE.width);
+        this.qteSelector.setPrefWidth(0.2 * ApplicationSAE.width);
 
-            this.setTop(top);
+        this.bookSelection.setPrefHeight(0.035 * ApplicationSAE.height);
+        this.moreInfo.setPrefHeight(0.035 * ApplicationSAE.height);
+        this.addBook.setPrefHeight(0.035 * ApplicationSAE.height);
+        this.qteSelector.setPrefHeight(0.035 * ApplicationSAE.height);
 
-            // center
-
-            VBox center = new VBox(10);
-            center.setAlignment(Pos.CENTER);
-
-            for (Integer libID : client.getPanier().getContenu().keySet()) {
-
-                Librairie lib = Reseau.getLibrairie(libID);
-
-                Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
-
-                VBox books = new VBox(5);
-
-                for (Livre book : livres.keySet()) {
-                    int quantite = livres.get(book);
-
-                    HBox bookBox = new HBox(10);
-                    HBox infosBookBox = new HBox(10);
-                    infosBookBox.setPrefWidth(750);
-                    infosBookBox.setAlignment(Pos.CENTER_LEFT);
-                    bookBox.setStyle("-fx-margin:10 ;-fx-padding: 15;");
-                    infosBookBox.setStyle("-fx-margin:10 ;-fx-padding: 10; -fx-background-color: #d7fffb;");
-
-                    // to change when we have images of the books
-
-                    ImageView bookImage = new ImageView(
-                            new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
-                    bookImage.setFitHeight(64);
-                    bookImage.setFitWidth(64);
-                    bookImage.setPreserveRatio(true);
-                    bookImage.setSmooth(true);
-
-                    String bookName = book.getTitre();
-
-                    if (bookName.length() > 30) {
-                        bookName = bookName.substring(0, 30);
-                        bookName += "...";
-                    }
-
-                    Label bookTitle = new Label("Titre : " + bookName);
-                    bookTitle.setPrefWidth(300);
-                    Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-                    bookPrice.setPrefWidth(100);
-                    bookPrice.setAlignment(Pos.CENTER_RIGHT);
-                    Label bookStock = new Label("Quantité commandé : " + quantite);
-                    bookStock.setPrefWidth(100);
-                    bookStock.setAlignment(Pos.CENTER_RIGHT);
-
-                    bookTitle.setStyle("-fx-font-size: 14px;");
-                    bookPrice.setStyle("-fx-font-size: 14px;");
-                    bookStock.setStyle("-fx-font-size: 14px;");
-
-                    Button updateQte = new Button("modifier quantité");
-                    // addToPanier.setGraphic(new ImageView(new
-                    // Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
-                    updateQte.setAlignment(Pos.CENTER_RIGHT);
-
-                    TextField quantityField = new TextField();
-                    quantityField.setPromptText("Quantité");
-                    quantityField.setPrefWidth(100);
-                    // quantityField.setAlignment(Pos.CENTER_LEFT);
-                    HBox.setMargin(quantityField, new Insets(5));
-                    HBox.setMargin(updateQte, new Insets(5));
-                    // pop up si nb négatif ou not a number quand ajouter au panier
-
-                    Button infoBtn = new Button("More Info");
-                    infoBtn.setOnAction(e -> new BookInfoAlert(book, bookImage));
-
-                    infosBookBox.getChildren().addAll(bookImage, bookTitle, infoBtn, bookPrice, bookStock);
-                    infosBookBox.setAlignment(Pos.CENTER_LEFT);
-
-                    bookBox.getChildren().addAll(infosBookBox, quantityField, updateQte);
-                    bookBox.setAlignment(Pos.CENTER);
-
-                    books.getChildren().add(bookBox);
-                }
-
-                TitledPane libPane = new TitledPane(lib.getNom(), books);
-                libPane.setCollapsible(false);
-                libPane.setPadding(new Insets(10));
-
-                center.getChildren().add(libPane);
-
-                this.setCenter(center);
-            }
-        } catch (LibraryNotFoundException e) {
-
+        if(recommandations.isEmpty()){
+            this.initEmptyUI();
         }
+        else{
+            this.initUI(recommandations);
+        }
+        
+        this.setMinHeight(ApplicationSAE.height);
+        this.setMinWidth(ApplicationSAE.width);
     }
 
+    private void initUI(List<Livre> recommandations) {
+
+        GridPane center = new GridPane();
+        int nbRecommandation = recommandations.size();
+        
+        // amélioration : for qui selon la parité place crée le podium sauf 1 et 10
+        switch (nbRecommandation) {
+            case 1:
+                center.add(new Text(), 0, 0);
+                center.add(new Text("1. " + recommandations.get(0).getTitre()), 1, 0);
+                center.add(new Text(), 2, 0);
+
+            case 2:
+                center.add(new Text("2. " + recommandations.get(1).getTitre()), 0, 1);
+
+            case 3:
+                center.add(new Text(), 1, 1);
+                center.add(new Text("3. " + recommandations.get(2).getTitre()), 2, 1);
+        
+            case 4:
+                center.add(new Text("4. " + recommandations.get(3).getTitre()), 0, 2);
+
+            case 5:
+                center.add(new Text(), 1, 2);
+                center.add(new Text("" + recommandations.get(0).getTitre()), 2, 2);
+
+            case 6:
+                center.add(new Text("6. " + recommandations.get(5).getTitre()), 0, 3);
+
+            case 7:
+                center.add(new Text(), 1, 3);
+                center.add(new Text("7. " + recommandations.get(6).getTitre()), 2, 3);
+
+            case 8:
+                center.add(new Text("8. " + recommandations.get(7).getTitre()), 0, 4);
+
+            case 9:
+
+                center.add(new Text(), 1, 4);
+                center.add(new Text("9. " + recommandations.get(8).getTitre()), 2, 4);
+
+            case 10:
+                center.add(new Text(), 0, 5);
+                center.add(new Text("10.    " + recommandations.get(0).getTitre()), 1,5);
+                center.add(new Text(), 2, 5);
+
+            default:
+                break;
+                
+        }
+        this.setCenter(center);
+            
+    }
+
+
+    private void initEmptyUI(){
+
+        Text emptyText = new Text("Pas de recommandations disponibles");
+        emptyText.setFont(Font.font("arial",25));
+
+        VBox btnHomeBox = new VBox(10,this.home);
+        this.home.setFont(Font.font("arial",22));
+        btnHomeBox.setAlignment(Pos.CENTER_RIGHT);
+        VBox.setMargin(this.home, new Insets(20));
+        VBox textBox = new VBox(10,emptyText);
+        textBox.setAlignment(Pos.CENTER);
+
+        VBox center = new VBox(10,btnHomeBox,textBox);
+        this.setCenter(center);
+
+        // bottom disabled
+        this.moreInfo.setDisable(true);
+        this.addBook.setDisable(true);
+        this.qteSelector.setDisable(true);
+
+        HBox bottom = new HBox(20,this.bookSelection,this.moreInfo,this.qteSelector,this.addBook);
+        bottom.setAlignment(Pos.CENTER);
+        BorderPane.setMargin(bottom, new Insets(10,10,40,10));
+        this.setBottom(bottom);
+    }
 }

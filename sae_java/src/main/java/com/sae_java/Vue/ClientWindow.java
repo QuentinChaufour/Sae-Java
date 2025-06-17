@@ -10,9 +10,11 @@ import com.sae_java.Modele.Reseau;
 import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
 import com.sae_java.Vue.controleur.ControleurDeconnexion;
 import com.sae_java.Vue.controleur.ControleurPage;
+import com.sae_java.Vue.controleur.ControleurRecommandation;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -32,15 +34,20 @@ import javafx.scene.text.FontWeight;
 public class ClientWindow extends BorderPane{
 
     private final ApplicationSAE app;
-    private final Client client;
     private int page; 
     private int maxPage;
 
+    private Label librairieLabel;
+    private Button backPage;
+    private Button nextPage;
 
-    public ClientWindow(ApplicationSAE app,Client client) {
+
+    public ClientWindow(ApplicationSAE app) {
         this.app = app;
-        this.client = client;
         this.page = 1;
+
+        Client client = this.app.getClient();
+
         try {
             int size = Reseau.getLibrairie(client.getLibrairie()).consulterStock().size();
             this.maxPage = size % 5 == 0 ? (int)size/5 : ((int)size/5)+1; 
@@ -49,8 +56,8 @@ public class ClientWindow extends BorderPane{
             maxPage = 2;
         }
         
-        this.minHeightProperty().set(600);
-        this.minWidthProperty().set(1200);
+        this.minHeightProperty().set(ApplicationSAE.height);
+        this.minWidthProperty().set(ApplicationSAE.width);
 
         // top of the borderPane
 
@@ -66,7 +73,7 @@ public class ClientWindow extends BorderPane{
         Button panier = new Button("Panier");
         panier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/panier_32px.png"))));
         panier.setStyle("-fx-margin: 10; -fx-padding: 10;");
-        panier.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new PanierClientWindow(this.app, this.client)));});
+        panier.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new PanierClientWindow(this.app)));});
 
         BorderPane.setMargin(top, new Insets(0, 0, 10, 0));
         BorderPane.setMargin(deconnexion, new Insets(5));
@@ -74,10 +81,10 @@ public class ClientWindow extends BorderPane{
         BorderPane.setAlignment(panier, Pos.CENTER_RIGHT);
         BorderPane.setMargin(panier, new Insets(5));
 
-        Label librairieLabel = new Label();
+        this.librairieLabel = new Label();
         try {
-            librairieLabel.setText(Reseau.getLibrairie(app.getClient().getLibrairie()) + "");
-            librairieLabel.setFont(Font.font("Arial",FontWeight.BOLD,30));
+            this.librairieLabel.setText(Reseau.getLibrairie(app.getClient().getLibrairie()) + "");
+            this.librairieLabel.setFont(Font.font("Arial",FontWeight.BOLD,30));
         } 
         catch (LibraryNotFoundException e) {
 
@@ -115,7 +122,7 @@ public class ClientWindow extends BorderPane{
         // buttons
 
         Button recommandation = new Button("Recommandation");
-        recommandation.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new RecommandationsWindow(this.app, this.client)));});
+        recommandation.setOnAction(new ControleurRecommandation(this.app));
 
         Button changerInfos = new Button("Update infos");
 
@@ -126,10 +133,18 @@ public class ClientWindow extends BorderPane{
         choiceLib.setItems(libList);
         choiceLib.setValue(libList.get(0));
         Button commitBtn = new Button("Change");
-        changeLibBox.getChildren().addAll(choiceLib,commitBtn);
+
+        changeLibBox.getChildren().addAll(choiceLib, commitBtn);
 
         TitledPane changeLibPane = new TitledPane("Changer de librairie", changeLibBox);
         changeLibPane.setExpanded(false);
+
+        // changer lib client et affichage
+        commitBtn.setOnAction((ActionEvent) -> {
+            client.setLibrairie(choiceLib.getValue().getId());
+            this.librairieLabel.setText(choiceLib.getValue() + "");
+            changeLibPane.setExpanded(false);
+        });
 
         Button parametres = new Button();
         parametres.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
@@ -152,7 +167,6 @@ public class ClientWindow extends BorderPane{
 
         this.setCenter(center);
 
-
         // bottom of the borderPane
         HBox bottom = new HBox(10);
         Label credit = new Label("V1 par Quentin");
@@ -160,10 +174,6 @@ public class ClientWindow extends BorderPane{
 
         this.setBottom(bottom);
 
-    }
-
-    public Client getClient() {
-        return client;
     }
 
     public VBox createPage(int page) throws LibraryNotFoundException{
@@ -184,15 +194,15 @@ public class ClientWindow extends BorderPane{
 
         Label pages = new Label(this.page + "");
 
-        Button previousPage = new Button();
-        previousPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
+        this.backPage = new Button();
+        this.backPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
 
-        Button nextPage = new Button();
-        nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
-        nextPage.setOnAction(new ControleurPage(this, this.app, previousPage, nextPage));
-        previousPage.setOnAction(new ControleurPage(this, this.app, previousPage, nextPage));
+        this.nextPage = new Button();
+        this.nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
+        this.nextPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
+        this.backPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
 
-        pageBox.getChildren().addAll(previousPage, pages, nextPage);
+        pageBox.getChildren().addAll(this.backPage, pages, this.nextPage);
         pageBox.setStyle("-fx-padding: 10;");
 
         pageBox.setAlignment(Pos.CENTER);
@@ -274,6 +284,18 @@ public class ClientWindow extends BorderPane{
         VBox page;
         try {
             page = this.createPage(this.page);
+            if(this.page == 1){
+                this.backPage.setDisable(true);
+            }
+            else{
+                this.backPage.setDisable(false);
+            }
+
+            if (this.page < this.maxPage) {
+                this.backPage.setDisable(false);
+            } else {
+                this.backPage.setDisable(true);
+            }
             this.setCenter(page);
         } catch (LibraryNotFoundException e) {
             
