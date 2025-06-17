@@ -1,8 +1,12 @@
 package com.sae_java.Vue;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -14,6 +18,11 @@ import javafx.scene.control.TextField;
 import com.sae_java.Vue.controleur.*;
 
 import com.sae_java.Modele.Vendeur;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Reseau;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 
@@ -42,8 +51,8 @@ public class VendeurWindow extends BorderPane{
         // LEFT BAR - Info Vendeur
         HBox vendeurInfo = new HBox(10);
         vendeurInfo.setStyle("-fx-padding: 10; -fx-background-color: #d7fffb; -fx-border-color: #000000; -fx-border-width: 2;");
-        Label vendeurName = new Label(app.getVendeur().getNom());
-        Label vendeurForname = new Label(app.getVendeur().getPrenom());
+        Label vendeurName = new Label(this.vendeur.getNom());
+        Label vendeurForname = new Label(this.vendeur.getPrenom());
         ImageView vendeurImage = new ImageView(new Image(getClass().getResourceAsStream("/images/utilisateur.png")));
         vendeurImage.setFitHeight(32);
         vendeurImage.setFitWidth(32);
@@ -52,7 +61,7 @@ public class VendeurWindow extends BorderPane{
         VBox left = new VBox(10);
         Label librairieLabel = new Label();
         try {
-            librairieLabel.setText("Librairie : " + Reseau.getLibrairie(app.getVendeur().getIdLibrairie()));
+            librairieLabel.setText("Librairie : " + Reseau.getLibrairie(this.vendeur.getIdLibrairie()));
         } catch (LibraryNotFoundException e) {
             e.printStackTrace();
         }
@@ -127,14 +136,23 @@ public class VendeurWindow extends BorderPane{
         transfert.setStyle("-fx-background-color: #d7fffb;");
         Label transfertLabel = new Label("Transférer un livre depuis une autre librairie");
         HBox transfertInput = new HBox(10);
-        TextField sourceLib = new TextField();
-        sourceLib.setPromptText("ID Librairie source");
+
+        ObservableList<Librairie> listLib = FXCollections.observableList(Reseau.librairies);
+        ChoiceBox<Librairie> sourceLibCombo = new ChoiceBox<>();
+        sourceLibCombo.setItems(listLib);
+        if(listLib.size() > 0){
+            sourceLibCombo.setValue(listLib.get(0));
+        }
+        
         TextField transfertIsbn = new TextField();
         transfertIsbn.setPromptText("ISBN");
+
         TextField transfertQuantite = new TextField();
         transfertQuantite.setPromptText("Quantité");
+
         Button transfertBtn = new Button("Transférer");
-        transfertInput.getChildren().addAll(new Label("Librairie source :"), sourceLib, new Label("ISBN :"), transfertIsbn, new Label("Quantité :"), transfertQuantite, transfertBtn);
+
+        transfertInput.getChildren().addAll(new Label("Librairie source :"), sourceLibCombo, new Label("ISBN :"), transfertIsbn, new Label("Quantité :"), transfertQuantite, transfertBtn);
         transfert.getChildren().addAll(transfertLabel, transfertInput);
 
         // Ajouter tout au center
@@ -143,7 +161,7 @@ public class VendeurWindow extends BorderPane{
 
         // BOTTOM
         HBox bottom = new HBox(10);
-        Label credit = new Label("V1 par Jolan");
+        Label credit = new Label("V1 par Jolan et River");
         bottom.getChildren().add(credit);
         this.setBottom(bottom);
     }
