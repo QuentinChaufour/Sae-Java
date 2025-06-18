@@ -314,7 +314,9 @@ public class Librairie implements Comparable<Librairie>{
         ResultSet resultSet = statement.executeQuery();
         Livre livre;
         if(resultSet.next()){
-            livre = new Livre(resultSet.getString("isbn"), resultSet.getString("titre"), resultSet.getString("nomedit"), resultSet.getInt("datepubli"), resultSet.getInt("prix"), resultSet.getInt("nbpages"), resultSet.getString("nomclass"));
+
+            
+            livre = Reseau.createLivre(isbn);
         }else{
             throw new BookNotInStockException();
         }

@@ -3,6 +3,8 @@ package com.sae_java.Modele;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.image.Image;
+
 public class Livre implements Comparable<Livre> {
 
     private final String isbn;
@@ -13,6 +15,7 @@ public class Livre implements Comparable<Livre> {
     private double prix;
     private int nbPages;
     private String classification;
+    private Image image;
 
     public Livre(String isbn, String titre, List<Auteur> auteurs, String editeur, Integer datePublication, double prix, int nbPages, String classification) {
         this.isbn = isbn;
@@ -25,7 +28,7 @@ public class Livre implements Comparable<Livre> {
         this.classification = classification;
     }
 
-    public Livre(String isbn, String titre, String editeur, int datePublication, double prix, int nbPages, String classification) {
+    public Livre(String isbn, String titre, String editeur, int datePublication, double prix, int nbPages, String classification,Image img) {
         this.isbn = isbn;
         this.titre = titre;
         this.auteurs = new ArrayList<>();
@@ -34,6 +37,7 @@ public class Livre implements Comparable<Livre> {
         this.prix = prix;
         this.nbPages = nbPages;
         this.classification = classification;
+        this.image = img;
     }
 
     /**
@@ -164,6 +168,14 @@ public class Livre implements Comparable<Livre> {
      */
     public void ajouterAuteur(Auteur auteur) {
         this.auteurs.add(auteur);
+    }
+
+    public Image getImage(){
+        return this.image;
+    }
+
+    public void setImage(Image img){
+        this.image = img;
     }
 
     /**

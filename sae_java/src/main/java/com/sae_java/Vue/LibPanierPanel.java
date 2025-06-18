@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
+import com.sae_java.Modele.Exceptions.PasAssezDeStockException;
+import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
-import com.sae_java.Vue.controleur.ControleurQtePanier;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -153,7 +153,20 @@ public class LibPanierPanel extends TitledPane{
         Button changeQTE = new Button("Ajouter au panier");
         changeQTE.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
         changeQTE.setAlignment(Pos.CENTER_RIGHT);
-        changeQTE.setOnAction(new ControleurQtePanier());
+        changeQTE.setOnAction((ActionEvent) -> {
+            try {
+                Integer qte = Integer.parseInt(quantityField.getText());
+                if(qte < 0){
+                    this.app.getClient().retirerDuPanier(book, this.app.getClient().getLibrairie(), Math.abs(qte));
+                }
+                else{
+                    this.app.getClient().ajouterAuPanier(book, this.app.getClient().getLibrairie(), Math.abs(qte));
+                }
+            } 
+            catch (NumberFormatException | NullPointerException | PasAssezDeStockException | QuantiteInvalideException e) {
+                quantityField.setStyle("-fx-border-color: red; -fx-border-width: 1px");
+            }
+        });
 
         HBox.setMargin(quantityField, new Insets(5));
         HBox.setMargin(changeQTE, new Insets(5));
