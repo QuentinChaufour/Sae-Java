@@ -51,7 +51,9 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
         try {
 
             int idLibVendeur = vendeurWindow.getVendeur().getIdLibrairie();
-            Librairie vendeurLib = Reseau.getLibrairie(idLibVendeur);
+            Librairie vendeurLib = Reseau.getLibrairie(idLib
+            
+            Vendeur);
 
             Livre livre = vendeurLib.getLivreLib(isbn);
             vendeurLib.ajouterNouveauLivre(livre, quantite);
