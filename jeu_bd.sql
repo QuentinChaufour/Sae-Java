@@ -2661,5 +2661,5 @@ insert into VENDEUR(numVendeur, nomV, prenomV, adresseV, codepostalV, villeV,idm
 	(2, 'Alves', 'Pierre', '8 avenue Victor Hugo', '45000', 'Orléans', 7),
 	(3, 'Arroussi', 'Sophie', '25 avenue John Kennedy', '59000', 'Lille', 5),
 	(4, 'Akerkoub', 'Julien', '3 rue des Mimosas', '69000', 'Lyon', 6),
-	(5, 'Cornille', 'Camille', '15 chemin des Écoles', '13000', 'Marseille', 2)
+	(5, 'Cornille', 'Camille', '15 chemin des Écoles', '13000', 'Marseille', 2),
 	(6, 'Roussel', 'Paul', '44 rue de Marmagne', '69000', 'Lyon', 6 );
