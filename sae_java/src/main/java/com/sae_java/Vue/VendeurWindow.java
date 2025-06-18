@@ -115,7 +115,8 @@ public class VendeurWindow extends BorderPane{
         Button checkBtn = new Button("Vérifier");
         checkInput.getChildren().addAll(new Label("ISBN :"), checkIsbn, checkBtn);
         checkDispo.getChildren().addAll(checkLabel, checkInput);
-
+        checkBtn.setOnAction(new ControleurCheckDisponibilite(app, this, checkIsbn));
+        
         // Passer une commande client
         VBox commandeClient = new VBox(5);
         commandeClient.setPadding(new Insets(10));
