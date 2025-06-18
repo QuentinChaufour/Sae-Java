@@ -23,11 +23,13 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -63,6 +65,10 @@ public class ClientWindow extends BorderPane{
         this.minHeightProperty().set(ApplicationSAE.height);
         this.minWidthProperty().set(ApplicationSAE.width);
 
+        if(ApplicationSAE.lightMode){
+            this.setStyle("-fx-background-color : #F8FAFC");
+        }
+
         // top of the borderPane
 
         BorderPane top = new BorderPane();
@@ -74,16 +80,17 @@ public class ClientWindow extends BorderPane{
 
         // create a button for Panier 
 
-        Button panier = new Button("Panier");
-        panier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/panier_32px.png"))));
-        panier.setStyle("-fx-margin: 10; -fx-padding: 10;");
-        panier.setOnAction((ActionEvent) -> {this.setPanierMenu();});
+        Button panierBtn = new Button("Panier");
+        panierBtn.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/panier_32px.png"))));
+        panierBtn.setOnAction((ActionEvent) -> {this.setPanierMenu();});
 
-        BorderPane.setMargin(top, new Insets(0, 0, 10, 0));
-        BorderPane.setMargin(deconnexion, new Insets(5));
+        deconnexion.setFont(Font.font(18));
+        panierBtn.setFont(Font.font(18));
+
+        BorderPane.setMargin(deconnexion, new Insets(15));
         BorderPane.setAlignment(deconnexion, Pos.CENTER_LEFT);
-        BorderPane.setAlignment(panier, Pos.CENTER_RIGHT);
-        BorderPane.setMargin(panier, new Insets(5));
+        BorderPane.setAlignment(panierBtn, Pos.CENTER_RIGHT);
+        BorderPane.setMargin(panierBtn, new Insets(15));
 
         this.librairieLabel = new Label();
         try {
@@ -93,13 +100,30 @@ public class ClientWindow extends BorderPane{
         catch (LibraryNotFoundException e) {
 
             // alert ?
-
-            e.printStackTrace();
         }
+
+        if (ApplicationSAE.lightMode) {
+
+            panierBtn.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius:20");
+            deconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            panierBtn.setOnMouseEntered(e -> {panierBtn.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color :  #9AA6B2;-fx-background-radius: 20");});
+            panierBtn.setOnMouseExited(e -> {panierBtn.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            deconnexion.setOnMouseEntered(e -> {deconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color :#ffa5a5;-fx-background-radius: 20");});
+            deconnexion.setOnMouseExited(e -> {deconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            deconnexion.setPrefWidth(ApplicationSAE.width * 0.2);
+            panierBtn.setPrefWidth(ApplicationSAE.width * 0.2);
+
+            top.setStyle("-fx-background-color : #D9EAFD");
+        }
+
 
         top.setLeft(deconnexion);
         top.setCenter(librairieLabel);
-        top.setRight(panier);
+        top.setRight(panierBtn);
+
 
         this.setTop(top);
 
@@ -108,7 +132,7 @@ public class ClientWindow extends BorderPane{
         // client infos
 
         HBox clientInfo = new HBox(10);
-        clientInfo.setStyle("-fx-padding: 10; -fx-background-color: #d7fffb; -fx-border-color: #000000; -fx-border-width: 2;");
+        clientInfo.setStyle("-fx-padding: 10; -fx-background-color: #D9EAFD; -fx-border-color: #000000; -fx-border-width: 2;");
         Label clientName = new Label(app.getClient().getNom());
         Label clientForname = new Label(app.getClient().getPrenom());
         ImageView clientImage = new ImageView(new Image(getClass().getResourceAsStream("/images/utilisateur.png")));
@@ -155,43 +179,30 @@ public class ClientWindow extends BorderPane{
         parametres.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
 
         left.getChildren().addAll(clientInfo,recommandation, changerInfos, changeLibPane,parametres);
-        left.setStyle("-fx-margin: 10;-fx-padding: 10; -fx-background-color: #ffcae2;");
+        left.setPrefWidth(ApplicationSAE.width * 0.15);
+
+        if(ApplicationSAE.lightMode){
+            left.setStyle("-fx-margin: 15;-fx-padding: 15; -fx-background-color: #9AA6B2;-fx-background-radius: 0 20 20 0");
+        }
+
         this.setLeft(left);
         // center of the borderPane
 
-        VBox center = null;
+        VBox center = new VBox();
         try {
             center = this.createPage(this.page);
+            if(ApplicationSAE.lightMode){
+                center.setStyle("-fx-background-color : #F8FAFC");
+            }
         } 
         catch (LibraryNotFoundException e) {
-
             // alert ?
-
-            e.printStackTrace();
         }
 
         this.setCenter(center);
+        BorderPane.setMargin(center, new Insets(10,20,10,20));
 
         // bottom of the borderPane
-        HBox pageBox = new HBox(10);
-
-        this.pageLabel = new Label(this.page + "");
-
-        this.backPage = new Button();
-        this.backPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
-
-        this.nextPage = new Button();
-        this.nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
-        this.nextPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
-        this.backPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
-
-        pageBox.getChildren().addAll(this.backPage, pageLabel, this.nextPage);
-        pageBox.setStyle("-fx-padding: 10;");
-
-        pageBox.setAlignment(Pos.CENTER);
-
-        this.setBottom(pageBox);
-
     }
 
     public VBox createPage(int page) throws LibraryNotFoundException{
@@ -203,68 +214,116 @@ public class ClientWindow extends BorderPane{
         for(int i = ( page - 1)*5;i< page*5;i++){
             if(i<livres.size()){
                 HBox book = this.createBook(livres.get(i));
+                HBox.setMargin(book, new Insets(20));
                 center.getChildren().add(book);
 
             }
         }
+        center.setAlignment(Pos.CENTER);
 
+        HBox pageBox = new HBox(10);
+
+        this.pageLabel = new Label(this.page + "");
+        this.pageLabel.setStyle("-fx-font-size:20;-fx-font-weight:bold");
+
+        this.backPage = new Button();
+        this.backPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
+        this.backPage.setPrefWidth(ApplicationSAE.width * 0.15);
+
+        this.nextPage = new Button();
+        this.nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
+        this.nextPage.setPrefWidth(ApplicationSAE.width * 0.15);
+
+        this.nextPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
+        this.backPage.setOnAction(new ControleurPage(this, this.app, this.backPage, this.nextPage));
+
+        pageBox.getChildren().addAll(this.backPage, pageLabel, this.nextPage);
+        pageBox.setAlignment(Pos.CENTER);
+
+        if(ApplicationSAE.lightMode){
+            this.nextPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            this.backPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            this.nextPage.setOnMouseEntered(e -> {this.nextPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");});
+            this.nextPage.setOnMouseExited(e -> {this.nextPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            this.backPage.setOnMouseEntered(e -> {this.backPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");});
+            this.backPage.setOnMouseExited(e -> {this.backPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            this.pageLabel.setStyle("-fx-font-size : 18; -fx-font-weight: bold");
+            pageBox.setStyle("-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            
+            pageBox.setMaxWidth(ApplicationSAE.width * 0.4);
+            HBox.setMargin(pageBox, new Insets(20,0,5,0));
+        }
+
+        BorderPane.setAlignment(pageBox, Pos.CENTER);
+        center.getChildren().add(pageBox);
+
+        center.setPrefHeight(ApplicationSAE.height * 0.85);
         return center;
     }
 
     private HBox createBook(Livre book) throws LibraryNotFoundException{
         HBox bookBox = new HBox(10);
         HBox infosBookBox = new HBox(10);
-        infosBookBox.setPrefWidth(750);
+        infosBookBox.setPrefWidth(ApplicationSAE.width * 0.65);
+        bookBox.setPrefWidth(ApplicationSAE.width * 0.75);
         infosBookBox.setAlignment(Pos.CENTER_LEFT);
-        bookBox.setStyle("-fx-margin:10 ;-fx-padding: 15;");
-        infosBookBox.setStyle("-fx-margin:10 ;-fx-padding: 10; -fx-background-color: #d7fffb;");
+        
+        if(ApplicationSAE.lightMode){
+            bookBox.setStyle("-fx-margin:5 ;-fx-padding: 10;-fx-background-color: #F8FAFC");
+            bookBox.setEffect(new DropShadow(5, Color.GRAY));
+            infosBookBox.setStyle("-fx-margin:10 ;-fx-padding: 10; -fx-background-color: #F8FAFC");
+        }
+
         ImageView bookImage;
 
         if (book.getImage() == null) {
             bookImage = new ImageView(new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
-            bookImage.setFitHeight(64);
-            bookImage.setFitWidth(64);
+            bookImage.setFitHeight(96);
+            bookImage.setFitWidth(96);
             bookImage.setPreserveRatio(true);
             bookImage.setSmooth(true);
         }
         else{
             bookImage = new ImageView(book.getImage());
-            bookImage.setFitHeight(64);
-            bookImage.setFitWidth(64);
+            bookImage.setFitHeight(96);
+            bookImage.setFitWidth(96);
             bookImage.setPreserveRatio(true);
             bookImage.setSmooth(true);
         }
-        
 
         String bookName = book.getTitre();
 
-        if(bookName.length() > 30){
-            bookName = bookName.substring(0, 30);
-            bookName += "...";
+        if(bookName.length() > 60){
+            bookName = bookName.substring(0, 60);
+            bookName += " ...";
         }
 
-        Label bookTitle = new Label("Titre : " + bookName);
-        bookTitle.setPrefWidth(300);
-        Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-        bookPrice.setPrefWidth(100);
+        Label bookTitle = new Label(bookName);
+        bookTitle.setPrefWidth(ApplicationSAE.width * 0.35);
+        Label bookPrice = new Label("Prix : " + book.getPrix() + " €");
+        bookPrice.setPrefWidth(ApplicationSAE.width * 0.1);
         bookPrice.setAlignment(Pos.CENTER_RIGHT);
         Label bookStock = new Label("Stock : " + Reseau.getLibrairie(this.app.getClient().getLibrairie()).consulterStock().get(book));
-        bookStock.setPrefWidth(100);
+        bookStock.setPrefWidth(ApplicationSAE.width * 0.1);
         bookStock.setAlignment(Pos.CENTER_RIGHT);
 
-        bookTitle.setStyle("-fx-font-size: 16px;");
-        bookPrice.setStyle("-fx-font-size: 14px;");
-        bookStock.setStyle("-fx-font-size: 14px;");
+        bookTitle.setStyle("-fx-font-size: 20px;");
+        bookPrice.setStyle("-fx-font-size: 18px;");
+        bookStock.setStyle("-fx-font-size: 18px;");
 
         TextField quantityField = new TextField();
         quantityField.setPromptText("Quantité");
-        quantityField.setPrefWidth(100);
+        quantityField.setPrefWidth(ApplicationSAE.width * 0.1);
         //quantityField.setAlignment(Pos.CENTER_LEFT);
 
         Button addToPanier = new Button("Ajouter au panier");
         addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
         addToPanier.setAlignment(Pos.CENTER_RIGHT);
         addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
+        addToPanier.setPrefWidth(ApplicationSAE.width * 0.1);
 
         HBox.setMargin(quantityField, new Insets(5));
         HBox.setMargin(addToPanier, new Insets(5));
@@ -294,10 +353,11 @@ public class ClientWindow extends BorderPane{
     }
 
     public void majPage(){
-        VBox pageC;
+        VBox center;
         try {
-            pageC = this.createPage(this.page);
-            this.setCenter(pageC);
+            center = this.createPage(this.page);
+            this.setCenter(center);
+            BorderPane.setMargin(center, new Insets(10,20,10,20));
             this.pageLabel.setText(this.page + "");
         } 
         catch (LibraryNotFoundException e) {
