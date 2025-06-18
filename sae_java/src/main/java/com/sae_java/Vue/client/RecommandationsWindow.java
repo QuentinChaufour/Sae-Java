@@ -1,8 +1,9 @@
-package com.sae_java.Vue;
+package com.sae_java.Vue.client;
 
 import java.util.List;
 
 import com.sae_java.Modele.Livre;
+import com.sae_java.Vue.ApplicationSAE;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;

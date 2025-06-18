@@ -5,7 +5,7 @@ import java.util.List;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.RecommandationsWindow;
+import com.sae_java.Vue.client.RecommandationsWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

@@ -97,6 +97,10 @@ public class ApplicationSAE extends Application {
     public Stage getStage() {
         return stage;
     }
+    
+    public Scene getScene(){
+        return this.scene;
+    }
 
     public void quitter(){
         Platform.exit();

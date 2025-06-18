@@ -1,4 +1,4 @@
-package com.sae_java.Vue;
+package com.sae_java.Vue.client;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +7,7 @@ import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
+import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
 import com.sae_java.Vue.controleur.ControleurDeconnexion;
 import com.sae_java.Vue.controleur.ControleurPage;
