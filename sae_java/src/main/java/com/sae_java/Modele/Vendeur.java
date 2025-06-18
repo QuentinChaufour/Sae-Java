@@ -1,3 +1,4 @@
+package com.sae_java.Modele;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

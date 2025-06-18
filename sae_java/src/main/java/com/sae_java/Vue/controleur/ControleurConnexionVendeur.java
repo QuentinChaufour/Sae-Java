@@ -22,7 +22,7 @@ public class ControleurConnexionVendeur implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-        app.getStage().setScene(new Scene(new VendeurWindow(app,new Vendeur("a", "a", "a", 0, 0))));
+        app.getStage().setScene(new Scene(new VendeurWindow(app,new Vendeur("Bonjoux", "Lucie", "12 rue des Lilas", 1, 3))));
         app.getStage().sizeToScene();
         app.getStage().setTitle("Vendeur Window");
         app.getStage().centerOnScreen();
