@@ -1,6 +1,7 @@
 package com.sae_java.Vue.controleur;
 
 import com.sae_java.Modele.Exceptions.BookNotInStockException;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
@@ -49,6 +50,9 @@ public class ControleurCheckDisponibilite implements EventHandler<ActionEvent> {
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Erreur SQL", "Erreur lors de l’accès à la base de données.");
+        } catch (LibraryNotFoundException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur Librairie", "Il y a une erreur lors de l'accès à la librairie du vendeur");
+
         }
     }
 
