@@ -8,6 +8,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.sae_java.Modele.Enumerations.EnumUpdatesDB;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
+import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
+
 public class Vendeur extends Personne{
     private int idVendeur;
     private int idlibrairie;

@@ -157,6 +157,7 @@ public class VendeurWindow extends BorderPane{
 
         transfertInput.getChildren().addAll(new Label("Librairie source :"), sourceLibCombo, new Label("ISBN :"), transfertIsbn, new Label("Quantité :"), transfertQuantite, transfertBtn);
         transfert.getChildren().addAll(transfertLabel, transfertInput);
+        transfertBtn.setOnAction(new ControleurTransfererLivVen(app,this,transfertIsbn,sourceLibCombo, transfertQuantite));
 
         // Ajouter tout au center
         center.getChildren().addAll(addLivre, updateStock, checkDispo, commandeClient, transfert);
