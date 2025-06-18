@@ -2655,3 +2655,11 @@ INSERT INTO DETAILCOMMANDE(numcom, numlig, qte, prixvente, isbn) VALUES
 	(4802,2,1,11.9,'9782215114970'),
 	(4835,1,1,13.5,'9782012101425'),
 	(5008,1,1,9.0,'9782012101425');
+
+insert into VENDEUR(numVendeur, nomV, prenomV, adresseV, codepostalV, villeV,idmag) values
+	(1, 'Bonjoux', 'Lucie', '12 rue des Lilas', '35000', 'Rennes', 3),
+	(2, 'Alves', 'Pierre', '8 avenue Victor Hugo', '45000', 'Orléans', 7),
+	(3, 'Arroussi', 'Sophie', '25 avenue John Kennedy', '59000', 'Lille', 5),
+	(4, 'Akerkoub', 'Julien', '3 rue des Mimosas', '69000', 'Lyon', 6),
+	(5, 'Cornille', 'Camille', '15 chemin des Écoles', '13000', 'Marseille', 2),
+	(6, 'Roussel', 'Paul', '44 rue de Marmagne', '69000', 'Lyon', 6 );
