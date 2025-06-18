@@ -2,6 +2,8 @@ package com.sae_java.Vue;
 
 import java.util.List;
 
+import com.sae_java.Modele.Livre;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,8 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
-import com.sae_java.Modele.Livre;
+import javafx.scene.text.TextAlignment;
 
 public class RecommandationsWindow extends BorderPane {
 
@@ -57,6 +58,11 @@ public class RecommandationsWindow extends BorderPane {
         this.addBook.setPrefHeight(0.035 * ApplicationSAE.height);
         this.qteSelector.setPrefHeight(0.035 * ApplicationSAE.height);
 
+        HBox bottom = new HBox(20,this.bookSelection,this.moreInfo,this.qteSelector,this.addBook);
+        bottom.setAlignment(Pos.CENTER);
+        BorderPane.setMargin(bottom, new Insets(10,10,40,10));
+        this.setBottom(bottom);
+
         if(recommandations.isEmpty()){
             this.initEmptyUI();
         }
@@ -70,56 +76,34 @@ public class RecommandationsWindow extends BorderPane {
 
     private void initUI(List<Livre> recommandations) {
 
-        GridPane center = new GridPane();
+        GridPane center = new GridPane(10,10);
         int nbRecommandation = recommandations.size();
+        center.setAlignment(Pos.CENTER);
+        center.setPadding(new Insets(20));
         
         // amélioration : for qui selon la parité place crée le podium sauf 1 et 10
-        switch (nbRecommandation) {
-            case 1:
-                center.add(new Text(), 0, 0);
-                center.add(new Text("1. " + recommandations.get(0).getTitre()), 1, 0);
-                center.add(new Text(), 2, 0);
+        for(int i=1; i<=nbRecommandation;i++){
 
-            case 2:
-                center.add(new Text("2. " + recommandations.get(1).getTitre()), 0, 1);
-
-            case 3:
-                center.add(new Text(), 1, 1);
-                center.add(new Text("3. " + recommandations.get(2).getTitre()), 2, 1);
-        
-            case 4:
-                center.add(new Text("4. " + recommandations.get(3).getTitre()), 0, 2);
-
-            case 5:
-                center.add(new Text(), 1, 2);
-                center.add(new Text("" + recommandations.get(0).getTitre()), 2, 2);
-
-            case 6:
-                center.add(new Text("6. " + recommandations.get(5).getTitre()), 0, 3);
-
-            case 7:
-                center.add(new Text(), 1, 3);
-                center.add(new Text("7. " + recommandations.get(6).getTitre()), 2, 3);
-
-            case 8:
-                center.add(new Text("8. " + recommandations.get(7).getTitre()), 0, 4);
-
-            case 9:
-
-                center.add(new Text(), 1, 4);
-                center.add(new Text("9. " + recommandations.get(8).getTitre()), 2, 4);
-
-            case 10:
-                center.add(new Text(), 0, 5);
-                center.add(new Text("10.    " + recommandations.get(0).getTitre()), 1,5);
-                center.add(new Text(), 2, 5);
-
-            default:
-                break;
-                
+            if(i == 1){
+                Text first = new Text("1. " + recommandations.get(0).getTitre());
+                first.setTextAlignment(TextAlignment.CENTER);
+                center.add(first, 0, 0,3,1);
+                first.setFont(Font.font("arial",20));
+            }
+            else if(i == 10){
+                Text last = new Text("10. " + recommandations.get(0).getTitre());
+                center.add(last, 1,5,3,1);
+                last.setFont(Font.font("arial",15));
+            }
+            else if(i%2 == 0){
+                center.add(new Text(i+". " + recommandations.get(i-1).getTitre()), 0, i-1);
+            }
+            else{
+                center.add(new Text(), 1, i-1);
+                center.add(new Text(i+". " + recommandations.get(i-1).getTitre()), 2, i-1);
+            }
         }
-        this.setCenter(center);
-            
+        this.setCenter(center);       
     }
 
 

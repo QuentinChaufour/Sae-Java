@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -33,6 +34,9 @@ public class PanierClientWindow extends BorderPane{
     public PanierClientWindow(ApplicationSAE app) {
         super();
         this.app = app;
+
+        this.setPrefSize(ApplicationSAE.width, ApplicationSAE.height);
+
         this.client = this.app.getClient();
 
         // init btn
@@ -128,18 +132,30 @@ public class PanierClientWindow extends BorderPane{
 
     public void majCenter(){
         Accordion accordion = new Accordion();
+        boolean expanded = false;
+        Map<Integer,Map<Livre,Integer>> content = client.getPanier().getContenu();
 
-        for (Integer libID : client.getPanier().getContenu().keySet()) {
+        if(content.isEmpty()){
+            this.initEmptyUI();
+        } 
+        else {
+            for (Integer libID : content.keySet()) {
 
-            Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
+                Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
 
-            try {
-                accordion.getPanes().add(new LibPanierPanel(libID, this.app, livres));
-            } catch (LibraryNotFoundException e) {
+                try {
+                    TitledPane pane = new LibPanierPanel(libID, this.app, livres);
+                    if (!expanded) {
+                        pane.setExpanded(true);
+                        expanded = false;
+                    }
+                    accordion.getPanes().add(pane);
+                } catch (LibraryNotFoundException e) {
+                }
             }
-        }
 
-        accordion.getPanes().get(0).setExpanded(true);
-        this.setCenter(accordion);
+            this.setCenter(accordion);
+            BorderPane.setMargin(accordion, new Insets(30, 30, 30, 30));
+        }
     }
 }
