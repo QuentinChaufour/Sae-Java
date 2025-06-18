@@ -87,6 +87,7 @@ public class VendeurWindow extends BorderPane{
         Button addLivreBtn = new Button("Ajouter");
         addLivreInput.getChildren().addAll(new Label("ISBN :"), addIsbn, new Label("Quantité :"), addQuantite, addLivreBtn);
         addLivre.getChildren().addAll(addLivreLabel, addLivreInput);
+        addLivreBtn.setOnAction(new ControleurAjouterLivre(app, this, addIsbn, addQuantite));
 
         // Modifier quantité
         VBox updateStock = new VBox(5);
@@ -101,6 +102,7 @@ public class VendeurWindow extends BorderPane{
         Button updateBtn = new Button("Actualiser");
         updateInput.getChildren().addAll(new Label("ISBN :"), updateIsbn, new Label("Quantité :"), updateQuantite, updateBtn);
         updateStock.getChildren().addAll(updateLabel, updateInput);
+        updateBtn.setOnAction(new ControleurUpdateQuantite(app, this, updateIsbn, updateQuantite));
 
         // Vérifier disponibilité
         VBox checkDispo = new VBox(5);
