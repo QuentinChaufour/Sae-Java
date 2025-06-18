@@ -1,6 +1,7 @@
 package com.sae_java.Vue.controleur;
 
 import com.sae_java.Modele.Exceptions.BookNotInStockException;
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
@@ -77,6 +78,9 @@ public class ControleurUpdateQuantite implements EventHandler<ActionEvent> {
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Erreur SQL", "Erreur lors de l'accès à la base de données.");
+        } catch (LibraryNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
