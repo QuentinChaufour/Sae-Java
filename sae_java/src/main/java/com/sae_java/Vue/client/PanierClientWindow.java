@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+
 
 public class PanierClientWindow extends BorderPane{
     
@@ -31,6 +33,8 @@ public class PanierClientWindow extends BorderPane{
     private Button commander;
     private Button previousPage;
     private Button nextPage;
+    private Label prixTot;
+    private Label nbElementPanier;
 
     public PanierClientWindow(ApplicationSAE app) {
         super();
@@ -43,6 +47,7 @@ public class PanierClientWindow extends BorderPane{
         // init btn
         this.commander = new Button("Commander");
         this.commander.setFont(Font.font("arial", 22));
+        this.commander.setOnAction((ActionEvent) -> {this.setCommandeMenu();});
         this.home = new  Button("Home");
         this.home.setFont(Font.font("arial", 22));
         this.home.setOnAction((ActionEvent) -> {this.app.getStage().setScene(new Scene(new ClientWindow(app)));});
@@ -65,6 +70,9 @@ public class PanierClientWindow extends BorderPane{
         this.previousPage.setPrefHeight(0.035 * ApplicationSAE.height);
         this.nextPage.setPrefHeight(0.035 * ApplicationSAE.height);
 
+        this.prixTot = new Label();
+        this.nbElementPanier = new Label();
+
         if(this.client.getPanier().getContenu().isEmpty()){
             this.initEmptyUI();
         }
@@ -75,6 +83,48 @@ public class PanierClientWindow extends BorderPane{
 
     private void initUI() {
 
+        VBox center = new VBox(10);
+        center.setAlignment(Pos.CENTER);
+
+        Accordion accordion = new Accordion();
+        boolean expanded = true;
+        for (Integer libID : client.getPanier().getContenu().keySet()) {
+
+            Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
+
+            try {
+                TitledPane pane = new LibPanierPanel(libID, this.app, livres);
+                if (!expanded) {
+                    pane.setExpanded(true);
+                    expanded = false;
+                }
+                accordion.getPanes().add(pane);
+            } catch (LibraryNotFoundException e) {
+            }
+        }
+
+        accordion.getPanes().get(0).setExpanded(true);
+        accordion.setPrefHeight(ApplicationSAE.height * 0.8);
+
+        this.prixTot.setText("Prix total du panier : " + this.app.getClient().getPanier().getPrixTotal() + " €");
+        this.prixTot.setStyle("-fx-font-size: 20");
+        this.nbElementPanier.setText(this.app.getClient().getPanier().getNbElements() + " Livres dans la commande");
+        this.nbElementPanier.setStyle("-fx-font-size: 17");
+
+        VBox infoPanier = new VBox(10,this.nbElementPanier,this.prixTot);
+        VBox.setMargin(this.nbElementPanier, new Insets(10,10,40,10));
+        VBox.setMargin(this.prixTot, new Insets(10, 10, 40, 10));
+        infoPanier.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox centerBox = new VBox(10,accordion,infoPanier);
+        this.setCenter(centerBox);
+
+        // bottom
+
+        this.commander.setDisable(false);
+        this.previousPage.setDisable(false);
+        this.nextPage.setDisable(false);
+
         HBox bottom = new HBox(20, this.commander, this.previousPage, this.nextPage, this.home);
         HBox.setMargin(this.previousPage, new Insets(10, 10, 20, 10));
         HBox.setMargin(this.nextPage, new Insets(10, 10, 20, 10));
@@ -83,30 +133,12 @@ public class PanierClientWindow extends BorderPane{
         bottom.setAlignment(Pos.CENTER);
 
         this.setBottom(bottom);
-
-        VBox center = new VBox(10);
-        center.setAlignment(Pos.CENTER);
-
-        Accordion accordion = new Accordion();
-
-        for (Integer libID : client.getPanier().getContenu().keySet()) {
-
-            Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
-
-            try {
-                accordion.getPanes().add(new LibPanierPanel(libID, this.app, livres));
-            } catch (LibraryNotFoundException e) {
-            }
-        }
-
-        accordion.getPanes().get(0).setExpanded(true);
-        this.setCenter(accordion);
     }
 
-    private void initEmptyUI(){
+    private void initEmptyUI() {
 
         Text emptyText = new Text("Votre Panier est vide");
-        emptyText.setFont(Font.font("arial",25));
+        emptyText.setFont(Font.font("arial", 25));
         VBox textBox = new VBox(10,emptyText);
         textBox.setAlignment(Pos.CENTER);
 
@@ -146,17 +178,50 @@ public class PanierClientWindow extends BorderPane{
 
                 try {
                     TitledPane pane = new LibPanierPanel(libID, this.app, livres);
-                    if (!expanded) {
-                        pane.setExpanded(true);
-                        expanded = false;
-                    }
+                    BorderPane.setMargin(pane, new Insets(20));
                     accordion.getPanes().add(pane);
-                } catch (LibraryNotFoundException e) {
+
+                    if (!expanded) {
+                        accordion.setExpandedPane(pane);
+                    }
+
+                } 
+                catch (LibraryNotFoundException e) {
                 }
             }
 
-            this.setCenter(accordion);
             BorderPane.setMargin(accordion, new Insets(30, 30, 30, 30));
+            accordion.setStyle("-fx-background-color: #e9e9e9F2; -fx-padding: 40; -fx-spacing: 10;");
+            accordion.setPrefHeight(ApplicationSAE.height * 0.9);
+            this.setStyle("-fx-padding: 10; -fx-hgap: 10; -fx-vgap: 10;");
+
+            this.prixTot.setText(this.app.getClient().getPanier().getPrixTotal() + " €");
+            this.nbElementPanier.setText(this.app.getClient().getPanier().getNbElements() + " Livres dans la commande");
+
+            this.prixTot.setText("Prix total du panier : " + this.app.getClient().getPanier().getPrixTotal() + " €");
+            this.prixTot.setStyle("-fx-font-size: 18;-fx-font-weight: bold");
+            this.nbElementPanier.setText(this.app.getClient().getPanier().getNbElements() + " Livres dans la commande");
+            this.nbElementPanier.setStyle("-fx-font-size: 18");
+
+            VBox infoPanier = new VBox(10, this.nbElementPanier, this.prixTot);
+            VBox.setMargin(this.nbElementPanier, new Insets(10, 20, 20, 10));
+            VBox.setMargin(this.prixTot, new Insets(10, 20, 20, 10));
+            infoPanier.setAlignment(Pos.CENTER_RIGHT);
+
+            this.commander.setDisable(false);
+            this.previousPage.setDisable(false);
+            this.nextPage.setDisable(false);
+
+            VBox centerBox = new VBox(10, accordion, infoPanier);
+            this.setCenter(centerBox);
         }
+    }
+
+    public void setCommandeMenu(){
+        this.app.getStage().setScene(new Scene(new CommandeWindow(this.app,this)));
+    }
+
+    public void setPanierMenu(){
+        this.app.getStage().setScene(new Scene(this));
     }
 }

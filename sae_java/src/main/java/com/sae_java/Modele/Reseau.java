@@ -68,7 +68,6 @@ public class Reseau {
             System.err.println("Erreur de connexion à la base de données : " + e.getMessage());
             System.exit(2);
         }
-
     }
 
     private Reseau() {} // Constructeur privé pour empêcher l'instanciation de la classe

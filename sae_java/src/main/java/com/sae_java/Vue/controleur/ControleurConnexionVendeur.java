@@ -2,9 +2,9 @@ package com.sae_java.Vue.controleur;
 
 import com.sae_java.Modele.Vendeur;
 import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.ClientWindow;
 import com.sae_java.Vue.FenetreConnexion;
 import com.sae_java.Vue.VendeurWindow;
+import com.sae_java.Vue.client.ClientWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

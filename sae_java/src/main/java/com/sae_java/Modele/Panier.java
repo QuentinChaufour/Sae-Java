@@ -97,6 +97,16 @@ public class Panier {
         return this.prixTotal;
     }
 
+    public int getNbElements(){
+        int nb = 0;
+        for(Map<Livre,Integer> i : this.contenu.values()){
+            for(Integer val : i.values()){
+                nb += val;
+            }
+        }
+        return nb;
+    }
+
     /**
      * permet de vider totalement le panier
      */
