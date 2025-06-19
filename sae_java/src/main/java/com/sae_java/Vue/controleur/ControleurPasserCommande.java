@@ -59,7 +59,7 @@ public class ControleurPasserCommande implements EventHandler<ActionEvent> {
             try{
                 client.ajouterAuPanier(livre, idLibrairie, qteint);
                 String modeLivraison = "M";      
-                client.commander(modeLivraison,true,true);
+                client.commander(modeLivraison,true,true,".");
                 showAlert(Alert.AlertType.INFORMATION, "Commande réussite.", "La commande a était passéé avec succès");
             }catch(QuantiteInvalideException e){
                 e.printStackTrace();
