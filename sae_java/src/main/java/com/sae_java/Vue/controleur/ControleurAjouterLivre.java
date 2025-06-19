@@ -2,6 +2,7 @@ package com.sae_java.Vue.controleur;
 
 import java.sql.SQLException;
 
+import com.sae_java.Modele.Exceptions.BookNotInDatabaseException;
 import com.sae_java.Modele.Exceptions.BookNotInStockException;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
@@ -13,36 +14,6 @@ import com.sae_java.Vue.VendeurWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
-
-public class ControleurAjouterLivre implements EventHandler<ActionEvent>{
-    
-    private AdminWindow adminWindow;
-    private TextField quantite;
-    private TextField isbn;
-    private TextField titre;
-    private TextField editeur;
-    private TextField datePublication;
-    private TextField prix;
-    private TextField nbPages;
-    private TextField classification;
-    private ChoiceBox<Librairie> librairies;
-        
-    public ControleurAjouterLivre(AdminWindow adminWindow, ChoiceBox<Librairie> librairies, TextField isbn, TextField titre, TextField editeur, TextField datePublication, TextField prix, TextField nbPages, TextField classification, TextField quantite) {
-        this.adminWindow = adminWindow;
-        this.librairies = librairies;
-        this.quantite = quantite;
-
-        this.isbn = isbn;
-        this.titre = titre;
-        this.editeur = editeur;
-        this.datePublication = datePublication;
-        this.prix = prix;
-        this. nbPages = nbPages;
-        this.classification = classification;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 
@@ -79,24 +50,34 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
         }
 
         try {
-
             int idLibVendeur = vendeurWindow.getVendeur().getIdLibrairie();
             Librairie vendeurLib = Reseau.getLibrairie(idLibVendeur);
 
-            Livre livre = vendeurLib.getLivreLib(isbn);
-            vendeurLib.ajouterNouveauLivre(livre, quantite);
+            Livre livre;
+            try {
+                // Essaye d’abord d’obtenir le livre depuis le stock de la librairie
+                livre = vendeurLib.getLivreLib(isbn);
+            } catch (BookNotInStockException e) {
+                // Sinon, tente de le récupérer directement depuis la base de données
+                try {
+                    livre = Reseau.getLivreFromDatabase(isbn);
+                } catch (BookNotInDatabaseException | SQLException ex) {
+                    showAlert(Alert.AlertType.ERROR, "Livre inexistant", "Ce livre n'existe pas dans la base de données.");
+                    return;
+                }
+            }
 
+            // Ajouter le livre à la librairie
+            vendeurLib.ajouterNouveauLivre(livre, quantite);
             showAlert(Alert.AlertType.INFORMATION, "Succès", "Livre ajouté au stock avec succès !");
-        } catch (BookNotInStockException e) {
-            showAlert(Alert.AlertType.ERROR, "Livre introuvable", "Le livre avec cet ISBN n'existe pas dans la base de données.");
+
         } catch (QuantiteInvalideException e) {
             showAlert(Alert.AlertType.ERROR, "Quantité invalide", "La quantité doit être un entier strictement positif.");
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Erreur SQL", "Une erreur est survenue lors de l'accès à la base de données.");
         } catch (LibraryNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Erreur Librairie", "Il y a une erreur lors de l'accès à la librairie du vendeur");
-
+            showAlert(Alert.AlertType.ERROR, "Erreur Librairie", "Erreur lors de l'accès à la librairie du vendeur.");
         }
     }
 

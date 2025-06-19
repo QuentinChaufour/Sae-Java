@@ -37,8 +37,23 @@ public class VendeurWindow extends BorderPane {
         top.setLeft(deconnexion);
         BorderPane.setAlignment(deconnexion, Pos.CENTER_LEFT);
         BorderPane.setMargin(deconnexion, new Insets(5));
+
+        //Titre
+        Label titre = new Label("Livre - Express");
+        titre.setStyle("-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        top.setCenter(titre);
+        BorderPane.setAlignment(titre, Pos.CENTER);
+
+        //LOGO
+        ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/images/logo.png")));
+        logo.setFitHeight(70); 
+        logo.setPreserveRatio(true);
+        top.setRight(logo);
+        BorderPane.setAlignment(logo, Pos.CENTER_RIGHT);
+        BorderPane.setMargin(logo, new Insets(5));
         this.setTop(top);
 
+        
         // LEFT BAR - Infos vendeur
         VBox left = new VBox(15);
         left.setStyle("-fx-background-color: #fafafa; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 0 1px 0 0;");

@@ -31,6 +31,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.sae_java.Modele.Enumerations.EnumPalmares;
 import com.sae_java.Modele.Enumerations.EnumUpdatesDB;
+import com.sae_java.Modele.Exceptions.BookNotInDatabaseException;
 import com.sae_java.Modele.Exceptions.BookNotInStockException;
 import com.sae_java.Modele.Exceptions.LibraryAlreadyExistsException;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
@@ -86,6 +87,27 @@ public class Reseau {
         }
         throw new LibraryNotFoundException();
     }
+
+    public static Livre getLivreFromDatabase(String isbn) throws BookNotInDatabaseException, SQLException {
+        PreparedStatement ps = createStatement("SELECT * FROM LIVRE WHERE isbn = ?");
+        ps.setString(1, isbn);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            String titre = rs.getString("titre");
+            List<Auteur> auteurs = new ArrayList<>();
+            String editeur = rs.getString("nomedit");       
+            int date = rs.getInt("datepubli");               
+            double prix = rs.getDouble("prix");
+            int nbPages = rs.getInt("nbpages");
+            String classification = rs.getString("nomclass");
+
+            return new Livre(isbn, titre, auteurs, editeur, date, prix, nbPages, classification);
+        } else {
+            throw new BookNotInDatabaseException();
+        }
+    }
+
 
     /**
      * met a jour les informations par rapport a la BD
