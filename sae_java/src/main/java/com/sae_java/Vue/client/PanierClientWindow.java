@@ -1,12 +1,17 @@
 package com.sae_java.Vue.client;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.sae_java.Modele.Client;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Vue.ApplicationSAE;
+import com.sae_java.Vue.controleur.ControleurPage;
 import com.sae_java.Modele.Livre;
 
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -35,14 +40,20 @@ public class PanierClientWindow extends BorderPane{
     private Button nextPage;
     private Label prixTot;
     private Label nbElementPanier;
+    private Label pageLabel;
+
+    private int page;
+    private int maxPage;
 
     public PanierClientWindow(ApplicationSAE app) {
         super();
         this.app = app;
+        this.client = this.app.getClient();
+        this.page = 1;
+        this.maxPage = client.getPanier().getContenu().keySet().size();
+
 
         this.setPrefSize(ApplicationSAE.width, ApplicationSAE.height);
-
-        this.client = this.app.getClient();
 
         // init btn
         this.commander = new Button("Commander");
@@ -54,9 +65,20 @@ public class PanierClientWindow extends BorderPane{
 
         this.previousPage = new Button();
         this.previousPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/left_arrow_32px.png"))));
+        this.previousPage.setOnAction(ActionEvent ->  {
+            this.RedcPage();
+            this.majCenter();
+        });
 
         this.nextPage = new Button();
         this.nextPage.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/right_arrow_32px.png"))));
+        this.nextPage.setOnAction(ActionEvent -> {
+            this.IncPage();
+            this.majCenter();
+            ;
+        });
+
+        this.pageLabel = new Label(this.page +"");
 
         // size
 
@@ -88,23 +110,29 @@ public class PanierClientWindow extends BorderPane{
 
         Accordion accordion = new Accordion();
         boolean expanded = true;
-        for (Integer libID : client.getPanier().getContenu().keySet()) {
+        List<Integer> libs = new ArrayList<>(client.getPanier().getContenu().keySet());
 
-            Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
+        for (int i = (this.page - 1) * 5; i < maxPage * 5; i++) {
 
-            try {
-                TitledPane pane = new LibPanierPanel(libID, this.app, livres);
-                if (!expanded) {
-                    pane.setExpanded(true);
-                    expanded = false;
+            if (i < libs.size()) {
+                Integer libID = libs.get(i);
+                Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
+
+                try {
+                    TitledPane pane = new LibPanierPanel(libID, this.app,this, livres);
+                    if (expanded) {
+                        Platform.runLater(() -> pane.setExpanded(true));
+                        expanded = false;
+                    }
+                    accordion.getPanes().add(pane);
+                } catch (LibraryNotFoundException e) {
                 }
-                accordion.getPanes().add(pane);
-            } catch (LibraryNotFoundException e) {
             }
         }
 
         accordion.getPanes().get(0).setExpanded(true);
         accordion.setPrefHeight(ApplicationSAE.height * 0.8);
+        accordion.setStyle("-fx-background-color: #e9e9e9F2; -fx-padding: 40; -fx-spacing: 10;");
 
         this.prixTot.setText("Prix total du panier : " + this.app.getClient().getPanier().getPrixTotal() + " €");
         this.prixTot.setStyle("-fx-font-size: 20");
@@ -125,7 +153,35 @@ public class PanierClientWindow extends BorderPane{
         this.previousPage.setDisable(false);
         this.nextPage.setDisable(false);
 
-        HBox bottom = new HBox(20, this.commander, this.previousPage, this.nextPage, this.home);
+        HBox pageBox = new HBox(10);
+
+        this.pageLabel = new Label(this.page + "");
+        this.pageLabel.setStyle("-fx-font-size:20;-fx-font-weight:bold");
+
+        pageBox.getChildren().addAll(this.previousPage, pageLabel, this.nextPage);
+        pageBox.setAlignment(Pos.CENTER);
+
+        if(ApplicationSAE.lightMode){
+            this.nextPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            this.previousPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            this.nextPage.setOnMouseEntered(e -> {this.nextPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");});
+            this.nextPage.setOnMouseExited(e -> {this.nextPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            this.previousPage.setOnMouseEntered(e -> {this.previousPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");});
+            this.previousPage.setOnMouseExited(e -> {this.previousPage.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            this.pageLabel.setStyle("-fx-font-size : 18; -fx-font-weight: bold");
+            pageBox.setStyle("-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            
+            pageBox.setMaxWidth(ApplicationSAE.width * 0.4);
+            HBox.setMargin(pageBox, new Insets(20,0,5,0));
+        }
+
+        BorderPane.setAlignment(pageBox, Pos.CENTER);
+        VBox.setMargin(pageBox, new Insets(20,0,0,0));
+
+        HBox bottom = new HBox(20, this.commander, pageBox, this.home);
         HBox.setMargin(this.previousPage, new Insets(10, 10, 20, 10));
         HBox.setMargin(this.nextPage, new Insets(10, 10, 20, 10));
         HBox.setMargin(this.commander, new Insets(10, 60, 20, 10));
@@ -164,56 +220,117 @@ public class PanierClientWindow extends BorderPane{
 
 
     public void majCenter(){
+        this.pageLabel.setText(this.page+"");
+
+        VBox center = new VBox(10);
+        center.setAlignment(Pos.CENTER);
+
         Accordion accordion = new Accordion();
-        boolean expanded = false;
-        Map<Integer,Map<Livre,Integer>> content = client.getPanier().getContenu();
+        boolean expanded = true;
+        List<Integer> libs = new ArrayList<>(client.getPanier().getContenu().keySet());
 
-        if(content.isEmpty()){
-            this.initEmptyUI();
-        } 
-        else {
-            for (Integer libID : content.keySet()) {
+        for (int i = (this.page - 1) * 5; i < maxPage * 5; i++) {
 
+            if (i < libs.size()) {
+                Integer libID = libs.get(i);
                 Map<Livre, Integer> livres = client.getPanier().getContenu().get(libID);
 
                 try {
-                    TitledPane pane = new LibPanierPanel(libID, this.app, livres);
-                    BorderPane.setMargin(pane, new Insets(20));
-                    accordion.getPanes().add(pane);
-
-                    if (!expanded) {
-                        accordion.setExpandedPane(pane);
+                    TitledPane pane = new LibPanierPanel(libID, this.app,this, livres);
+                    if (expanded) {
+                        Platform.runLater(() -> pane.setExpanded(true));
+                        expanded = false;
                     }
-
-                } 
-                catch (LibraryNotFoundException e) {
+                    accordion.getPanes().add(pane);
+                } catch (LibraryNotFoundException e) {
                 }
             }
+        }
 
-            BorderPane.setMargin(accordion, new Insets(30, 30, 30, 30));
-            accordion.setStyle("-fx-background-color: #e9e9e9F2; -fx-padding: 40; -fx-spacing: 10;");
-            accordion.setPrefHeight(ApplicationSAE.height * 0.9);
-            this.setStyle("-fx-padding: 10; -fx-hgap: 10; -fx-vgap: 10;");
+        accordion.getPanes().get(0).setExpanded(true);
+        accordion.setPrefHeight(ApplicationSAE.height * 0.8);
+        accordion.setStyle("-fx-background-color: #e9e9e9F2; -fx-padding: 40; -fx-spacing: 10;");
 
-            this.prixTot.setText(this.app.getClient().getPanier().getPrixTotal() + " €");
-            this.nbElementPanier.setText(this.app.getClient().getPanier().getNbElements() + " Livres dans la commande");
+        this.prixTot.setText("Prix total du panier : " + this.app.getClient().getPanier().getPrixTotal() + " €");
+        this.prixTot.setStyle("-fx-font-size: 20");
+        this.nbElementPanier.setText(this.app.getClient().getPanier().getNbElements() + " Livres dans la commande");
+        this.nbElementPanier.setStyle("-fx-font-size: 17");
 
-            this.prixTot.setText("Prix total du panier : " + this.app.getClient().getPanier().getPrixTotal() + " €");
-            this.prixTot.setStyle("-fx-font-size: 18;-fx-font-weight: bold");
-            this.nbElementPanier.setText(this.app.getClient().getPanier().getNbElements() + " Livres dans la commande");
-            this.nbElementPanier.setStyle("-fx-font-size: 18");
+        VBox infoPanier = new VBox(10, this.nbElementPanier, this.prixTot);
+        VBox.setMargin(this.nbElementPanier, new Insets(10, 10, 40, 10));
+        VBox.setMargin(this.prixTot, new Insets(10, 10, 40, 10));
+        infoPanier.setAlignment(Pos.CENTER_RIGHT);
 
-            VBox infoPanier = new VBox(10, this.nbElementPanier, this.prixTot);
-            VBox.setMargin(this.nbElementPanier, new Insets(10, 20, 20, 10));
-            VBox.setMargin(this.prixTot, new Insets(10, 20, 20, 10));
-            infoPanier.setAlignment(Pos.CENTER_RIGHT);
+        VBox centerBox = new VBox(10, accordion, infoPanier);
+        this.setCenter(centerBox);
 
-            this.commander.setDisable(false);
-            this.previousPage.setDisable(false);
-            this.nextPage.setDisable(false);
+        // bottom
 
-            VBox centerBox = new VBox(10, accordion, infoPanier);
-            this.setCenter(centerBox);
+        this.commander.setDisable(false);
+        this.previousPage.setDisable(false);
+        this.nextPage.setDisable(false);
+
+        HBox pageBox = new HBox(10);
+
+        this.pageLabel = new Label(this.page + "");
+        this.pageLabel.setStyle("-fx-font-size:20;-fx-font-weight:bold");
+
+        pageBox.getChildren().addAll(this.previousPage, pageLabel, this.nextPage);
+        pageBox.setAlignment(Pos.CENTER);
+
+        if (ApplicationSAE.lightMode) {
+            this.nextPage.setStyle(
+                    "-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            this.previousPage.setStyle(
+                    "-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            this.nextPage.setOnMouseEntered(e -> {
+                this.nextPage.setStyle(
+                        "-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");
+            });
+            this.nextPage.setOnMouseExited(e -> {
+                this.nextPage.setStyle(
+                        "-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            });
+
+            this.previousPage.setOnMouseEntered(e -> {
+                this.previousPage.setStyle(
+                        "-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");
+            });
+            this.previousPage.setOnMouseExited(e -> {
+                this.previousPage.setStyle(
+                        "-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+            });
+
+            this.pageLabel.setStyle("-fx-font-size : 18; -fx-font-weight: bold");
+            pageBox.setStyle("-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            pageBox.setMaxWidth(ApplicationSAE.width * 0.4);
+            HBox.setMargin(pageBox, new Insets(20, 0, 5, 0));
+        }
+
+        BorderPane.setAlignment(pageBox, Pos.CENTER);
+        VBox.setMargin(pageBox, new Insets(20, 0, 0, 0));
+
+        HBox bottom = new HBox(20, this.commander, pageBox, this.home);
+        HBox.setMargin(this.previousPage, new Insets(10, 10, 20, 10));
+        HBox.setMargin(this.nextPage, new Insets(10, 10, 20, 10));
+        HBox.setMargin(this.commander, new Insets(10, 60, 20, 10));
+        HBox.setMargin(this.home, new Insets(10, 10, 20, 60));
+        bottom.setAlignment(Pos.CENTER);
+
+        this.setBottom(bottom);
+    }
+
+    public void IncPage() {
+        if(this.page < this.maxPage - 1) {
+            this.page++;
+        }
+    }
+
+    public void RedcPage() {
+        if (this.page > 1) {
+            this.page--;
         }
     }
 

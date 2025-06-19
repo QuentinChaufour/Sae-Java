@@ -38,7 +38,6 @@ import javafx.scene.text.FontWeight;
 public class ClientWindow extends BorderPane{
 
     private final ApplicationSAE app;
-    private final PanierClientWindow panier;
     private int page; 
     private int maxPage;
 
@@ -53,8 +52,6 @@ public class ClientWindow extends BorderPane{
         this.page = 1;
 
         Client client = this.app.getClient();
-
-        this.panier = new PanierClientWindow(this.app);
 
         try {
             int size = Reseau.getLibrairie(client.getLibrairie()).consulterStock().size();
@@ -347,6 +344,7 @@ public class ClientWindow extends BorderPane{
         addToPanier.setAlignment(Pos.CENTER_RIGHT);
         addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
         addToPanier.setPrefWidth(ApplicationSAE.width * 0.1);
+        addToPanier.setStyle("-fx-background-color: #9AA6B2");
 
         HBox.setMargin(quantityField, new Insets(5));
         HBox.setMargin(addToPanier, new Insets(5));
@@ -372,7 +370,6 @@ public class ClientWindow extends BorderPane{
         if (this.page > 1) {
             this.page--;
         }
-
     }
 
     public void majPage(){
@@ -394,7 +391,6 @@ public class ClientWindow extends BorderPane{
     }
 
     public void setPanierMenu(){
-        this.panier.majCenter();
-        this.app.getStage().setScene(new Scene(this.panier)); 
+        this.app.getStage().setScene(new Scene(new PanierClientWindow(this.app))); 
     }
 }

@@ -9,6 +9,7 @@ import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
 import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
+import com.sae_java.Vue.controleur.ControleurPanierQte;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ import javafx.scene.text.Font;
 public class LibPanierPanel extends TitledPane{
     
     private ApplicationSAE app;
+    private PanierClientWindow panier;
 
     private int page;
     private int maxPage;
@@ -36,9 +38,10 @@ public class LibPanierPanel extends TitledPane{
     private Button nextPage;
     private Map<Livre,Integer> content;
 
-    public LibPanierPanel(int idLib,ApplicationSAE app,Map<Livre,Integer> content) throws LibraryNotFoundException{
+    public LibPanierPanel(int idLib,ApplicationSAE app,PanierClientWindow panier,Map<Livre,Integer> content) throws LibraryNotFoundException{
 
         this.app = app;
+        this.panier = panier;
         this.page = 1;
         this.content = content;
         this.maxPage = content.size()%5 == 0 ? (int)content.size()/5 : (int)Math.ceil(content.size()/5);
@@ -51,7 +54,7 @@ public class LibPanierPanel extends TitledPane{
     }
 
     public void majPanel() throws LibraryNotFoundException{
-        this.setContent(this.createPage());
+        this.panier.majCenter();
     }
 
     public void nextPage(){
@@ -174,8 +177,9 @@ public class LibPanierPanel extends TitledPane{
         addToPanier.setTooltip(new Tooltip("Nombre négatif (-) pour en enlever, positif pour en ajouter"));
         addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
         addToPanier.setAlignment(Pos.CENTER_RIGHT);
-        addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
+        addToPanier.setOnAction(new ControleurPanierQte(this.app,this,quantityField, book));
         addToPanier.setPrefWidth(ApplicationSAE.width * 0.1);
+        addToPanier.setStyle("-fx-background-color: #9AA6B2");
 
         HBox.setMargin(quantityField, new Insets(5));
         HBox.setMargin(addToPanier, new Insets(5));
