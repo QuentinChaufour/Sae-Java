@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.controleur.ControleurPanierQte;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
+import com.sae_java.Vue.ApplicationSAE;
+import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,10 +16,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class LibPanierPanel extends TitledPane{
@@ -44,7 +47,7 @@ public class LibPanierPanel extends TitledPane{
         this.fontProperty().set(Font.font("arial",20));
 
         this.setContent(this.createPage());
-        this.setStyle("-fx-padding: 10; -fx-spacing: 10;");
+        this.setStyle("-fx-padding: 10; -fx-spacing: 10;-fx-background-color : #F8FAFC");
     }
 
     public void majPanel() throws LibraryNotFoundException{
@@ -115,55 +118,73 @@ public class LibPanierPanel extends TitledPane{
     private HBox createBook(Livre book) throws LibraryNotFoundException{
         HBox bookBox = new HBox(10);
         HBox infosBookBox = new HBox(10);
-        infosBookBox.setPrefWidth(750);
+        infosBookBox.setPrefWidth(ApplicationSAE.width * 0.65);
+        bookBox.setPrefWidth(ApplicationSAE.width * 0.75);
         infosBookBox.setAlignment(Pos.CENTER_LEFT);
-        bookBox.setStyle("-fx-margin:10 ;-fx-padding: 15;");
-        infosBookBox.setStyle("-fx-margin:10 ;-fx-padding: 10; -fx-background-color: #d7fffb;");
+        
+        if(ApplicationSAE.lightMode){
+            bookBox.setStyle("-fx-margin:5 ;-fx-padding: 10;-fx-background-color: #F8FAFC");
+            bookBox.setEffect(new DropShadow(5, Color.GRAY));
+            infosBookBox.setStyle("-fx-margin:10 ;-fx-padding: 10; -fx-background-color: #F8FAFC");
+        }
 
-        ImageView bookImage = new ImageView(new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
-        bookImage.setFitHeight(64);
-        bookImage.setFitWidth(64);
-        bookImage.setPreserveRatio(true);
-        bookImage.setSmooth(true);
+        ImageView bookImage;
+
+        if (book.getImage() == null) {
+            bookImage = new ImageView(new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
+            bookImage.setFitHeight(96);
+            bookImage.setFitWidth(96);
+            bookImage.setPreserveRatio(true);
+            bookImage.setSmooth(true);
+        }
+        else{
+            bookImage = new ImageView(book.getImage());
+            bookImage.setFitHeight(96);
+            bookImage.setFitWidth(96);
+            bookImage.setPreserveRatio(true);
+            bookImage.setSmooth(true);
+        }
 
         String bookName = book.getTitre();
 
-        if(bookName.length() > 30){
-            bookName = bookName.substring(0, 30);
-            bookName += "...";
+        if(bookName.length() > 60){
+            bookName = bookName.substring(0, 60);
+            bookName += " ...";
         }
 
-        Label bookTitle = new Label("Titre : " + bookName);
-        bookTitle.setPrefWidth(300);
-        Label bookPrice = new Label("Prix : " + book.getPrix() + "€");
-        bookPrice.setPrefWidth(100);
+        Label bookTitle = new Label(bookName);
+        bookTitle.setPrefWidth(ApplicationSAE.width * 0.35);
+        Label bookPrice = new Label("Prix : " + book.getPrix() + " €");
+        bookPrice.setPrefWidth(ApplicationSAE.width * 0.1);
         bookPrice.setAlignment(Pos.CENTER_RIGHT);
-        Label bookStock = new Label("Quantité : " + this.content.get(book));
-        bookStock.setPrefWidth(100);
+        Label bookStock = new Label("Stock : " + Reseau.getLibrairie(this.app.getClient().getLibrairie()).consulterStock().get(book));
+        bookStock.setPrefWidth(ApplicationSAE.width * 0.1);
         bookStock.setAlignment(Pos.CENTER_RIGHT);
 
-        bookTitle.setStyle("-fx-font-size: 16px;");
-        bookPrice.setStyle("-fx-font-size: 14px;");
-        bookStock.setStyle("-fx-font-size: 14px;");
+        bookTitle.setStyle("-fx-font-size: 20px;");
+        bookPrice.setStyle("-fx-font-size: 18px;");
+        bookStock.setStyle("-fx-font-size: 18px;");
 
         TextField quantityField = new TextField();
         quantityField.setPromptText("Quantité");
-        quantityField.setPrefWidth(100);
+        quantityField.setPrefWidth(ApplicationSAE.width * 0.1);
         //quantityField.setAlignment(Pos.CENTER_LEFT);
 
-        Button changeQTE = new Button("Ajouter au panier");
-        changeQTE.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
-        changeQTE.setAlignment(Pos.CENTER_RIGHT);
-        changeQTE.setOnAction(new ControleurPanierQte(this.app, this,quantityField,book));
+        Button addToPanier = new Button("Modifier Quantitée");
+        addToPanier.setTooltip(new Tooltip("Nombre négatif (-) pour en enlever, positif pour en ajouter"));
+        addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
+        addToPanier.setAlignment(Pos.CENTER_RIGHT);
+        addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
+        addToPanier.setPrefWidth(ApplicationSAE.width * 0.1);
 
         HBox.setMargin(quantityField, new Insets(5));
-        HBox.setMargin(changeQTE, new Insets(5));
+        HBox.setMargin(addToPanier, new Insets(5));
         // pop up si nb négatif ou not a number quand ajouter au panier
 
         infosBookBox.getChildren().addAll(bookImage,bookTitle, bookPrice, bookStock);
         infosBookBox.setAlignment(Pos.CENTER_LEFT);
 
-        bookBox.getChildren().addAll(infosBookBox, quantityField, changeQTE);
+        bookBox.getChildren().addAll(infosBookBox, quantityField,addToPanier);
         bookBox.setAlignment(Pos.CENTER);
 
         return bookBox;

@@ -34,6 +34,8 @@ public class ApplicationSAE extends Application {
     public static int height;
     public static int width;
 
+    public static boolean lightMode;
+
     private Connection connection;
 
     @Override
@@ -61,7 +63,8 @@ public class ApplicationSAE extends Application {
 
         // Get width and height
         ApplicationSAE.width = (int)bounds.getWidth();
-        ApplicationSAE.height = (int)bounds.getHeight() - 30;
+        ApplicationSAE.height = (int)bounds.getHeight() - 25;
+        ApplicationSAE.lightMode = true;
     }
     
     @Override

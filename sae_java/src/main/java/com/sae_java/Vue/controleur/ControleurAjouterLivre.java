@@ -9,11 +9,7 @@ import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
 import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.ConsultationLivreWindow;
-import com.sae_java.Vue.FenetreConnexion;
-import com.sae_java.Vue.client.ClientWindow;
 import com.sae_java.Vue.VendeurWindow;
-
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -55,9 +51,7 @@ public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
         try {
 
             int idLibVendeur = vendeurWindow.getVendeur().getIdLibrairie();
-            Librairie vendeurLib = Reseau.getLibrairie(idLib
-            
-            Vendeur);
+            Librairie vendeurLib = Reseau.getLibrairie(idLibVendeur);
 
             Livre livre = vendeurLib.getLivreLib(isbn);
             vendeurLib.ajouterNouveauLivre(livre, quantite);
