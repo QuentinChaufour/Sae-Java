@@ -2,15 +2,17 @@ package com.sae_java.Vue.controleur;
 
 import java.sql.SQLException;
 import java.util.Optional;
+
+import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Vue.AdminWindow;
+import com.sae_java.Vue.admin.AdminWindow;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 
 public class ControleurRetirerLib implements EventHandler<ActionEvent>{

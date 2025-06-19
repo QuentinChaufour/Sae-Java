@@ -1,9 +1,8 @@
 package com.sae_java.Vue.controleur;
 
-import com.sae_java.Vue.AdminWindow;
 import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.FenetreConnexion;
-import com.sae_java.Vue.client.ClientWindow;
+import com.sae_java.Vue.admin.AdminWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
