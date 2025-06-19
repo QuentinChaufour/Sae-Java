@@ -210,7 +210,7 @@ public class AdminWindow extends BorderPane{
         ajouterLivl2.setSpacing(10);
         ajouterLivl2.setAlignment(Pos.CENTER);
         actions.getChildren().add(ajouterLivl2);
-        ajouterLivre.setOnAction(new ControleurAjouterLivre(this, choiceBoxAjouterLivLibrairieAdmin, tfIsbn, tfTtitre, tfEditeur, tfDatePubli, tfPrix, tfNbPages, tfClassification, tfQuantite));
+        ajouterLivre.setOnAction(new ControleurAjouterLivreAdmin(this, choiceBoxAjouterLivLibrairieAdmin, tfIsbn, tfTtitre, tfEditeur, tfDatePubli, tfPrix, tfNbPages, tfClassification, tfQuantite));
         ajouterLiv.getChildren().addAll(ajouterLivText, choiceBoxAjouterLivLibrairieAdmin, labelISBN, tfIsbn, labelTitre, tfTtitre, labelEditeur, tfEditeur, labelDatePubli, tfDatePubli);
         ajouterLivl2.getChildren().addAll(labelPrix, tfPrix, labelNbPages, tfNbPages, labelClassification, tfClassification, labelQuantite, tfQuantite, ajouterLivre);
 

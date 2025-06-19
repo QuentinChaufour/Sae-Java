@@ -7,7 +7,6 @@ import com.sae_java.Modele.Reseau;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 import com.sae_java.Vue.AdminWindow;
 import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.ClientWindow;
 import com.sae_java.Vue.ConsultationLivreWindow;
 import com.sae_java.Vue.FenetreConnexion;
 
