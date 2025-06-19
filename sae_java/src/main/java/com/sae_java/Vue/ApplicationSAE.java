@@ -8,17 +8,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
+
+import com.sae_java.Modele.Client;
+import com.sae_java.Modele.Vendeur;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import com.sae_java.Modele.Client;
 
 public class ApplicationSAE extends Application {
 
@@ -26,9 +29,12 @@ public class ApplicationSAE extends Application {
     private Scene scene;
 
     private Client client;
+    private Vendeur vendeur;
+
+    public static int height;
+    public static int width;
 
     private Connection connection;
-    //private ImageView imageView;
 
     @Override
     public void init(){
@@ -42,13 +48,22 @@ public class ApplicationSAE extends Application {
         }catch (SQLException e) {
             e.printStackTrace();
            }
-     */
+
+        this.vendeur = new Vendeur("Dupont", "Jean", "1234",1, 1);
+
         //this.imageView = new ImageView();
         //this.imageView.setFitWidth(200);
         //this.imageView.setFitHeight(200);
+        */
 
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+
+        // Get width and height
+        ApplicationSAE.width = (int)bounds.getWidth();
+        ApplicationSAE.height = (int)bounds.getHeight() - 30;
     }
-
+    
     @Override
     public void start(Stage stage){
 
@@ -147,6 +162,10 @@ public class ApplicationSAE extends Application {
 
     public void setClient(Client client){
         this.client = client;
+    }
+
+     public Vendeur getVendeur() {
+        return this.vendeur;
     }
 
     public void loadIdentification(){

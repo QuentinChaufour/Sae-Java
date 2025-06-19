@@ -8,6 +8,7 @@ import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Vue.controleur.ControleurAjouterLivre;
+import com.sae_java.Vue.controleur.ControleurAjouterLivreTab;
 import com.sae_java.Vue.controleur.ControleurDeconnexion;
 import com.sae_java.Vue.controleur.ControleurRetirerLivre;
 import com.sae_java.Vue.controleur.ControleurRetourAdmin;
@@ -36,7 +37,7 @@ public class ConsultationLivreWindow extends BorderPane{
         this.minWidthProperty().set(1800);
 
         BorderPane top = new BorderPane();
-        Text titre = new Text("Consultation des livres de la librairie : ");
+        Text titre = new Text("Consultation des livres de la librairie : " + this.librairie.getNom());
         titre.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
         Button boutonDeconnexion = new Button("Retour");
         boutonDeconnexion.setAlignment(Pos.CENTER_LEFT);
@@ -83,7 +84,7 @@ public class ConsultationLivreWindow extends BorderPane{
             Text titree = new Text(livre.getTitre());
             Text quantite = new Text(""+stocks.get(livre));
             Button ajouter = new Button("Ajouter un livre");
-            ajouter.setOnAction(new ControleurAjouterLivre(this.app, this, 1, livre));
+            ajouter.setOnAction(new ControleurAjouterLivreTab(this, 1, livre));
             Button retirer = new Button("Retirer un livre");
             retirer.setOnAction(new ControleurRetirerLivre(this.app, this, 1, livre));
 
