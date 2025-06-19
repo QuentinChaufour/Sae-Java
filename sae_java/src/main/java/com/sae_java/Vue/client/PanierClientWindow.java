@@ -6,12 +6,10 @@ import java.util.Map;
 
 import com.sae_java.Modele.Client;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.controleur.ControleurPage;
 import com.sae_java.Modele.Livre;
+import com.sae_java.Vue.ApplicationSAE;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -52,7 +50,7 @@ public class PanierClientWindow extends BorderPane{
         this.page = 1;
         this.maxPage = client.getPanier().getContenu().keySet().size();
 
-
+        this.setStyle("-fx-background-color : #F5F5F5");
         this.setPrefSize(ApplicationSAE.width, ApplicationSAE.height);
 
         // init btn

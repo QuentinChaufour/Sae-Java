@@ -341,7 +341,7 @@ public class ClientWindow extends BorderPane{
 
         Button addToPanier = new Button("Ajouter au panier");
         addToPanier.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/ajout_16px.png"))));
-        addToPanier.setAlignment(Pos.CENTER_RIGHT);
+        addToPanier.setAlignment(Pos.CENTER);
         addToPanier.setOnAction(new ControleurAddBookToPanier(this.app, book, quantityField));
         addToPanier.setPrefWidth(ApplicationSAE.width * 0.1);
         addToPanier.setStyle("-fx-background-color: #9AA6B2");

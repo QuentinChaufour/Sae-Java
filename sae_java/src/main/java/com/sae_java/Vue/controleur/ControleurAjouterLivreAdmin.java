@@ -2,18 +2,13 @@ package com.sae_java.Vue.controleur;
 
 import java.sql.SQLException;
 
+import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
-import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
-import com.sae_java.Vue.AdminWindow;
-import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.ConsultationLivreWindow;
-import com.sae_java.Vue.FenetreConnexion;
+import com.sae_java.Vue.admin.AdminWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 

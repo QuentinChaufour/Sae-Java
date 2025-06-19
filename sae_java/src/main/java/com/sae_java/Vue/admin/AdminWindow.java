@@ -1,4 +1,20 @@
-package com.sae_java.Vue;
+package com.sae_java.Vue.admin;
+
+import com.sae_java.Modele.Librairie;
+import com.sae_java.Modele.Reseau;
+import com.sae_java.Vue.ApplicationSAE;
+import com.sae_java.Vue.controleur.ControleurAffichageAjouterLib;
+import com.sae_java.Vue.controleur.ControleurAffichageAjouterLivre;
+import com.sae_java.Vue.controleur.ControleurAffichageConsulterLivres;
+import com.sae_java.Vue.controleur.ControleurAffichageRetirerLib;
+import com.sae_java.Vue.controleur.ControleurAffichageTransfererLivre;
+import com.sae_java.Vue.controleur.ControleurAjouterLib;
+import com.sae_java.Vue.controleur.ControleurAjouterLivreAdmin;
+import com.sae_java.Vue.controleur.ControleurConsultationLivres;
+import com.sae_java.Vue.controleur.ControleurDeconnexion;
+import com.sae_java.Vue.controleur.ControleurGraphiqueWindow;
+import com.sae_java.Vue.controleur.ControleurRetirerLib;
+import com.sae_java.Vue.controleur.ControleurTransfererLiv;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,9 +32,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import com.sae_java.Vue.controleur.*;
-import com.sae_java.Modele.Librairie;
-import com.sae_java.Modele.Reseau;
 
 public class AdminWindow extends BorderPane{
     private final ApplicationSAE app;
@@ -36,12 +49,11 @@ public class AdminWindow extends BorderPane{
         Text titre = new Text("Tableau de bord : Livre Express");
         titre.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
         Button boutonDeconnexion = new Button("Deconnexion");
-        boutonDeconnexion.setAlignment(Pos.CENTER_LEFT);
-        ImageView imageMaison = new ImageView(new Image("file:./src/main/resources/images/deconnexion_32px.png")); 
+        ImageView imageMaison = new ImageView(new Image(getClass().getResourceAsStream("/images/deconnexion_32px.png"))); 
         boutonDeconnexion.setGraphic(imageMaison);
         boutonDeconnexion.setOnAction(new ControleurDeconnexion(app));
         Button boutonGraphique = new Button("Graphiques");
-        ImageView imageGraphique = new ImageView(new Image("file:./src/main/resources/images/graphique.png"));
+        ImageView imageGraphique = new ImageView(new Image(getClass().getResourceAsStream("/images/graphique.png")));
         BorderPane.setMargin(top, new Insets(0, 0, 10, 0));
         boutonGraphique.setOnAction(new ControleurGraphiqueWindow(this.app));
         boutonGraphique.setGraphic(imageGraphique);
@@ -50,6 +62,25 @@ public class AdminWindow extends BorderPane{
         BorderPane.setAlignment(titre, Pos.CENTER);
         BorderPane.setMargin(boutonGraphique, new Insets(5));
         BorderPane.setAlignment(imageGraphique, Pos.CENTER_RIGHT);
+
+        boutonDeconnexion.setFont(Font.font(18));
+        boutonGraphique.setFont(Font.font(18));
+
+        if (ApplicationSAE.lightMode) {
+
+            boutonGraphique.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius:20");
+            boutonDeconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            boutonGraphique.setOnMouseEntered(e -> {boutonGraphique.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color :  #9AA6B2;-fx-background-radius: 20");});
+            boutonGraphique.setOnMouseExited(e -> {boutonGraphique.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            boutonDeconnexion.setOnMouseEntered(e -> {boutonDeconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color :#ffa5a5;-fx-background-radius: 20");});
+            boutonDeconnexion.setOnMouseExited(e -> {boutonDeconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+
+            boutonDeconnexion.setPrefWidth(ApplicationSAE.width * 0.2);
+            boutonGraphique.setPrefWidth(ApplicationSAE.width * 0.2);
+        }
+
         top.setLeft(boutonDeconnexion);
         top.setCenter(titre);
         top.setRight(boutonGraphique);
@@ -81,6 +112,14 @@ public class AdminWindow extends BorderPane{
         ajouterLivre.setPrefHeight(40);
         ajouterLivre.setOnAction(new ControleurAffichageAjouterLivre(this));
         actions.getChildren().addAll(actionsReseau, ajouteLibrairie, retirerLibrairie, transfererLiv, consulterLivres, ajouterLivre);
+
+        actions.setAlignment(Pos.CENTER);
+        actions.setPrefWidth(ApplicationSAE.width * 0.2);
+
+        if(ApplicationSAE.lightMode){
+            actions.setStyle("-fx-margin: 15;-fx-padding: 15; -fx-background-color: #9AA6B2;-fx-background-radius: 0 20 0 0");
+        }
+
         this.centre.getChildren().add(actions);
         this.setCenter(this.centre);
     }

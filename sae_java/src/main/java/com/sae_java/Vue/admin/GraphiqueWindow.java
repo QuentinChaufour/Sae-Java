@@ -1,16 +1,16 @@
-package com.sae_java.Vue;
+package com.sae_java.Vue.admin;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 import com.sae_java.Modele.Auteur;
+import com.sae_java.Modele.Enumerations.EnumPalmares;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Enumerations.EnumPalmares;
+import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.controleur.ControleurCaByLibrairie;
 import com.sae_java.Vue.controleur.ControleurPalmaresAuteur;
 import com.sae_java.Vue.controleur.ControleurPalmaresLibrairie;
@@ -48,14 +48,23 @@ public class GraphiqueWindow extends BorderPane{
         this.minWidthProperty().set(ApplicationSAE.width);
 
         BorderPane top = new BorderPane();
-        Text titre = new Text("Consultation des livres de la librairie : ");
+        Text titre = new Text("Consultation des statistiques");
         titre.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
         Button boutonDeconnexion = new Button("Retour");
         boutonDeconnexion.setAlignment(Pos.CENTER_LEFT);
         boutonDeconnexion.setOnAction(new ControleurRetourAdmin(app));
+        if (ApplicationSAE.lightMode) {
+
+            boutonDeconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            boutonDeconnexion.setOnMouseExited(e -> {boutonDeconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+            boutonDeconnexion.setOnMouseEntered(e -> {boutonDeconnexion.setStyle("-fx-margin: 20; -fx-padding: 15;-fx-background-color :#9AA6B2;-fx-background-radius: 20");});
+
+            boutonDeconnexion.setPrefWidth(ApplicationSAE.width * 0.2);
+        }
+
         BorderPane.setMargin(top, new Insets(0, 0, 10, 0));
-        BorderPane.setMargin(boutonDeconnexion, new Insets(5));
-        BorderPane.setAlignment(boutonDeconnexion, Pos.CENTER_LEFT);
+        BorderPane.setMargin(boutonDeconnexion, new Insets(10,10,10,40));
         BorderPane.setAlignment(titre, Pos.CENTER);
         top.setLeft(boutonDeconnexion);
         top.setCenter(titre);
@@ -83,12 +92,15 @@ public class GraphiqueWindow extends BorderPane{
         boutonCAByLibrairie.setOnAction(new ControleurCaByLibrairie(this, choiceBoxType));
 
         options.getChildren().addAll(titreGraphique, boutonPalmaresLivre, boutonPalmaresLibrairie, boutonPalmaresAuteur, boutonCAByLibrairie, titreType, choiceBoxType);
+        options.setAlignment(Pos.CENTER);
+        if(ApplicationSAE.lightMode){
+            options.setStyle("-fx-margin: 15;-fx-padding: 15; -fx-background-color: #9AA6B2;-fx-background-radius: 0 20 0 0");
+        }
 
+        options.setPrefWidth(ApplicationSAE.width * 0.2);
         this.setLeft(options);
 
-        
-
-        
+        boutonCAByLibrairie.fire();
     }   
 
     public VBox CAByLibrairieCambembert(){
