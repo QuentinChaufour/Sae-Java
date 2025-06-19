@@ -14,37 +14,10 @@ import com.sae_java.Vue.VendeurWindow;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
-public class ControleurAjouterLivre implements EventHandler<ActionEvent>{
-    
-    private AdminWindow adminWindow;
-    private TextField quantite;
-    private TextField isbn;
-    private TextField titre;
-    private TextField editeur;
-    private TextField datePublication;
-    private TextField prix;
-    private TextField nbPages;
-    private TextField classification;
-    private ChoiceBox<Librairie> librairies;
-        
-    public ControleurAjouterLivre(AdminWindow adminWindow, ChoiceBox<Librairie> librairies, TextField isbn, TextField titre, TextField editeur, TextField datePublication, TextField prix, TextField nbPages, TextField classification, TextField quantite) {
-        this.adminWindow = adminWindow;
-        this.librairies = librairies;
-        this.quantite = quantite;
-
-        this.isbn = isbn;
-        this.titre = titre;
-        this.editeur = editeur;
-        this.datePublication = datePublication;
-        this.prix = prix;
-        this. nbPages = nbPages;
-        this.classification = classification;
-
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
 
 public class ControleurAjouterLivre implements EventHandler<ActionEvent> {
 
