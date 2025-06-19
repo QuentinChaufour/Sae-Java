@@ -1,26 +1,17 @@
 package com.sae_java.Vue.controleur;
 
 import java.sql.SQLException;
-import java.text.ChoiceFormat;
 import java.util.Optional;
-
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Modele.Reseau;
-import com.sae_java.Modele.Enumerations.EnumUpdatesDB;
-import com.sae_java.Modele.Exceptions.LibraryAlreadyExistsException;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
-import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 import com.sae_java.Vue.AdminWindow;
-import com.sae_java.Vue.ApplicationSAE;
-
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
 
 public class ControleurRetirerLib implements EventHandler<ActionEvent>{
     
@@ -39,7 +30,7 @@ public class ControleurRetirerLib implements EventHandler<ActionEvent>{
         if(reponse.isPresent() && reponse.get().equals(ButtonType.YES)){
             try {
                 Reseau.removeLibrairie(Reseau.getLibrairie(this.librairies.getValue().getId()));
-                this.adminWindow.setCenter(this.adminWindow.majAffichage());
+                this.adminWindow.getCentre().getChildren().set(1, this.adminWindow.affichageRetirerLib());
             } catch (SQLException e) {
                 System.err.println("connection SQL échoué");
             } catch (LibraryNotFoundException e) {

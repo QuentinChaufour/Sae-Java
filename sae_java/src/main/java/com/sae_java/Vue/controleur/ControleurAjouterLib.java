@@ -48,7 +48,7 @@ public class ControleurAjouterLib implements EventHandler<ActionEvent>{
             } catch (LibraryAlreadyExistsException e) {
                 System.err.println("La librairie existe déja");
             }
-            this.adminWindow.setCenter(this.adminWindow.majAffichage());
+            this.adminWindow.getCentre().getChildren().set(1, this.adminWindow.affichageAjouterLib());
         }
     }    
 }
