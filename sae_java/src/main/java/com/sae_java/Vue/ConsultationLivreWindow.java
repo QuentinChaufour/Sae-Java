@@ -33,8 +33,8 @@ public class ConsultationLivreWindow extends BorderPane{
         this.app = app;
         this.librairie = librairie;
 
-        this.minHeightProperty().set(900);
-        this.minWidthProperty().set(1800);
+        this.minHeightProperty().set(ApplicationSAE.height);
+        this.minWidthProperty().set(ApplicationSAE.width);
 
         BorderPane top = new BorderPane();
         Text titre = new Text("Consultation des livres de la librairie : " + this.librairie.getNom());

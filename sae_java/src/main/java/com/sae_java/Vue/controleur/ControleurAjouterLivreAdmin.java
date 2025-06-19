@@ -56,6 +56,6 @@ public class ControleurAjouterLivreAdmin implements EventHandler<ActionEvent>{
             System.err.println("SQL pas bon");
             e.printStackTrace();
         }
-            this.adminWindow.setCenter(this.adminWindow.majAffichage());
+            this.adminWindow.getCentre().getChildren().set(1, this.adminWindow.affichageAjouterLivre());
     }
 }
