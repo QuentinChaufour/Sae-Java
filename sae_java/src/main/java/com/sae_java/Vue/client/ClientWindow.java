@@ -29,6 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -65,10 +66,6 @@ public class ClientWindow extends BorderPane{
         
         this.minHeightProperty().set(ApplicationSAE.height);
         this.minWidthProperty().set(ApplicationSAE.width);
-
-        if(ApplicationSAE.lightMode){
-            this.setStyle("-fx-background-color : #F8FAFC");
-        }
 
         // top of the borderPane
 
@@ -116,8 +113,6 @@ public class ClientWindow extends BorderPane{
 
             deconnexion.setPrefWidth(ApplicationSAE.width * 0.2);
             panierBtn.setPrefWidth(ApplicationSAE.width * 0.2);
-
-            top.setStyle("-fx-background-color : #D9EAFD");
         }
 
 
@@ -178,27 +173,39 @@ public class ClientWindow extends BorderPane{
         });
 
         ToggleButton switchTheme = new ToggleButton("light mode");
-        BorderPane.setAlignment(switchTheme, Pos.BASELINE_CENTER);
+        BorderPane.setAlignment(switchTheme, Pos.BOTTOM_CENTER);
         if(ApplicationSAE.lightMode){
             switchTheme.setStyle("-fx-background-color: #F9FAFC");
         }
 
         switchTheme.setOnAction((ActionEvent) -> {
             if(ApplicationSAE.lightMode){
-                switchTheme.setStyle("-fx-background-color: #24232A");
+                switchTheme.setStyle("-fx-background-color: #24232A;-fx-text-fill: #FFFFFF");
                 ApplicationSAE.lightMode = false;
+                switchTheme.setText("dark mode");
             }
             else{
-                switchTheme.setStyle("-fx-background-color: #F9FAFC");
+                switchTheme.setStyle("-fx-background-color: #F9FAFC;-fx-text-fill: #000000");
                 ApplicationSAE.lightMode = true;
+                switchTheme.setText("light mode");
             }
         });
 
-        left.getChildren().addAll(clientInfo,recommandation, changerInfos, changeLibPane,switchTheme);
+        VBox.setMargin(clientInfo, new Insets(10));
+        VBox.setMargin(recommandation, new Insets(10));
+        VBox.setMargin(changerInfos, new Insets(10));
+        VBox.setMargin(changeLibPane, new Insets(10));
+
+        VBox actions = new VBox(clientInfo,recommandation, changerInfos, changeLibPane);
+        VBox.setVgrow(actions, Priority.ALWAYS);
+
+        switchTheme.setPrefWidth(ApplicationSAE.width * 0.1);
+
+        left.getChildren().addAll(actions,switchTheme);
         left.setPrefWidth(ApplicationSAE.width * 0.15);
 
         if(ApplicationSAE.lightMode){
-            left.setStyle("-fx-margin: 15;-fx-padding: 15; -fx-background-color: #9AA6B2;-fx-background-radius: 0 20 20 0");
+            left.setStyle("-fx-margin: 15;-fx-padding: 15; -fx-background-color: #9AA6B2;-fx-background-radius: 0 20 0 0");
         }
 
         this.setLeft(left);
@@ -227,7 +234,7 @@ public class ClientWindow extends BorderPane{
         VBox center = new VBox(10);
 
         for(int i = ( page - 1)*5;i< page*5;i++){
-            if(i<livres.size()){
+            if (i < livres.size()) {
                 HBox book = this.createBook(livres.get(i));
                 HBox.setMargin(book, new Insets(20));
                 center.getChildren().add(book);

@@ -195,7 +195,7 @@ public class Client extends Personne{
      *  permet a un client de passer commande de son panier
      * @return si les commandes ont été éffectué mais pas si elles étaient correctent
      */
-    public boolean commander(String modeLivraison,boolean enligne,boolean faireFacture) {
+    public boolean commander(String modeLivraison,boolean enligne,boolean faireFacture,String folder) {
 
         // assurer que les stocks sont a jour
         Reseau.updateInfos(EnumUpdatesDB.STOCKS);
@@ -211,7 +211,7 @@ public class Client extends Personne{
             Reseau.updateInfos(EnumUpdatesDB.STOCKS);
 
             if(faireFacture){
-                Reseau.createBillPDF(commandes, this, "."); // current directory
+                Reseau.createBillPDF(commandes, this, folder); // current directory
             }
 
         } else {

@@ -1,5 +1,7 @@
 package com.sae_java.Vue.controleur;
 
+import java.io.File;
+
 import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.client.CommandeWindow;
 
@@ -7,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.DirectoryChooser;
 
 public class ControleurCommander implements EventHandler<ActionEvent>{
     
@@ -23,7 +26,20 @@ public class ControleurCommander implements EventHandler<ActionEvent>{
         
         Alert alert = new Alert(AlertType.INFORMATION);
 
-        if(this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(), this.commande.getFacture())){
+        boolean facture = this.commande.getFacture();
+        boolean commandeWorked = true;
+
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDirectory = directoryChooser.showDialog(this.app.getStage());
+        if (selectedDirectory == null) {
+            commandeWorked = this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(), false,"");
+        }
+        else{
+            commandeWorked = this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(), facture,selectedDirectory.getAbsolutePath());
+        }
+
+
+        if(commandeWorked){
             alert.setContentText("La commande a été passé avec succès");
         }
         else{

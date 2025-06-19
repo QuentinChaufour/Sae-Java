@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,7 +28,6 @@ import javafx.scene.text.Text;
 public class CommandeWindow extends BorderPane{
  
     private ApplicationSAE app;
-    private PanierClientWindow panier;
 
     private RadioButton aDomicile;
     private RadioButton enLibrairie;
@@ -37,10 +35,11 @@ public class CommandeWindow extends BorderPane{
     private RadioButton enLigne;
     private RadioButton facture;
     private RadioButton noFacture;
+
+    private Button selectPath;
     
-    public CommandeWindow(ApplicationSAE app,PanierClientWindow panier){
+    public CommandeWindow(ApplicationSAE app){
         this.app = app;
-        this.panier = panier;
         this.setStyle("-fx-background-color : #333333");
 
         this.setPrefSize(ApplicationSAE.width, ApplicationSAE.height);
@@ -105,6 +104,7 @@ public class CommandeWindow extends BorderPane{
         enLibrairie.setToggleGroup(radio);
 
         HBox radioLivraison = new HBox(10,aDomicile,enLibrairie);
+        radioLivraison.setAlignment(Pos.CENTER);
         TitledPane chooseLivraison = new TitledPane("Choix de livraison",radioLivraison);
 
 
@@ -117,6 +117,7 @@ public class CommandeWindow extends BorderPane{
         enLigne.setToggleGroup(radioEnLigneToggle);
 
         HBox radioEnLigne = new HBox(10, enLibrairieC, enLigne);
+        radioEnLigne.setAlignment(Pos.CENTER);
         TitledPane chooseEnLigne = new TitledPane("Type de Commande", radioEnLigne);
         chooseEnLigne.setExpanded(true);
         chooseEnLigne.setCollapsible(false);
@@ -129,10 +130,11 @@ public class CommandeWindow extends BorderPane{
         this.facture = new RadioButton("Faire facture");
         this.noFacture = new RadioButton("Sans facture");
 
-        aDomicile.setToggleGroup(radioFactureGroup);
-        enLibrairie.setToggleGroup(radioFactureGroup);
+        this.facture.setToggleGroup(radioFactureGroup);
+        this.noFacture.setToggleGroup(radioFactureGroup);
 
         HBox radioFacture = new HBox(10, facture, noFacture);
+        radioFacture.setAlignment(Pos.CENTER);
         TitledPane chooseFacture = new TitledPane("Choix de livraison", radioFacture);
         chooseFacture.setCollapsible(false);
 
