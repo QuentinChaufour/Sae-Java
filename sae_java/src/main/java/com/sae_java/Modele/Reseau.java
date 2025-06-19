@@ -918,4 +918,37 @@ public class Reseau {
         }
     }
 
+
+        /**
+     * trouve un client depuis son Id dans la BD
+     * @param idClient int
+     * @throws SQLException
+     */
+    public static Client trouverClient(int idClient) throws SQLException{
+        try{
+            String sql = "SELECT * FROM CLIENT WHERE idcli = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, idClient);  // Injection du paramètre dans la requête
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) { // Exemple de traitement : affichage des infos du client
+                String nom = rs.getString("nomcli");
+                String prenom = rs.getString("prenomcli");
+                String mdp = rs.getString("motdepassecli");
+                String adresse = rs.getString("adresseCli");
+                String codePostal = rs.getString("codepostal");
+                String ville = rs.getString("villecli");
+                Client monClient = new Client(nom,prenom,mdp,idClient,adresse,codePostal,ville,2);
+                System.out.println("Client trouvé : " + nom + " " + prenom);
+                return monClient;
+            }else {
+                System.out.println("Aucun client trouvé avec l'ID : " + idClient);
+            }  
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+
+
+
