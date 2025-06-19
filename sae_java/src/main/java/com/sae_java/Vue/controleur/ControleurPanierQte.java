@@ -28,20 +28,20 @@ public class ControleurPanierQte implements EventHandler<ActionEvent>{
     @Override
     public void handle(ActionEvent e){
         try {
-                Integer qte = Integer.parseInt(this.qteField.getText());
-                if(qte < 0){
-                    this.app.getClient().retirerDuPanier(book, this.app.getClient().getLibrairie(), Math.abs(qte));
-                    this.qteField.setStyle("");
-                    this.panel.majPanel();
-                }
-                else{
-                    this.app.getClient().ajouterAuPanier(book, this.app.getClient().getLibrairie(), Math.abs(qte));
-                    this.qteField.setStyle("");
-                    this.panel.majPanel();
-                }
-            } 
-            catch (NumberFormatException | NullPointerException | PasAssezDeStockException | QuantiteInvalideException | LibraryNotFoundException ex) {
-                this.qteField.setStyle("-fx-border-color: red; -fx-border-width: 1px");
+            Integer qte = Integer.parseInt(this.qteField.getText().trim());
+            if(qte < 0){
+                this.app.getClient().retirerDuPanier(book, this.app.getClient().getLibrairie(), -qte);
+                this.qteField.setStyle("");
+                this.panel.majPanel();
             }
+            else{
+                this.app.getClient().ajouterAuPanier(book, this.app.getClient().getLibrairie(), qte);
+                this.qteField.setStyle("");
+                this.panel.majPanel();
+            }
+        } 
+        catch (NumberFormatException | NullPointerException | PasAssezDeStockException | QuantiteInvalideException | LibraryNotFoundException ex) {
+            this.qteField.setStyle("-fx-border-color: red; -fx-border-width: 1px");
+        }
     }
 }
