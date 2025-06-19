@@ -14,39 +14,35 @@ import com.sae_java.Modele.Librairie;
 import com.sae_java.Vue.ApplicationSAE;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 public class ControleurTransfererLiv implements EventHandler<ActionEvent>{
     
-    private final ApplicationSAE app;
     private TextField isbn;
-    private TextField idSrc;
-    private TextField idTgt;
+    private ChoiceBox<Librairie> librairiesSrc;
+    private ChoiceBox<Librairie> librairiesTgt;
     private TextField qte;
     
-    public ControleurTransfererLiv(ApplicationSAE app, TextField isbn, TextField idSrc, TextField idTgt, TextField qte){
-        this.app = app;
+    public ControleurTransfererLiv(TextField isbn, ChoiceBox<Librairie> librairiesSrc, ChoiceBox<Librairie> librairiesTgt, TextField qte){
         this.isbn = isbn;
-        this.idSrc = idSrc; 
-        this.idTgt = idTgt;
+        this.librairiesSrc = librairiesSrc; 
+        this.librairiesTgt = librairiesTgt;
         this.qte = qte;
     }
 
     @Override
     public void handle(ActionEvent event) {
-        if(!this.isbn.getText().isEmpty() && !this.idSrc.getText().isEmpty() && !this.idTgt.getText().isEmpty()){
-            Livre liv;
-            Librairie lib;
+        if(!this.isbn.getText().isEmpty() && !this.qte.getText().isEmpty()){
             try {
-                lib = Reseau.getLibrairie(Integer.parseInt(this.idSrc.getText()));
-                liv = lib.getLivreLib(this.isbn.getText());
-                Reseau.transfert(liv, Integer.parseInt(this.qte.getText()), Integer.parseInt(this.idSrc.getText()), Integer.parseInt(this.idTgt.getText()));
+                Livre liv = this.librairiesSrc.getValue().getLivreLib(this.isbn.getText());
+                Reseau.transfert(liv, Integer.parseInt(this.qte.getText()), this.librairiesSrc.getValue().getId(), this.librairiesTgt.getValue().getId());
             } catch (NumberFormatException e) {
                 System.err.println("Mauvais format du nombre");
                 e.printStackTrace();
             } catch (LibraryNotFoundException e) {
                 System.err.println("Librairie non trouvée");
-                e.printStackTrace();
+                e.printStackTrace(); 
             } catch (SQLException e) {
                 System.err.println("Connection SQL non fonctionnelle");
                 e.printStackTrace();
@@ -58,8 +54,6 @@ public class ControleurTransfererLiv implements EventHandler<ActionEvent>{
                 e.printStackTrace();
             }
             this.isbn.setText("");
-            this.idSrc.setText("");
-            this.idTgt.setText("");
             this.qte.setText("");
             
         }

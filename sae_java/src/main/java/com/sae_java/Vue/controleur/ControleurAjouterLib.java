@@ -8,6 +8,7 @@ import com.sae_java.Modele.Enumerations.EnumUpdatesDB;
 import com.sae_java.Modele.Exceptions.LibraryAlreadyExistsException;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 import com.sae_java.Modele.Librairie;
+import com.sae_java.Vue.AdminWindow;
 import com.sae_java.Vue.ApplicationSAE;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,14 +16,14 @@ import javafx.scene.control.TextField;
 
 public class ControleurAjouterLib implements EventHandler<ActionEvent>{
     
-    private final ApplicationSAE app;
     private TextField titre;
     private TextField ville;
+    private AdminWindow adminWindow;
     
-    public ControleurAjouterLib(ApplicationSAE app, TextField titre, TextField ville) {
-        this.app = app;
+    public ControleurAjouterLib(AdminWindow adminWindow, TextField titre, TextField ville) {
         this.titre = titre;
         this.ville = ville;
+        this.adminWindow = adminWindow;
         
     }
 
@@ -47,8 +48,7 @@ public class ControleurAjouterLib implements EventHandler<ActionEvent>{
             } catch (LibraryAlreadyExistsException e) {
                 System.err.println("La librairie existe déja");
             }
-            this.titre.setText("");
-            this.ville.setText("");
+            this.adminWindow.setCenter(this.adminWindow.majAffichage());
         }
     }    
 }
