@@ -4,8 +4,12 @@ import java.util.List;
 
 import com.sae_java.Modele.Livre;
 import com.sae_java.Vue.ApplicationSAE;
+import com.sae_java.Vue.alert.BookInfoAlert;
+import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
+import com.sae_java.Vue.controleur.ControleurAddRecommandation;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -59,6 +63,17 @@ public class RecommandationsWindow extends BorderPane {
         this.addBook.setPrefHeight(0.035 * ApplicationSAE.height);
         this.qteSelector.setPrefHeight(0.035 * ApplicationSAE.height);
 
+        this.addBook.setOnAction(new ControleurAddRecommandation(this.app, this.bookSelection, this.qteSelector));
+        this.moreInfo.setOnAction((ActionEvent) -> {
+            Livre book = this.bookSelection.getValue();
+            if(book.getImage() == null){
+                new BookInfoAlert(book, new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
+            }
+            else{
+                new BookInfoAlert(book, book.getImage());
+            }
+        });
+
         HBox bottom = new HBox(20,this.bookSelection,this.moreInfo,this.qteSelector,this.addBook);
         bottom.setAlignment(Pos.CENTER);
         BorderPane.setMargin(bottom, new Insets(10,10,40,10));
@@ -76,6 +91,14 @@ public class RecommandationsWindow extends BorderPane {
     }
 
     private void initUI(List<Livre> recommandations) {
+
+        HBox top = new HBox(10, this.home);
+        top.setAlignment(Pos.CENTER_RIGHT);
+        this.home.setFont(Font.font("arial", 22));
+
+        this.setTop(top);
+
+        this.bookSelection.setValue(recommandations.get(0));
 
         GridPane center = new GridPane(10,10);
         int nbRecommandation = recommandations.size();

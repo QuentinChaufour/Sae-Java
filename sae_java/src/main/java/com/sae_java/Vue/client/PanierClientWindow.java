@@ -218,7 +218,7 @@ public class PanierClientWindow extends BorderPane{
     }
 
     public void setCommandeMenu(){
-        this.app.getStage().setScene(new Scene(new CommandeWindow(this.app,this)));
+        this.app.getStage().setScene(new Scene(new CommandeWindow(this.app)));
     }
 
     public void setPanierMenu(){

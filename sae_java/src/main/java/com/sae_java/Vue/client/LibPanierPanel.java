@@ -157,7 +157,7 @@ public class LibPanierPanel extends TitledPane{
         Label bookPrice = new Label("Prix : " + book.getPrix() + " €");
         bookPrice.setPrefWidth(ApplicationSAE.width * 0.1);
         bookPrice.setAlignment(Pos.CENTER_RIGHT);
-        Label bookStock = new Label("Stock : " + Reseau.getLibrairie(this.app.getClient().getLibrairie()).consulterStock().get(book));
+        Label bookStock = new Label("Qte : " + this.app.getClient().getPanier().getContenu().get(this.app.getClient().getLibrairie()).get(book));
         bookStock.setPrefWidth(ApplicationSAE.width * 0.1);
         bookStock.setAlignment(Pos.CENTER_RIGHT);
 

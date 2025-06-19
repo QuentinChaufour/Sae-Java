@@ -191,15 +191,15 @@ public class FenetreConnexion {
     }
 
     public String getUserNameField() {
-        return this.userNameField.getText();
+        return this.userNameField.getText().trim();
     }
 
     public String getUserFornameField() {
-        return this.userFornameField.getText();
+        return this.userFornameField.getText().trim();
     }
 
     public String getUserMDpField() {
-        return this.userMDPField.getText();
+        return this.userMDPField.getText().trim();
     }
 
     public Integer getChoiceBoxLibrairieUser() {
@@ -207,23 +207,23 @@ public class FenetreConnexion {
     }
 
     public String getSellerNameField() {
-        return this.sellerNameField.getText();
+        return this.sellerNameField.getText().trim();
     }
 
     public String getSellerFornameField() {
-        return this.sellerFornameField.getText();
+        return this.sellerFornameField.getText().trim();
     }
 
     public String getSellerDMPField() {
-        return this.sellerMDPField.getText();
+        return this.sellerMDPField.getText().trim();
     }
 
     public String getAdminNameField() {
-        return this.adminNameField.getText();
+        return this.adminNameField.getText().trim();
     }
 
     public String getPasswordField() {
-        return this.passwordField.getText();
+        return this.passwordField.getText().trim();
     }
 
     public void errorClient(){

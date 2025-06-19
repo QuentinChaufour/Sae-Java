@@ -6,6 +6,7 @@ import com.sae_java.Modele.Livre;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -14,13 +15,13 @@ import javafx.stage.Stage;
 
 public class BookInfoAlert {
 
-    public BookInfoAlert(Livre livre,ImageView bookImage) {
+    public BookInfoAlert(Livre livre,Image bookImage) {
        
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
 
         BorderPane root = new BorderPane();
-        ImageView imageView = new ImageView(bookImage.getImage());
+        ImageView imageView = new ImageView(bookImage);
         imageView.setFitWidth(50);
         imageView.setFitHeight(100);
         imageView.setPreserveRatio(true);

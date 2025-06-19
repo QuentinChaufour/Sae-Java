@@ -1174,7 +1174,7 @@ public class ApplicationTerminal {
                 }
             }
             else{
-                if(this.client.commander(modeLivraison, enLigne, facture)){
+                if(this.client.commander(modeLivraison, enLigne, facture,".")){
                     System.out.println("La commande a bien été effectué.");
                 }
                 else{
