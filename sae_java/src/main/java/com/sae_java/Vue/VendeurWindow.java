@@ -128,6 +128,7 @@ public class VendeurWindow extends BorderPane {
         styliserChamp(commandeClientId); styliserChamp(commandeIsbn); styliserChamp(commandeQuantite); styliserBouton(commandeBtn);
         commandeInput.getChildren().addAll(new Label("Client ID :"), commandeClientId, new Label("ISBN :"), commandeIsbn, new Label("Quantité :"), commandeQuantite, commandeBtn);
         commandeClient.getChildren().addAll(commandeLabel, commandeInput);
+        commandeBtn.setOnAction(new ControleurPasserCommande(app, this, commandeClientId, commandeIsbn, commandeQuantite));
 
         // Transfert de livre
         VBox transfert = new VBox(10);
