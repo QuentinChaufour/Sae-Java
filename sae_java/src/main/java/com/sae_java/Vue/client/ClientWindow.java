@@ -23,6 +23,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -153,6 +154,7 @@ public class ClientWindow extends BorderPane{
         recommandation.setOnAction(new ControleurRecommandation(this.app));
 
         Button changerInfos = new Button("Update infos");
+        changerInfos.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
 
         VBox changeLibBox = new VBox(10);
         ObservableList<Librairie> libList = FXCollections.observableList(Reseau.librairies);
@@ -175,10 +177,24 @@ public class ClientWindow extends BorderPane{
             changeLibPane.setExpanded(false);
         });
 
-        Button parametres = new Button();
-        parametres.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
+        ToggleButton switchTheme = new ToggleButton("light mode");
+        BorderPane.setAlignment(switchTheme, Pos.BASELINE_CENTER);
+        if(ApplicationSAE.lightMode){
+            switchTheme.setStyle("-fx-background-color: #F9FAFC");
+        }
 
-        left.getChildren().addAll(clientInfo,recommandation, changerInfos, changeLibPane,parametres);
+        switchTheme.setOnAction((ActionEvent) -> {
+            if(ApplicationSAE.lightMode){
+                switchTheme.setStyle("-fx-background-color: #24232A");
+                ApplicationSAE.lightMode = false;
+            }
+            else{
+                switchTheme.setStyle("-fx-background-color: #F9FAFC");
+                ApplicationSAE.lightMode = true;
+            }
+        });
+
+        left.getChildren().addAll(clientInfo,recommandation, changerInfos, changeLibPane,switchTheme);
         left.setPrefWidth(ApplicationSAE.width * 0.15);
 
         if(ApplicationSAE.lightMode){
@@ -202,7 +218,6 @@ public class ClientWindow extends BorderPane{
         this.setCenter(center);
         BorderPane.setMargin(center, new Insets(10,20,10,20));
 
-        // bottom of the borderPane
     }
 
     public VBox createPage(int page) throws LibraryNotFoundException{
@@ -258,6 +273,7 @@ public class ClientWindow extends BorderPane{
         }
 
         BorderPane.setAlignment(pageBox, Pos.CENTER);
+        VBox.setMargin(pageBox, new Insets(20,0,0,0));
         center.getChildren().add(pageBox);
 
         center.setPrefHeight(ApplicationSAE.height * 0.85);
@@ -267,8 +283,8 @@ public class ClientWindow extends BorderPane{
     private HBox createBook(Livre book) throws LibraryNotFoundException{
         HBox bookBox = new HBox(10);
         HBox infosBookBox = new HBox(10);
-        infosBookBox.setPrefWidth(ApplicationSAE.width * 0.65);
-        bookBox.setPrefWidth(ApplicationSAE.width * 0.75);
+        infosBookBox.setPrefWidth(ApplicationSAE.width * 0.6);
+        bookBox.setPrefWidth(ApplicationSAE.width * 0.7);
         infosBookBox.setAlignment(Pos.CENTER_LEFT);
         
         if(ApplicationSAE.lightMode){
@@ -302,7 +318,7 @@ public class ClientWindow extends BorderPane{
         }
 
         Label bookTitle = new Label(bookName);
-        bookTitle.setPrefWidth(ApplicationSAE.width * 0.35);
+        bookTitle.setPrefWidth(ApplicationSAE.width * 0.3);
         Label bookPrice = new Label("Prix : " + book.getPrix() + " €");
         bookPrice.setPrefWidth(ApplicationSAE.width * 0.1);
         bookPrice.setAlignment(Pos.CENTER_RIGHT);
