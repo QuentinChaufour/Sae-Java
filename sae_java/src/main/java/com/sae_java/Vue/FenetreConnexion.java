@@ -7,6 +7,7 @@ import com.sae_java.Vue.controleur.ControleurConnexionClient;
 import com.sae_java.Vue.controleur.ControleurConnexionVendeur;
 import com.sae_java.Vue.controleur.ControleurQuitter;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -51,6 +52,7 @@ public class FenetreConnexion {
         this.app = app;
 
         this.userNameField = new TextField();
+        Platform.runLater(() -> this.userNameField.requestFocus());
         this.userFornameField = new TextField();
         this.userMDPField = new PasswordField();
         
@@ -65,7 +67,9 @@ public class FenetreConnexion {
 
         this.choiceBoxLibrairieUser = new ChoiceBox<>();
         this.choiceBoxLibrairieUser.setItems(libList);
-        this.choiceBoxLibrairieUser.setValue(libList.get(0));
+        if(!libList.isEmpty()){
+            this.choiceBoxLibrairieUser.setValue(libList.get(0));
+        }
 
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #F2F2F2; -fx-padding: 10; -fx-hgap: 10; -fx-vgap: 10;");
@@ -92,7 +96,7 @@ public class FenetreConnexion {
 
         identificationClient.setStyle("-fx-background-color: #FFFFFF; -fx-padding: 10; -fx-spacing: 10;");
 
-        identificationClient.add(new Label("Nom : "),0,0);
+        identificationClient.add(new Label("Nom : "), 0, 0);
         identificationClient.add(this.userNameField, 1, 0);
         identificationClient.add(new Label("Prénom : "), 0, 1);
         identificationClient.add(this.userFornameField, 1, 1);
@@ -145,13 +149,13 @@ public class FenetreConnexion {
 
         // Create TitledPanes with content
         TitledPane paneClient = new TitledPane("Client", identificationClient);
-        paneClient.setStyle("-fx-padding: 10; -fx-spacing: 10;");
+        paneClient.setStyle("-fx-padding: 10; -fx-spacing: 10;-fx-background-radius:10");
 
         TitledPane paneVendeur = new TitledPane("Vendeur", identificationVendeur);
-        paneVendeur.setStyle("-fx-padding: 10; -fx-spacing: 10;");
+        paneVendeur.setStyle("-fx-padding: 10; -fx-spacing: 10;-fx-background-radius:10");
 
         TitledPane paneAdmin = new TitledPane("Admin", identificationAdmin);
-        paneAdmin.setStyle("-fx-padding: 10; -fx-spacing: 10;");
+        paneAdmin.setStyle("-fx-padding: 10; -fx-spacing: 10;-fx-background-radius:10");
 
         // Add TitledPanes to the Accordion
         accordion.getPanes().addAll(paneClient, paneVendeur, paneAdmin);

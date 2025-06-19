@@ -3,9 +3,9 @@ package com.sae_java.Vue.controleur;
 import com.sae_java.Modele.Librairie;
 import com.sae_java.Vue.AdminWindow;
 import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.ClientWindow;
 import com.sae_java.Vue.ConsultationLivreWindow;
 import com.sae_java.Vue.FenetreConnexion;
+import com.sae_java.Vue.client.ClientWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

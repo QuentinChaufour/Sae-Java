@@ -17,9 +17,17 @@ public class Vendeur extends Personne{
         this.idlibrairie = idLib;
     }
 
+    public int getIdVendeur() {
+        return this.idVendeur;
+    }
+
+    public int getIdLibrairie() {
+        return this.idlibrairie;
+    }
+
     public void ajouteLivreStock(Livre livre){        
         try {
-            PreparedStatement ps = Reseau.createStatement("insert into testLIVRE values (?,?,?,?,?,?,?,?)");
+            PreparedStatement ps = Reseau.createStatement("insert into LIVRE values (?,?,?,?,?,?,?,?)");
             ps.setString(1, livre.getIsbn());
             ps.setString(2, livre.getTitre());
             ps.setObject(3, livre.getAuteurs());
@@ -65,7 +73,7 @@ public class Vendeur extends Personne{
         System.out.println("Maxnumcommande1 : " + maxNumCommande);
         try{
             System.out.println("avant createStatement");
-            PreparedStatement statement = Reseau.createStatement("SELECT numcom FROM testCOMMANDE where numcom >= ALL (SELECT numcom FROM testCOMMANDE)");
+            PreparedStatement statement = Reseau.createStatement("SELECT numcom FROM COMMANDE where numcom >= ALL (SELECT numcom FROM COMMANDE)");
             System.out.println("après createStatement");
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -107,7 +115,7 @@ public class Vendeur extends Personne{
         PreparedStatement s;
         try {
             try {
-                s = Reseau.createStatement("SELECT MAX(numcom) FROM testCOMMANDE");
+                s = Reseau.createStatement("SELECT MAX(numcom) FROM COMMANDE");
                 ResultSet rs = s.executeQuery();
                 maxNumCommande = rs.getInt(1)+1;
                 if (rs.next()) {
@@ -143,7 +151,7 @@ public class Vendeur extends Personne{
 
     public Livre transfererLivre(Livre livre, Librairie nouvLibrairie){
         try {
-            PreparedStatement ps1 = Reseau.createStatement("insert into testLIVRE values (?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement ps1 = Reseau.createStatement("insert into LIVRE values (?, ?, ?, ?, ?, ?, ?, ?)");
             ps1.setString(1, livre.getIsbn());
             ps1.setString(2, livre.getTitre());
             ps1.setObject(3, livre.getNbPages());
@@ -158,7 +166,7 @@ public class Vendeur extends Personne{
 
         try {
             
-            PreparedStatement ps2 = Reseau.createStatement("insert into testPOSSEDER values (?, ?, ?)");
+            PreparedStatement ps2 = Reseau.createStatement("insert into POSSEDER values (?, ?, ?)");
             ps2.setInt(1, nouvLibrairie.getId());
             ps2.setString(2, livre.getIsbn());
             ps2.setInt(3, 1);

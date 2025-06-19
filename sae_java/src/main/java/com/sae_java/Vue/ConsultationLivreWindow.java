@@ -84,6 +84,7 @@ public class ConsultationLivreWindow extends BorderPane{
             Text titree = new Text(livre.getTitre());
             Text quantite = new Text(""+stocks.get(livre));
             Button ajouter = new Button("Ajouter un livre");
+
             ajouter.setOnAction(new ControleurAjouterLivreTab(this, 1, livre));
             Button retirer = new Button("Retirer un livre");
             retirer.setOnAction(new ControleurRetirerLivre(this.app, this, 1, livre));

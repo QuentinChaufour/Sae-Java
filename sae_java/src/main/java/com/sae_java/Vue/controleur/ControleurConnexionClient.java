@@ -6,9 +6,9 @@ import com.sae_java.Modele.Client;
 import com.sae_java.Modele.Reseau;
 import com.sae_java.Modele.Exceptions.NoCorrespondingClient;
 import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Vue.ClientWindow;
 import com.sae_java.Vue.FenetreConnexion;
 import com.sae_java.Vue.alert.DBExceptionAlert;
+import com.sae_java.Vue.client.ClientWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -35,7 +35,7 @@ public class ControleurConnexionClient implements EventHandler<ActionEvent>{
             Client client = Reseau.identificationClient(nom, prenom, mdp, lib);
             this.app.setClient(client);
 
-            app.getStage().setScene(new Scene(new ClientWindow(app, app.getClient())));
+            app.getStage().setScene(new Scene(new ClientWindow(app)));
             app.getStage().sizeToScene();
             app.getStage().setTitle("Client Window");
             app.getStage().centerOnScreen();

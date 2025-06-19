@@ -17,7 +17,7 @@ public class ControleurDeconnexion implements EventHandler<ActionEvent>{
     public void handle(ActionEvent event){
 
         this.app.setClient(null);
-
         this.app.loadIdentification();
+        this.app.getStage().setMaximized(false);
     }
 }

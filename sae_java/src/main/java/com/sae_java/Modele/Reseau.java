@@ -1,5 +1,6 @@
 package com.sae_java.Modele;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
@@ -36,6 +37,8 @@ import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Exceptions.NoCorrespondingClient;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 
+import javafx.scene.image.Image;
+
 
 public class Reseau {
 
@@ -65,7 +68,6 @@ public class Reseau {
             System.err.println("Erreur de connexion à la base de données : " + e.getMessage());
             System.exit(2);
         }
-
     }
 
     private Reseau() {} // Constructeur privé pour empêcher l'instanciation de la classe
@@ -455,7 +457,7 @@ public class Reseau {
      * @return LIvre
      * @throws SQLException
      */
-    private static Livre createLivre(String isbn) throws SQLException{
+    public static Livre createLivre(String isbn) throws SQLException{
         
         PreparedStatement statementLivre = Reseau.connection.prepareStatement("SELECT * FROM LIVRE WHERE isbn = ?");
         statementLivre.setString(1, isbn);
@@ -469,8 +471,13 @@ public class Reseau {
         double prix = resultSetLivre.getBigDecimal("prix").doubleValue();
         String nomClass = resultSetLivre.getString("nomclass");
         String nomEdit = resultSetLivre.getString("nomedit");
+        byte[] imageBytes = resultSetLivre.getBytes("img");
+        Image img = null;
+        if(imageBytes != null){
+            img = new Image(new ByteArrayInputStream(imageBytes));
+        }
 
-        Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass);
+        Livre livre = new Livre(isbn, titreLivre, nomEdit, datePubli, prix, nbPages, nomClass,img);
 
         PreparedStatement statementAutor = Reseau.connection.prepareStatement("SELECT * FROM ECRIRE NATURAL JOIN AUTEUR WHERE isbn = ?");
         statementAutor.setString(1, isbn);
@@ -772,36 +779,17 @@ public class Reseau {
      */
     private static <T> Map<T,Integer> getPalmaresLivre(int n) throws SQLException {
 
-        PreparedStatement statement = Reseau.createStatement("SELECT isbn, titre, nomedit, datepubli, prix, nbpages, nomclass,COUNT(numlig) nbCommande FROM COMMANDE NATURAL JOIN DETAILCOMMANDE NATURAL JOIN LIVRE GROUP BY isbn ORDER BY COUNT(numlig) DESC LIMIT ?");
+        PreparedStatement statement = Reseau.createStatement("SELECT isbn,COUNT(numlig) nbCommande FROM COMMANDE NATURAL JOIN DETAILCOMMANDE NATURAL JOIN LIVRE GROUP BY isbn ORDER BY COUNT(numlig) DESC LIMIT ?");
         statement.setInt(1, n);
         ResultSet resultSet = statement.executeQuery();
         Map<T,Integer> livresPalmares = new LinkedHashMap<>();
 
         while (resultSet.next()) {
             String isbn = resultSet.getString("isbn");
-            String titre = resultSet.getString("titre");
-            String nomEdit = resultSet.getString("nomedit");
-            Integer datePubli = resultSet.getInt("datepubli");
-            double prix = resultSet.getBigDecimal("prix").doubleValue();
-            Integer nbPages = resultSet.getInt("nbpages");
-            String nomClass = resultSet.getString("nomclass");
 
             Integer nombreCommandes = resultSet.getInt("nbCommande");
 
-            Livre livre = new Livre(isbn, titre, nomEdit, datePubli, prix, nbPages, nomClass);
-            
-            // Ajout des auteurs
-            PreparedStatement statementAuteur = Reseau.connection.prepareStatement("SELECT * FROM ECRIRE NATURAL JOIN AUTEUR WHERE isbn = ?");
-            statementAuteur.setString(1, isbn);
-            ResultSet resultSetAuteur = statementAuteur.executeQuery();
-
-            while (resultSetAuteur.next()) {
-                String idAuteur = resultSetAuteur.getString("idauteur");
-                String nomPrenom = resultSetAuteur.getString("nomauteur");
-                Integer naissance = resultSetAuteur.getInt("anneenais");
-                Integer deces = resultSetAuteur.getInt("anneedeces");
-                livre.ajouterAuteur(new Auteur(idAuteur, nomPrenom, naissance, deces));
-            }
+            Livre livre = Reseau.createLivre(isbn);
 
             livresPalmares.put((T) livre, nombreCommandes);
         }

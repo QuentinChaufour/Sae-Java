@@ -1505,7 +1505,7 @@ public class ApplicationTerminal {
 
         if(actif){
             try {
-                Livre toAdd = new Livre(isbn, titre, editeur, dtePubli, prix, nbPages, classification);
+                Livre toAdd = new Livre(isbn, titre, editeur, dtePubli, prix, nbPages, classification,null);
                 Librairie lib = Reseau.getLibrairie(librairie);
                 lib.ajouterNouveauLivre(toAdd, qte);
                 System.out.println("Le livre a été ajouté !");

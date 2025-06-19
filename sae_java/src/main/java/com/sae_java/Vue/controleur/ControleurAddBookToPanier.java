@@ -1,9 +1,8 @@
 package com.sae_java.Vue.controleur;
 
-import com.sae_java.Vue.ApplicationSAE;
-import com.sae_java.Modele.Livre;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
-import com.sae_java.Modele.Client;
+import com.sae_java.Modele.Livre;
+import com.sae_java.Vue.ApplicationSAE;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,7 +31,7 @@ public class ControleurAddBookToPanier implements EventHandler<ActionEvent>{
         }
         catch (NumberFormatException | NullPointerException | QuantiteInvalideException ex){
             this.qteField.setText("");
-            this.qteField.setStyle("-fx-border-color: red; -fx-border-width: 1px");       
+            this.qteField.setStyle("-fx-border-color: red; -fx-border-width: 2px");       
         }
     }
 }

@@ -1,10 +1,14 @@
 package com.sae_java.Vue.controleur;
 
+import com.sae_java.Modele.Vendeur;
 import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.FenetreConnexion;
+import com.sae_java.Vue.VendeurWindow;
+import com.sae_java.Vue.client.ClientWindow;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
 
 public class ControleurConnexionVendeur implements EventHandler<ActionEvent>{
     
@@ -18,6 +22,9 @@ public class ControleurConnexionVendeur implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent event) {
-        System.out.println("");
+        app.getStage().setScene(new Scene(new VendeurWindow(app,new Vendeur("Bonjoux", "Lucie", "12 rue des Lilas", 1, 3))));
+        app.getStage().sizeToScene();
+        app.getStage().setTitle("Vendeur Window");
+        app.getStage().centerOnScreen();
     }
 }
