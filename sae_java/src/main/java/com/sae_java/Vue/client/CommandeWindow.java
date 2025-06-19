@@ -38,7 +38,7 @@ public class CommandeWindow extends BorderPane{
     
     public CommandeWindow(ApplicationSAE app){
         this.app = app;
-        this.setStyle("-fx-background-color : #333333");
+        this.setStyle("-fx-background-color : #F5F5F5");
 
         this.setPrefSize(ApplicationSAE.width, ApplicationSAE.height);
 
