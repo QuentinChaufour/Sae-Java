@@ -35,8 +35,6 @@ public class CommandeWindow extends BorderPane{
     private RadioButton enLigne;
     private RadioButton facture;
     private RadioButton noFacture;
-
-    private Button selectPath;
     
     public CommandeWindow(ApplicationSAE app){
         this.app = app;
@@ -98,6 +96,7 @@ public class CommandeWindow extends BorderPane{
         ToggleGroup radio = new ToggleGroup();
 
         this.aDomicile = new RadioButton("A domicile");
+        this.aDomicile.setSelected(true);;
         this.enLibrairie = new RadioButton("En librairie");
 
         aDomicile.setToggleGroup(radio);
@@ -112,6 +111,7 @@ public class CommandeWindow extends BorderPane{
 
         this.enLibrairieC = new RadioButton("En librairie");
         this.enLigne = new RadioButton("En ligne");
+        this.enLigne.setSelected(true);
 
         enLibrairieC.setToggleGroup(radioEnLigneToggle);
         enLigne.setToggleGroup(radioEnLigneToggle);
@@ -129,6 +129,7 @@ public class CommandeWindow extends BorderPane{
 
         this.facture = new RadioButton("Faire facture");
         this.noFacture = new RadioButton("Sans facture");
+        this.noFacture.setSelected(true);
 
         this.facture.setToggleGroup(radioFactureGroup);
         this.noFacture.setToggleGroup(radioFactureGroup);
