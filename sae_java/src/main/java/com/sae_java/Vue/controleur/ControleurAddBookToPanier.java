@@ -24,6 +24,9 @@ public class ControleurAddBookToPanier implements EventHandler<ActionEvent>{
     public void handle(ActionEvent e){
         try{
             Integer qte = Integer.parseInt(this.qteField.getText().trim());
+            if(qte <= 0){
+                throw new QuantiteInvalideException();
+            }
             this.app.getClient().ajouterAuPanier(book, this.app.getClient().getLibrairie(), qte);
 
             this.qteField.setStyle("-fx-border-color: black; -fx-border-width: 0px");

@@ -28,17 +28,17 @@ public class ControleurCommander implements EventHandler<ActionEvent>{
 
         boolean facture = this.commande.getFacture();
         boolean commandeWorked = true;
-
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File selectedDirectory = directoryChooser.showDialog(this.app.getStage());
+        if(facture){
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            File selectedDirectory = directoryChooser.showDialog(this.app.getStage());
         if (selectedDirectory == null) {
             commandeWorked = this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(), false,"");
         }
         else{
             commandeWorked = this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(), facture,selectedDirectory.getAbsolutePath());
         }
-
-
+        }
+        
         if(commandeWorked){
             alert.setContentText("La commande a été passé avec succès");
         }
