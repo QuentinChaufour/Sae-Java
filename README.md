@@ -10,4 +10,4 @@ pour un client : nom : Garcia \
 (ou tout autre client inscrit dans le jeu de données)
 
 pour l'admin : nom : revan\
-               mot de passe : Two_Face
+               mot de passe : mdp
