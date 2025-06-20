@@ -4,6 +4,7 @@ delete from DETAILCOMMANDE;
 delete from COMMANDE;
 delete from POSSEDER;
 delete from LIVRE;
+delete from VENDEUR;
 delete from MAGASIN;
 delete from CLIENT;
 
