@@ -46,6 +46,7 @@ public class FenetreConnexion {
     private PasswordField passwordField;
 
     private ChoiceBox<Librairie> choiceBoxLibrairieUser;
+    private ChoiceBox<Librairie> choiceBoxLibrairieSeller;
 
     public FenetreConnexion(ApplicationSAE app) {
 
@@ -69,6 +70,12 @@ public class FenetreConnexion {
         this.choiceBoxLibrairieUser.setItems(libList);
         if(!libList.isEmpty()){
             this.choiceBoxLibrairieUser.setValue(libList.get(0));
+        }
+
+        this.choiceBoxLibrairieSeller = new ChoiceBox<>();
+        this.choiceBoxLibrairieSeller.setItems(libList);
+        if(!libList.isEmpty()){
+            this.choiceBoxLibrairieSeller.setValue(libList.get(0));
         }
 
         BorderPane root = new BorderPane();
@@ -123,6 +130,8 @@ public class FenetreConnexion {
         identificationVendeur.add(this.sellerFornameField, 1, 1);
         identificationVendeur.add(new Label("Mot de passe : "), 0, 2);
         identificationVendeur.add(this.sellerMDPField, 1, 2);
+        identificationVendeur.add(new Label("Librairie : "), 0, 3);
+        identificationVendeur.add(this.choiceBoxLibrairieSeller, 1, 3);
 
         Button buttonLogginVendeur = new Button("S'identifier");
         buttonLogginVendeur.disableProperty().bind(this.sellerNameField.textProperty().isEmpty(). or (this.sellerFornameField.textProperty().isEmpty()). or (this.sellerMDPField.textProperty().isEmpty()));
@@ -206,6 +215,9 @@ public class FenetreConnexion {
         return this.choiceBoxLibrairieUser.getValue().getId();
     }
 
+    public Integer getChoiceBoxLibrairieSeller() {
+        return this.choiceBoxLibrairieSeller.getValue().getId();
+    }
     public String getSellerNameField() {
         return this.sellerNameField.getText().trim();
     }

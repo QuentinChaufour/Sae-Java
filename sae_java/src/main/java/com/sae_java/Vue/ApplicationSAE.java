@@ -175,6 +175,10 @@ public class ApplicationSAE extends Application {
         return this.vendeur;
     }
 
+    public void setVendeur(Vendeur vendeur){
+        this.vendeur = vendeur;
+    }
+
     public void loadIdentification(){
 
         BorderPane root = new FenetreConnexion(this).getRoot();
