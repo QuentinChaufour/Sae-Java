@@ -74,11 +74,7 @@ public class VendeurWindow extends BorderPane {
             e.printStackTrace();
         }
 
-        Button changerInfos = new Button("Update infos");
-        changerInfos.setStyle("-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
-        changerInfos.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/reglages_32px.png"))));
-
-        left.getChildren().addAll(vendeurInfo, librairieLabel, changerInfos);
+        left.getChildren().addAll(vendeurInfo, librairieLabel);
         this.setLeft(left);
 
         // CENTER - Actions

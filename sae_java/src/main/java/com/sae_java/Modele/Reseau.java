@@ -36,6 +36,7 @@ import com.sae_java.Modele.Exceptions.BookNotInStockException;
 import com.sae_java.Modele.Exceptions.LibraryAlreadyExistsException;
 import com.sae_java.Modele.Exceptions.LibraryNotFoundException;
 import com.sae_java.Modele.Exceptions.NoCorrespondingClient;
+import com.sae_java.Modele.Exceptions.NoCorrespondingVendeur;
 import com.sae_java.Modele.Exceptions.QuantiteInvalideException;
 
 import javafx.scene.image.Image;
@@ -552,6 +553,40 @@ public class Reseau {
         }
         else {
             throw new NoCorrespondingClient("Aucun client ne correspond selon les critères de recherche : " + prenom + " " + nom + " avec comme mot de passe " + motDePasse);
+        }
+        
+    }
+
+        /**
+     * permet d'identifier un vendeur
+     * @param nom String
+     * @param prenom String
+     * @param motDePasse String
+     * @param idLibrary int
+     * @return Vendeur
+     * @throws SQLException
+     * @throws NoCorrespondingVendeur
+     */
+    public static Vendeur identificationVendeur(String nom,String prenom, String motDePasse,Integer idLibrary) throws SQLException, NoCorrespondingVendeur{
+
+        PreparedStatement statement = Reseau.connection.prepareStatement("SELECT * FROM VENDEUR WHERE nomV = ? AND prenomV = ? AND idmag = ?");
+        statement.setString(1, nom);
+        statement.setString(2, prenom);
+        statement.setInt(3, idLibrary);
+        
+        ResultSet resultset = statement.executeQuery();
+        if(resultset.next()){
+
+            int idVendeur = resultset.getInt("numVendeur");
+            String nomVendeur = resultset.getString("nomV");
+            String prenomVendeur = resultset.getString("prenomV");
+            int idLibVendeur = resultset.getInt("idmag");
+            
+            Vendeur vendeur = new Vendeur(nomVendeur, prenomVendeur, motDePasse, idVendeur, idLibVendeur);
+            return vendeur;
+        }
+        else {
+            throw new NoCorrespondingVendeur("Aucun vendeur ne correspond selon les critères de recherche : " + prenom + " " + nom + " avec comme mot de passe " + motDePasse);
         }
         
     }
