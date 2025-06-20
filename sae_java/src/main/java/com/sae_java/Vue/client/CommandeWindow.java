@@ -197,6 +197,6 @@ public class CommandeWindow extends BorderPane{
     }
 
     public void fermer(){
-        this.app.getStage().setScene(new Scene(new PanierClientWindow(this.app)));
+        this.app.getStage().setScene(new Scene(new ClientWindow(this.app)));
     }
 }

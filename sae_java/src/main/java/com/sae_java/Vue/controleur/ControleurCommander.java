@@ -38,6 +38,9 @@ public class ControleurCommander implements EventHandler<ActionEvent>{
             commandeWorked = this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(), facture,selectedDirectory.getAbsolutePath());
         }
         }
+        else{
+            commandeWorked = this.app.getClient().commander(this.commande.getLivraison(), this.commande.getEnLigne(),false, "");
+        }
         
         if(commandeWorked){
             alert.setContentText("La commande a été passé avec succès");
