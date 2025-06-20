@@ -142,9 +142,24 @@ public class CommandeWindow extends BorderPane{
         HBox btn = new HBox(10);
         Button confirm = new Button("Commander");
         confirm.setOnAction(new ControleurCommander(this.app, this));
+        confirm.setStyle("-fx-font-size: 15");
+
+        if(ApplicationSAE.lightMode){
+            confirm.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            confirm.setOnMouseEntered(e -> {confirm.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #9AA6B2;-fx-background-radius: 20");});
+            confirm.setOnMouseExited(e -> {confirm.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+        }
 
         Button stop = new Button("Annuler");
         stop.setOnAction((ActionEvent) -> {this.fermer();});
+
+        if(ApplicationSAE.lightMode){
+            stop.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");
+
+            stop.setOnMouseEntered(e -> {stop.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #ffa5a5;-fx-background-radius: 20");});
+            stop.setOnMouseExited(e -> {stop.setStyle("-fx-margin: 10 50 10 50;-fx-padding: 10;-fx-background-color : #BCCCDC;-fx-background-radius: 20");});
+        }
 
         btn.getChildren().addAll(confirm,stop);
 
@@ -165,12 +180,7 @@ public class CommandeWindow extends BorderPane{
     }
 
     public boolean getFacture(){
-        if(this.facture.isSelected()){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return this.facture.isSelected();
     }
 
     public String getLivraison(){
@@ -183,12 +193,7 @@ public class CommandeWindow extends BorderPane{
     }
 
     public boolean getEnLigne(){
-        if(this.enLibrairieC.isSelected()){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return this.enLigne.isSelected();
     }
 
     public void fermer(){

@@ -5,26 +5,23 @@ import java.util.List;
 import com.sae_java.Modele.Livre;
 import com.sae_java.Vue.ApplicationSAE;
 import com.sae_java.Vue.alert.BookInfoAlert;
-import com.sae_java.Vue.controleur.ControleurAddBookToPanier;
 import com.sae_java.Vue.controleur.ControleurAddRecommandation;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 
 public class RecommandationsWindow extends BorderPane {
 
@@ -100,33 +97,33 @@ public class RecommandationsWindow extends BorderPane {
 
         this.bookSelection.setValue(recommandations.get(0));
 
-        GridPane center = new GridPane(10,10);
-        int nbRecommandation = recommandations.size();
-        center.setAlignment(Pos.CENTER);
+        ScrollPane center = new ScrollPane();
+
         center.setPadding(new Insets(20));
         
-        // amélioration : for qui selon la parité place crée le podium sauf 1 et 10
-        for(int i=1; i<=nbRecommandation;i++){
+        VBox centerContent = new VBox(10);
+        centerContent.setAlignment(Pos.CENTER);
 
-            if(i == 1){
-                Text first = new Text("1. " + recommandations.get(0).getTitre());
-                first.setTextAlignment(TextAlignment.CENTER);
-                center.add(first, 0, 0,3,1);
-                first.setFont(Font.font("arial",20));
+        for(Livre book : recommandations){
+            HBox bookBox = new HBox(10);
+            bookBox.setAlignment(Pos.CENTER_LEFT);
+            Text bookTitle = new Text(book.getTitre());
+            bookTitle.setFont(Font.font("arial", 20));
+            if(book.getImage() != null) {
+                ImageView bookImage = new ImageView(book.getImage());
+                bookImage.setFitHeight(96);
+                bookImage.setFitWidth(96);
+                bookBox.getChildren().add(bookImage);
+            } else {
+                ImageView bookImage = new ImageView(new Image(getClass().getResourceAsStream("/images/insertion_image.png")));
+                bookImage.setFitHeight(96);
+                bookImage.setFitWidth(96);
+                bookBox.getChildren().add(bookImage);
             }
-            else if(i == 10){
-                Text last = new Text("10. " + recommandations.get(0).getTitre());
-                center.add(last, 1,5,3,1);
-                last.setFont(Font.font("arial",15));
-            }
-            else if(i%2 == 0){
-                center.add(new Text(i+". " + recommandations.get(i-1).getTitre()), 0, i-1);
-            }
-            else{
-                center.add(new Text(), 1, i-1);
-                center.add(new Text(i+". " + recommandations.get(i-1).getTitre()), 2, i-1);
-            }
+            bookBox.getChildren().add(bookTitle);
+            centerContent.getChildren().add(bookBox);
         }
+        center.setContent(centerContent);
         this.setCenter(center);       
     }
 
